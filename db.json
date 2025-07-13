@@ -1,0 +1,51 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "12345",
+      "role": "admin",
+      "permissions": [
+        "view_dashboard",
+        "view_products",
+        "edit_product",
+        "delete_product"
+      ]
+    },
+    {
+      "id": 2,
+      "username": "manager",
+      "password": "manager123",
+      "role": "manager",
+      "permissions": ["view_dashboard", "view_products", "edit_product"]
+    },
+    {
+      "id": 3,
+      "username": "user",
+      "password": "user123",
+      "role": "user",
+      "permissions": ["view_dashboard", "view_products"]
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Laptop",
+      "price": 999.99
+      
+    },
+    {
+      "id": 2,
+      "name": "Smartphone",
+      "price": 499.99
+      
+    },
+    {
+      "id": 3,
+      "name": "Coffee Maker",
+      "price": 79.99
+      
+    }
+  ]
+}
+
