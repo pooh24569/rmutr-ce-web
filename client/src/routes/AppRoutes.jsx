@@ -1,4 +1,4 @@
-import Layout from "@/layouts/Layout";
+import Layout from "@/layouts/layout";
 import LayoutAdmin from "@/layouts/LayoutAdmin";
 import About from "@/pages/About";
 import Camping from "@/pages/admin/Camping";
