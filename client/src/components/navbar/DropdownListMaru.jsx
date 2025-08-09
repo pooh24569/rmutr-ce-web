@@ -43,9 +43,12 @@ const DropdownListMaru = () => {
             </DropdownMenuItem>
           );
         })}
-        <SignedOut>
+
+        {/*กรณียังไม่ได้ login*/}
+
+        {/* <SignedOut>
           <DropdownMenuItem>
-            {/*กรณียังไม่ได้ login*/}
+            
             <SignInButton mode="modal">
               <button className="btn btn-primary">Login</button>
             </SignInButton>
@@ -56,8 +59,17 @@ const DropdownListMaru = () => {
               <button className="btn btn-secondary">Register</button>
             </SignUpButton>
           </DropdownMenuItem>
-        </SignedOut>
+        </SignedOut> */}
 
+        {/* ใหม่: ลิงก์ไปเพจของเรา */}
+        <SignedOut>
+          <DropdownMenuItem>
+            <Link to="/login">Login</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link to="/register">Register</Link>
+          </DropdownMenuItem>
+        </SignedOut>
         {/*กรณี login แล้ว*/}
         <SignedIn>
           <DropdownMenuItem>

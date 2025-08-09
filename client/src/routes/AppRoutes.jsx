@@ -6,18 +6,22 @@ import Camping from "@/pages/admin/Camping";
 import Dashboard from "@/pages/admin/Dashboard";
 import Manage from "@/pages/admin/Manage";
 import Home from "@/pages/Home";
+import Login from "@/pages/Login";
 import Notfound from "@/pages/Notfound";
 import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
         {/* Public */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />
+          
         </Route>
 
         {/* Private */}
