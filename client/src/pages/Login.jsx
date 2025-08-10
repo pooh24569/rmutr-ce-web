@@ -14,7 +14,7 @@ export default function Login() {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();ฟ
     if (loading) return;
     setErr("");
     setLoading(true);
