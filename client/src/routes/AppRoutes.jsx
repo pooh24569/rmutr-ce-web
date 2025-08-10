@@ -1,40 +1,45 @@
-import Layout from "@/layouts/layout";
+import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+import Layout from "@/layouts/Layout";
 import LayoutAdmin from "@/layouts/LayoutAdmin";
+import Home from "@/pages/Home";
 import About from "@/pages/About";
-import Camping from "@/pages/admin/Camping";
-
+import Login from "@/pages/Login";
 import Dashboard from "@/pages/admin/Dashboard";
 import Manage from "@/pages/admin/Manage";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
+import Camping from "@/pages/admin/Camping";
 import Notfound from "@/pages/Notfound";
-import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
+function RequireAuth() {
+  const saved = localStorage.getItem("auth");
+  const token = saved ? JSON.parse(saved).token : null;
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
-const AppRoutes = () => {
+export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        {/* Public */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />
-          
         </Route>
-
-        {/* Private */}
-        <Route path="/admin" element={<LayoutAdmin />}>
-          <Route index element={<Dashboard />} />
-          <Route path="manage" element={<Manage />} />
-          <Route path="camping" element={<Camping />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/admin" element={<LayoutAdmin />}>
+            <Route index element={<Dashboard />} />
+            <Route path="manage" element={<Manage />} />
+            <Route path="camping" element={<Camping />} />
+          </Route>
         </Route>
-
         <Route path="*" element={<Notfound />} />
       </Routes>
     </BrowserRouter>
   );
-};
-
-export default AppRoutes;
+}

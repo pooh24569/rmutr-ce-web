@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function Login() {
   const [showPw, setShowPw] = useState(false);
-  const [values, setValues] = useState({ email: "", password: "" });
+  const [values, setValues] = useState({ username: "", password: "" });
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const baseURL = import.meta.env.VITE_API_BASE || "http://localhost:7001";
@@ -20,7 +20,7 @@ export default function Login() {
     setLoading(true);
     try {
       const { data } = await axios.post(`${baseURL}/api/auth/login`, {
-        username: values.email.trim(),
+        username: values.username.trim(),
         password: values.password,
       });
       localStorage.setItem(
@@ -37,31 +37,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
-      {/* WRAPPER: ยึดตำแหน่งฝุ่งรอบการ์ด */}
       <div className="relative">
-        {/* DECOR รอบกรอบ (อยู่วงนอกของการ์ด) */}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
-          {/* ขนาด responsive และยึดจากขอบการ์ดด้วย offset ติดลบ/บวก */}
-          <div
-            className="absolute -top-10 -left-12 h-44 w-44 sm:h-56 sm:w-56 md:h-72 md:w-72
-                       rounded-full blur-2xl opacity-100
-                       bg-gradient-to-br from-rose-300 via-orange-200 to-amber-200"
-          />
-          <div
-            className="absolute -top-14 right-[-2.5rem] h-40 w-40 sm:h-52 sm:w-52 md:h-64 md:w-64
-                       rounded-full blur-2xl opacity-40
-                       bg-gradient-to-br from-sky-200 via-sky-300 to-sky-200"
-          />
-          <div
-            className="absolute bottom-[-2rem] right-[-3rem] h-64 w-64 sm:h-72 sm:w-72 md:h-96 md:w-96
-                       rounded-full blur-[100px] opacity-50
-                       bg-gradient-to-br from-teal-200 via-emerald-200 to-teal-300"
-          />
-          <div
-            className="absolute -bottom-12 -left-14 h-64 w-64 sm:h-72 sm:w-72 md:h-96 md:w-96
-                       rounded-full blur-2xl opacity-50
-                       bg-gradient-to-br from-pink-200 via-rose-200 to-pink-300"
-          />
+          <div className="absolute -top-10 -left-12 h-44 w-44 sm:h-56 sm:w-56 md:h-72 md:w-72 rounded-full blur-2xl opacity-100 bg-gradient-to-br from-rose-300 via-orange-200 to-amber-200" />
+          <div className="absolute -top-14 right-[-2.5rem] h-40 w-40 sm:h-52 sm:w-52 md:h-64 md:w-64 rounded-full blur-2xl opacity-40 bg-gradient-to-br from-sky-200 via-sky-300 to-sky-200" />
+          <div className="absolute bottom-[-2rem] right-[-3rem] h-64 w-64 sm:h-72 sm:w-72 md:h-96 md:w-96 rounded-full blur-[100px] opacity-50 bg-gradient-to-br from-teal-200 via-emerald-200 to-teal-300" />
+          <div className="absolute -bottom-12 -left-14 h-64 w-64 sm:h-72 sm:w-72 md:h-96 md:w-96 rounded-full blur-2xl opacity-50 bg-gradient-to-br from-pink-200 via-rose-200 to-pink-300" />
         </div>
 
         {/* CARD */}
@@ -89,23 +70,22 @@ export default function Login() {
               </div>
             )}
 
-            {/* EMAIL */}
+            {/* USERNAME */}
             <div>
               <label
-                htmlFor="email"
+                htmlFor="username"
                 className="mb-1 block text-sm text-neutral-700"
               >
-                Student email
+                Username
               </label>
               <div className="relative">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  placeholder="Student ID@rmutr.ac.th"
-                  value={values.email}
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="Student ID"
+                  value={values.username}
                   onChange={onChange}
                   required
                   className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 pr-9 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
@@ -182,7 +162,7 @@ export default function Login() {
             {/* SUBMIT */}
             <button
               type="submit"
-              disabled={loading || !values.email || !values.password}
+              disabled={loading || !values.username || !values.password}
               className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
             >
               {loading ? "กำลังเข้าสู่ระบบ…" : "Log in"}
