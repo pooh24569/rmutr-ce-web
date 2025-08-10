@@ -14,7 +14,7 @@ export default function Login() {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();ฟ
+    e.preventDefault();
     if (loading) return;
     setErr("");
     setLoading(true);
@@ -23,7 +23,10 @@ export default function Login() {
         username: values.email.trim(),
         password: values.password,
       });
-      localStorage.setItem("auth", JSON.stringify({ token: data.token, user: data.user }));
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ token: data.token, user: data.user })
+      );
       window.location.assign("/admin");
     } catch (e) {
       setErr(e?.response?.data?.message || "เข้าสู่ระบบไม่สำเร็จ");
@@ -65,7 +68,11 @@ export default function Login() {
         <div className="relative z-10 w-[92vw] max-w-sm sm:max-w-md rounded-3xl bg-white/30 backdrop-blur-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.25)] ring-1 ring-white/60 p-6 sm:p-8">
           {/* โลโก้ */}
           <div className="flex justify-center mb-4">
-            <img src="/LOGO-RMUTR.png" alt="RMUTR Logo" className="h-14 sm:h-30 w-auto object-contain" />
+            <img
+              src="/LOGO-RMUTR.png"
+              alt="RMUTR Logo"
+              className="h-14 sm:h-30 w-auto object-contain"
+            />
           </div>
 
           <p className="text-center text-sm text-neutral-600 mb-6">
@@ -74,14 +81,20 @@ export default function Login() {
 
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             {err && (
-              <div className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md" role="alert">
+              <div
+                className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md"
+                role="alert"
+              >
                 {err}
               </div>
             )}
 
             {/* EMAIL */}
             <div>
-              <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Student email
               </label>
               <div className="relative">
@@ -113,7 +126,10 @@ export default function Login() {
 
             {/* PASSWORD */}
             <div>
-              <label htmlFor="password" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="password"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Password
               </label>
               <div className="relative">
@@ -135,14 +151,26 @@ export default function Login() {
                   aria-label={showPw ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                 >
                   {showPw ? (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    >
                       <path d="M3 3l18 18" />
                       <path d="M10.58 10.58a2 2 0 0 0 2.84 2.84" />
                       <path d="M16.1 16.1A9.77 9.77 0 0 1 12 18c-5 0-9-6-9-6a16.92 16.92 0 0 1 4.66-4.66" />
                       <path d="M14.12 5.09A10.45 10.45 0 0 1 21 12s-1 1.67-2.9 3.35" />
                     </svg>
                   ) : (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    >
                       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
@@ -162,7 +190,10 @@ export default function Login() {
 
             <p className="text-center text-xs text-neutral-500">
               Forgot password?{" "}
-              <a href="/reset" className="font-medium text-rose-600 hover:underline">
+              <a
+                href="/reset"
+                className="font-medium text-rose-600 hover:underline"
+              >
                 Reset
               </a>
             </p>
