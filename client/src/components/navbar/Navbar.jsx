@@ -1,7 +1,7 @@
 import React from "react";
 import Logo from "./Logo";
 import Searchbar from "./Searchbar";
-import DropdownListMaru from "./DropdownListMaru";
+import DropdownListMaru from "./DropdownListMenu";
 
 const Navbar = () => {
   return (

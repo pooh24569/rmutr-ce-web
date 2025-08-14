@@ -11,7 +11,7 @@ import { AlignLeft, TypeOutline } from "lucide-react";
 import { Button } from "../ui/button";
 import UserIcon from "./UserIcon";
 import { links } from "@/utils/links";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import {
   SignedIn,
   SignedOut,
