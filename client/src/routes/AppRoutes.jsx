@@ -15,6 +15,9 @@ import Dashboard from "@/pages/admin/Dashboard";
 import Manage from "@/pages/admin/Manage";
 import Camping from "@/pages/admin/Camping";
 import Notfound from "@/pages/Notfound";
+import Register from "@/pages/Register";
+import ResetEmail from "@/pages/ResetEmail";
+import ResetPassword from "@/pages/ResetPassword";
 
 function RequireAuth() {
   const saved = localStorage.getItem("auth");
@@ -27,6 +30,10 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/reset-email" element={<ResetEmail />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />

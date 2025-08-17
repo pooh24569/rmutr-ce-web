@@ -1,30 +1,58 @@
 const express = require("express");
 const verifyToken = require("../middlewares/authMiddleware");
 const authorizeRoles = require("../middlewares/roleMiddleware"); // Assuming you have a role middleware
+const { canDeleteUser, canAssignRole } = require("../middlewares/policies");
+const UserCtrl = require("../controllers/userController"); 
+
+
 const router = express.Router();
 
-//Only admin can access this route
-router.get("/admin", verifyToken, authorizeRoles("admin"), (req, res) => {
-  res.json({ message: "Admin route accessed" });
-});
-
-//Both admin and user can access this route
+// superadmin can access this route
 router.get(
-  "/manager",
+  "/superadmin",
   verifyToken,
-  authorizeRoles("admin", "manager"),
+  authorizeRoles("superadmin"),
   (req, res) => {
-    res.json({ message: "Manager route accessed" });
+    res.json({ message: "Superadmin route accessed" });
   }
 );
 
-//All users can access this route
+//Only admin can access this route
 router.get(
-  "/user",
+  "/admin",
   verifyToken,
-  authorizeRoles("admin", "manager", "user"),
+  authorizeRoles("superadmin", "admin"),
   (req, res) => {
-    res.json({ message: "User route accessed" });
+    res.json({ message: "Admin route accessed" });
+  }
+);
+
+//Both admin and student can access this route
+router.get(
+  "/teacher",
+  verifyToken,
+  authorizeRoles("superadmin", "admin", "teacher"),
+  (req, res) => {
+    res.json({ message: "Teacher route accessed" });
+  }
+);
+
+//All student can access this route
+router.get(
+  "/student",
+  verifyToken,
+  authorizeRoles("superadmin", "admin", "teacher", "student"),
+  (req, res) => {
+    res.json({ message: "student route accessed" });
+  }
+);
+
+router.get(
+  "/parent",
+  verifyToken,
+  authorizeRoles("superadmin", "admin", "parent"),
+  (req, res) => {
+    res.json({ message: "Parent route accessed" });
   }
 );
 

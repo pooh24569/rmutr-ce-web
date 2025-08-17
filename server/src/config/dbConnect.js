@@ -1,14 +1,15 @@
-const e = require("express");
 const mongoose = require("mongoose");
 
 const dbConnect = async () => {
   try {
-    const connect = await mongoose.connect(process.env.CONNECTION_STRING);
+    const uri = process.env.CONNECTION_STRING;
+    if (!uri) throw new Error("Missing CONNECTION_STRING in .env");
+    const conn = await mongoose.connect(uri);
     console.log(
-      `Database connected: ${connect.connection.host}, ${connect.connection.name}`
+      `Database connected: ${conn.connection.host}, ${conn.connection.name}`
     );
   } catch (err) {
-    console.log(err);
+    console.error("Mongo connect error:", err.message);
     process.exit(1);
   }
 };

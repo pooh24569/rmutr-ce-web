@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
+  const navigate = useNavigate();
   const [showPw, setShowPw] = useState(false);
-  const [values, setValues] = useState({ username: "", password: "" });
+  const [values, setValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const baseURL = import.meta.env.VITE_API_BASE || "http://localhost:7001";
@@ -17,19 +24,32 @@ export default function Login() {
     e.preventDefault();
     if (loading) return;
     setErr("");
+
+    if (!values.username.trim() || !values.email.trim() || values.password.length < 6) {
+      setErr("กรุณากรอกข้อมูลให้ครบและรหัสผ่านอย่างน้อย 6 ตัวอักษร");
+      return;
+    }
+
+    if (values.password !== values.confirmPassword) {
+      setErr("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data } = await axios.post(`${baseURL}/api/auth/login`, {
+      const { data } = await axios.post(`${baseURL}/api/auth/register`, {
         username: values.username.trim(),
+        email: values.email.trim(),
         password: values.password,
       });
+
       localStorage.setItem(
         "auth",
         JSON.stringify({ token: data.token, user: data.user })
       );
       window.location.assign("/admin");
     } catch (e) {
-      setErr(e?.response?.data?.message || "เข้าสู่ระบบไม่สำเร็จ");
+      setErr(e?.response?.data?.message || "สมัครไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
@@ -38,6 +58,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
       <div className="relative">
+        {/* Background blur / gradient */}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
           <div className="absolute -top-10 -left-12 h-44 w-44 sm:h-56 sm:w-56 md:h-72 md:w-72 rounded-full blur-2xl opacity-100 bg-gradient-to-br from-rose-300 via-orange-200 to-amber-200" />
           <div className="absolute -top-14 right-[-2.5rem] h-40 w-40 sm:h-52 sm:w-52 md:h-64 md:w-64 rounded-full blur-2xl opacity-40 bg-gradient-to-br from-sky-200 via-sky-300 to-sky-200" />
@@ -47,7 +68,8 @@ export default function Login() {
 
         {/* CARD */}
         <div className="relative z-10 w-[92vw] max-w-sm sm:max-w-md rounded-3xl bg-white/30 backdrop-blur-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.25)] ring-1 ring-white/60 p-6 sm:p-8">
-          {/* โลโก้ */}
+          
+          {/* Logo */}
           <div className="flex justify-center mb-4">
             <img
               src="/LOGO-RMUTR.png"
@@ -57,59 +79,53 @@ export default function Login() {
           </div>
 
           <p className="text-center text-sm text-neutral-600 mb-6">
-            <span className="font-bold">Get Started</span>
+            <span className="font-bold">Create an Account</span>
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             {err && (
-              <div
-                className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md"
-                role="alert"
-              >
+              <div className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md" role="alert">
                 {err}
               </div>
             )}
 
-            {/* USERNAME */}
+            {/* Username */}
             <div>
-              <label
-                htmlFor="username"
-                className="mb-1 block text-sm text-neutral-700"
-              >
+              <label htmlFor="username" className="mb-1 block text-sm text-neutral-700">
                 Username
               </label>
-              <div className="relative">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="Student ID"
-                  value={values.username}
-                  onChange={onChange}
-                  required
-                  className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 pr-9 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
-                />
-                <svg
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-70"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
-                >
-                  <path d="M4 6h16v12H4z" />
-                  <path d="m22 6-10 7L2 6" />
-                </svg>
-              </div>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="Student ID"
+                value={values.username}
+                onChange={onChange}
+                required
+                className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
+              />
             </div>
 
-            {/* PASSWORD */}
+            {/* Email */}
             <div>
-              <label
-                htmlFor="password"
-                className="mb-1 block text-sm text-neutral-700"
-              >
+              <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="example@email.com"
+                value={values.email}
+                onChange={onChange}
+                required
+                className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="mb-1 block text-sm text-neutral-700">
                 Password
               </label>
               <div className="relative">
@@ -117,8 +133,7 @@ export default function Login() {
                   id="password"
                   name="password"
                   type={showPw ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
                   value={values.password}
                   onChange={onChange}
                   required
@@ -131,26 +146,14 @@ export default function Login() {
                   aria-label={showPw ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                 >
                   {showPw ? (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    >
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M3 3l18 18" />
                       <path d="M10.58 10.58a2 2 0 0 0 2.84 2.84" />
                       <path d="M16.1 16.1A9.77 9.77 0 0 1 12 18c-5 0-9-6-9-6a16.92 16.92 0 0 1 4.66-4.66" />
                       <path d="M14.12 5.09A10.45 10.45 0 0 1 21 12s-1 1.67-2.9 3.35" />
                     </svg>
                   ) : (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    >
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
@@ -159,22 +162,36 @@ export default function Login() {
               </div>
             </div>
 
-            {/* SUBMIT */}
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirmPassword" className="mb-1 block text-sm text-neutral-700">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="Re-enter password"
+                value={values.confirmPassword}
+                onChange={onChange}
+                required
+                className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
+              />
+            </div>
+
+            {/* Submit */}
             <button
               type="submit"
-              disabled={loading || !values.username || !values.password}
-              className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              disabled={loading || !values.username || !values.email || !values.password || !values.confirmPassword}
+              className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
             >
-              {loading ? "กำลังเข้าสู่ระบบ…" : "Log in"}
+              {loading ? "กำลังสมัคร…" : "Register"}
             </button>
 
             <p className="text-center text-xs text-neutral-500">
-              Forgot password?{" "}
-              <a
-                href="/reset-email"
-                className="font-medium text-rose-600 hover:underline"
-              >
-                Reset
+              Already have an account?{" "}
+              <a href="/login" className="font-medium text-rose-600 hover:underline">
+                Log in
               </a>
             </p>
           </form>
