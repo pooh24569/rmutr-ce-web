@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [showPw, setShowPw] = useState(false);
   const [values, setValues] = useState({ username: "", password: "" });
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const baseURL = import.meta.env.VITE_API_BASE || "http://localhost:7001";
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -19,15 +22,12 @@ export default function Login() {
     setErr("");
     setLoading(true);
     try {
-      const { data } = await axios.post(`${baseURL}/api/auth/login`, {
+      const { data } = await api.post(`/api/auth/login`, {
         username: values.username.trim(),
         password: values.password,
       });
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: data.token, user: data.user })
-      );
-      window.location.assign("/admin");
+      login({ user: data.user, token: data.token });
+      navigate("/admin", { replace: true });
     } catch (e) {
       setErr(e?.response?.data?.message || "เข้าสู่ระบบไม่สำเร็จ");
     } finally {

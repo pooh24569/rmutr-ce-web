@@ -18,10 +18,10 @@ import Notfound from "@/pages/Notfound";
 import Register from "@/pages/Register";
 import ResetEmail from "@/pages/ResetEmail";
 import ResetPassword from "@/pages/ResetPassword";
+import { useAuth } from "@/context/AuthContext";
 
 function RequireAuth() {
-  const saved = localStorage.getItem("auth");
-  const token = saved ? JSON.parse(saved).token : null;
+  const { token } = useAuth();
   return token ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
@@ -33,7 +33,7 @@ export default function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/reset-email" element={<ResetEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
+
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />

@@ -8,13 +8,7 @@ const TextAreaInput = ({ register, name, type, placeholder }) => {
       <Label htmlFor={name} className="capitalize">
         {name}
       </Label>
-      <Textarea
-        {...register(name)}
-        rows={4}
-        type={type}
-        name="title"
-        placeholder={placeholder}
-      />
+      <Textarea {...register(name)} rows={4} placeholder={placeholder} />
     </div>
   );
 };

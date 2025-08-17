@@ -6,8 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const campingSchema = z.object({
-  title: z.string().min(2, "Title must be more than 2 characters"),
-  price: z.number().min(1, "Price must be a positive number"),
+  title: z.string().min(1, "Title is required"),
+  price: z.number().min(0, "Price must be a positive number"),
   description: z.string().min(1, "Description is required"),
 });
 

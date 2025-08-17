@@ -8,12 +8,7 @@ const FormInputs = ({ register, name, type, placeholder }) => {
       <Label htmlFor={name} className="capitalize">
         {name}
       </Label>
-      <Input
-        {...register(name)}
-        type={type}
-        name="title"
-        placeholder={placeholder}
-      />
+      <Input {...register(name)} type={type} placeholder={placeholder} />
     </div>
   );
 };

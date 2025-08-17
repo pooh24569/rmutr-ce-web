@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "@/lib/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,10 +10,10 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "student", // Default role
   });
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const baseURL = import.meta.env.VITE_API_BASE || "http://localhost:7001";
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +25,11 @@ export default function Register() {
     if (loading) return;
     setErr("");
 
-    if (!values.username.trim() || !values.email.trim() || values.password.length < 6) {
+    if (
+      !values.username.trim() ||
+      !values.email.trim() ||
+      values.password.length < 6
+    ) {
       setErr("กรุณากรอกข้อมูลให้ครบและรหัสผ่านอย่างน้อย 6 ตัวอักษร");
       return;
     }
@@ -37,17 +41,14 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(`${baseURL}/api/auth/register`, {
+      await api.post(`/api/auth/register`, {
         username: values.username.trim(),
         email: values.email.trim(),
         password: values.password,
+        role: values.role,
       });
 
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: data.token, user: data.user })
-      );
-      window.location.assign("/admin");
+      navigate("/login", { replace: true });
     } catch (e) {
       setErr(e?.response?.data?.message || "สมัครไม่สำเร็จ");
     } finally {
@@ -68,7 +69,6 @@ export default function Register() {
 
         {/* CARD */}
         <div className="relative z-10 w-[92vw] max-w-sm sm:max-w-md rounded-3xl bg-white/30 backdrop-blur-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.25)] ring-1 ring-white/60 p-6 sm:p-8">
-          
           {/* Logo */}
           <div className="flex justify-center mb-4">
             <img
@@ -84,14 +84,20 @@ export default function Register() {
 
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             {err && (
-              <div className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md" role="alert">
+              <div
+                className="text-red-700 text-sm border border-red-200 bg-red-50 p-2 rounded-md"
+                role="alert"
+              >
                 {err}
               </div>
             )}
 
             {/* Username */}
             <div>
-              <label htmlFor="username" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="username"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Username
               </label>
               <input
@@ -108,7 +114,10 @@ export default function Register() {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Email
               </label>
               <input
@@ -125,7 +134,10 @@ export default function Register() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="password"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Password
               </label>
               <div className="relative">
@@ -146,14 +158,26 @@ export default function Register() {
                   aria-label={showPw ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                 >
                   {showPw ? (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    >
                       <path d="M3 3l18 18" />
                       <path d="M10.58 10.58a2 2 0 0 0 2.84 2.84" />
                       <path d="M16.1 16.1A9.77 9.77 0 0 1 12 18c-5 0-9-6-9-6a16.92 16.92 0 0 1 4.66-4.66" />
                       <path d="M14.12 5.09A10.45 10.45 0 0 1 21 12s-1 1.67-2.9 3.35" />
                     </svg>
                   ) : (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    >
                       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
@@ -164,7 +188,10 @@ export default function Register() {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="mb-1 block text-sm text-neutral-700">
+              <label
+                htmlFor="confirmPassword"
+                className="mb-1 block text-sm text-neutral-700"
+              >
                 Confirm Password
               </label>
               <input
@@ -179,10 +206,36 @@ export default function Register() {
               />
             </div>
 
+            {/* Role */}
+            <div>
+              <label
+                htmlFor="role"
+                className="mb-1 block text-sm text-neutral-700"
+              >
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={values.role}
+                onChange={onChange}
+                className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none focus:border-neutral-500 focus:bg-white"
+              >
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="admin">Parent</option>
+              </select>
+            </div>
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading || !values.username || !values.email || !values.password || !values.confirmPassword}
+              disabled={
+                loading ||
+                !values.username ||
+                !values.email ||
+                !values.password ||
+                !values.confirmPassword
+              }
               className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
             >
               {loading ? "กำลังสมัคร…" : "Register"}
@@ -190,7 +243,10 @@ export default function Register() {
 
             <p className="text-center text-xs text-neutral-500">
               Already have an account?{" "}
-              <a href="/login" className="font-medium text-rose-600 hover:underline">
+              <a
+                href="/login"
+                className="font-medium text-rose-600 hover:underline"
+              >
                 Log in
               </a>
             </p>
