@@ -18,19 +18,20 @@ const register = async (req, res) => {
         .status(409)
         .json({ message: `User with username ${username} already exists` });
     }
-    if (role === "superadmin") {
-      const countSuper = await User.countDocuments({ role: "superadmin" });
-      if (countSuper > 0) {
-        return res.status(403).json({ message: "Superadmin already exists" });
-      }
+    const allowedPublicRoles = ["student", "teacher", "parent"];
+    if (role && !allowedPublicRoles.includes(role)) {
+      return res
+        .status(403)
+        .json({ message: `Role ${role} is not allowed for public registration` });
     }
+    const finalRole = role && allowedPublicRoles.includes(role) ? role : "student"; 
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       username,
       password: hashedPassword,
-      role,
+      role: finalRole,
     });
 
     await newUser.save();
