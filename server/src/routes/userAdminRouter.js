@@ -1,12 +1,13 @@
-const express = require("express");
-const verifyToken = require("../middlewares/authMiddleware");
-const authorizeRoles = require("../middlewares/roleMiddleware");
-const { canDeleteUser, canAssignRole } = require("../middlewares/policies");
-const UserCtrl = require("../controllers/userController");
+import express from "express";
+import verifyToken from "../middlewares/authMiddleware.js";
+import authorizeRoles from "../middlewares/roleMiddleware.js";
+import { canDeleteUser, canAssignRole } from "../middlewares/policies.js";
+import * as UserCtrl from "../controllers/userController.js";
+import { validate, createUserSchema } from "../utils/validation.js";
 
 const router = express.Router();
 
-// list users → superadmin/admin
+// GET /api/user-admin
 router.get(
   "/",
   verifyToken,
@@ -14,16 +15,17 @@ router.get(
   UserCtrl.list
 );
 
-// create user → superadmin/admin (admin ห้ามตั้ง superadmin)
+// POST /api/user-admin
 router.post(
   "/",
   verifyToken,
   authorizeRoles("superadmin", "admin"),
+  validate(createUserSchema), // ✅ ตรวจ username/email/password/role ด้วย Joi
   canAssignRole,
   UserCtrl.create
 );
 
-// delete user → superadmin/admin (admin ห้ามลบ superadmin)
+// DELETE /api/user-admin/:id
 router.delete(
   "/:id",
   verifyToken,
@@ -32,4 +34,4 @@ router.delete(
   UserCtrl.remove
 );
 
-module.exports = router;
+export default router;

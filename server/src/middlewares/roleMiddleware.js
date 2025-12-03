@@ -1,19 +1,12 @@
-const authorizeRoles = (...allowedRoles) => {
+export default function authorizeRoles(...allowed) {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: No user information found" });
-    }
-
-    if (allowedRoles.length && !allowedRoles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({ message: "Access denied: You do not have the required role" });
-    }
     
-    return next();// User has the required role, proceed to the next middleware or route handler
-  };
-};
+    const role = req.user?.role;
+    if (!role) return res.status(401).json({ message: "Unauthorized" });
 
-module.exports = authorizeRoles;
+    if (allowed.length && !allowed.includes(role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+  };
+}

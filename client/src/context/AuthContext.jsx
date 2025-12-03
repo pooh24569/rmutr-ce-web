@@ -1,81 +1,77 @@
-/* import React, { createContext, useContext, useState } from "react";
+// frontend/src/context/AuthContext.jsx
+import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  const login = (userData) => {
-    setUser(userData);
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
-
-  const hasPermission = (permission) => {
-    return user?.permissions?.includes(permission) || false;
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout, hasPermission }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+const getInitialAuth = () => {
+  if (typeof window === "undefined") {
+    return { user: null, token: null };
   }
-  return context;
+
+  const saved = localStorage.getItem("auth");
+  if (!saved) return { user: null, token: null };
+
+  try {
+    const parsed = JSON.parse(saved);
+    return {
+      user: parsed.user || null,
+      token: parsed.token || null,
+    };
+  } catch {
+    return { user: null, token: null };
+  }
 };
 
-export default AuthContext;
- */
-
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
-const AuthContext = createContext(null);
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [auth, setAuth] = useState(getInitialAuth);
+  const [loading, setLoading] = useState(true); // ✨ เพิ่ม loading
 
+  // ✨ Check auth on mount
   useEffect(() => {
-    const saved = localStorage.getItem("auth");
-    if (saved) {
-      const { user, token } = JSON.parse(saved);
-      setUser(user);
-      setToken(token);
-    }
+    // Simulate checking token validity
+    const checkAuth = async () => {
+      try {
+        // ถ้ามี token อาจจะ verify กับ backend
+        // const response = await api.get("/api/auth/verify");
+        // if (!response.data.success) {
+        //   logout();
+        // }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const login = ({ user, token }) => {
-    setUser(user);
-    setToken(token);
-    localStorage.setItem("auth", JSON.stringify({ user, token }));
+    const next = { user, token };
+    setAuth(next);
+    localStorage.setItem("auth", JSON.stringify(next));
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
+    setAuth({ user: null, token: null });
     localStorage.removeItem("auth");
   };
 
   const hasPermission = (permission) =>
-    user?.permissions?.includes(permission) || false;
+    auth.user?.permissions?.includes(permission) || false;
 
   const value = useMemo(
-    () => ({ user, token, login, logout, hasPermission }),
-    [user, token]
+    () => ({
+      user: auth.user,
+      token: auth.token,
+      loading, // ✨ export loading
+      login,
+      logout,
+      hasPermission,
+    }),
+    [auth, loading]
   );
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
@@ -84,3 +80,5 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
 };
+
+export default AuthContext;

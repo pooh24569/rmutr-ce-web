@@ -1,9 +1,8 @@
-import Navbar from "@/components/navbar/Navbar";
 import React from "react";
 import { Outlet } from "react-router-dom";
 
 
-const LayoutAdmin = () => {
+const AdminLayout = () => {
   return (
     <main className="container">
       <Navbar />
@@ -12,4 +11,4 @@ const LayoutAdmin = () => {
   );
 };
 
-export default LayoutAdmin;
+export default AdminLayout;

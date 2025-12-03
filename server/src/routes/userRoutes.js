@@ -1,59 +1,38 @@
-const express = require("express");
-const verifyToken = require("../middlewares/authMiddleware");
-const authorizeRoles = require("../middlewares/roleMiddleware"); // Assuming you have a role middleware
-const { canDeleteUser, canAssignRole } = require("../middlewares/policies");
-const UserCtrl = require("../controllers/userController"); 
+import express from "express";
+import verifyToken from "../middlewares/authMiddleware.js";
+import authorizeRoles from "../middlewares/roleMiddleware.js";
 
+const userRouter = express.Router();
 
-const router = express.Router();
-
-// superadmin can access this route
-router.get(
+userRouter.get(
   "/superadmin",
   verifyToken,
   authorizeRoles("superadmin"),
-  (req, res) => {
-    res.json({ message: "Superadmin route accessed" });
-  }
+  (_req, res) => res.json({ message: "Superadmin route accessed" })
 );
-
-//Only admin can access this route
-router.get(
+userRouter.get(
   "/admin",
   verifyToken,
   authorizeRoles("superadmin", "admin"),
-  (req, res) => {
-    res.json({ message: "Admin route accessed" });
-  }
+  (_req, res) => res.json({ message: "Admin route accessed" })
 );
-
-//Both admin and student can access this route
-router.get(
+userRouter.get(
   "/teacher",
   verifyToken,
   authorizeRoles("superadmin", "admin", "teacher"),
-  (req, res) => {
-    res.json({ message: "Teacher route accessed" });
-  }
+  (_req, res) => res.json({ message: "Teacher route accessed" })
 );
-
-//All student can access this route
-router.get(
+userRouter.get(
   "/student",
   verifyToken,
   authorizeRoles("superadmin", "admin", "teacher", "student"),
-  (req, res) => {
-    res.json({ message: "student route accessed" });
-  }
+  (_req, res) => res.json({ message: "Student route accessed" })
 );
-
-router.get(
+userRouter.get(
   "/parent",
   verifyToken,
   authorizeRoles("superadmin", "admin", "parent"),
-  (req, res) => {
-    res.json({ message: "Parent route accessed" });
-  }
+  (_req, res) => res.json({ message: "Parent route accessed" })
 );
 
-module.exports = router;
+export default userRouter;

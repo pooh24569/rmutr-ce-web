@@ -20,5 +20,4 @@ function Input({
       {...props} />
   );
 }
-
 export { Input }

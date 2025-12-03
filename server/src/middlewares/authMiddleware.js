@@ -1,30 +1,16 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-const verifyToken = (req, res, next) => {
-  let token;
-  let authHeader = req.headers.Authorization || req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer")) {
-    token = authHeader.split(" ")[1];
-
-    if (!token) {
-      return res
-        .status(401)
-        .json({ message: "No token provided, authorization denied" });
-    }
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // Attach user info to request object
-      console.log("User authenticated:", req.user);
-      next(); // Proceed to the next middleware or route handler
-    } catch (err) {
-      return res.status(401).json({ message: "Token is not valid" });
-    }
-  } else {
-    return res
-      .status(401)
-      .json({ message: "Authorization header is missing or malformed" });
+export default function verifyToken(req, res, next) {
+  const auth = req.headers.authorization || req.headers.Authorization;
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization header missing" });
   }
-};
-
-module.exports = verifyToken;
+  const token = auth.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // { id, role }
+    return next();
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}
