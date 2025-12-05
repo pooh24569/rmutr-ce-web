@@ -7,12 +7,17 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 
+
 import dbConnect from "./config/dbConnect.js";
 import { logger } from "./utils/logger.js";
 import sanitizeRequest from "./middlewares/sanitize.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import userAdminRouter from "./routes/userAdminRouter.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+import classRoutes from "./routes/classRoutes.js";
+
 
 // Connect to database
 await dbConnect();
@@ -73,6 +78,8 @@ app.use(sanitizeRequest);
 // CORS Configuration
 const allowedOrigins = [
   process.env.FRONTEND_BASE_URL || "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
   "https://yourdomain.com",
   "https://www.yourdomain.com",
 ].filter(Boolean);
@@ -146,6 +153,9 @@ app.use("/api/auth/send-reset-otp", otpLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/user-admin", userAdminRouter);
+app.use("/api/events", eventRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/classes", classRoutes);
 
 
 // ============================================

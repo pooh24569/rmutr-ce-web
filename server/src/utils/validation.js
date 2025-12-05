@@ -167,6 +167,76 @@ export const userIdSchema = Joi.object({
 });
 
 // ============================================
+// PROFILE SCHEMAS
+// ============================================
+
+export const updateProfileSchema = Joi.object({
+  firstName: Joi.string().min(2).max(50).trim().optional(),
+  lastName: Joi.string().min(2).max(50).trim().optional(),
+  phoneNumber: Joi.string()
+    .pattern(/^[0-9]{9,13}$/)
+    .optional()
+    .allow("")
+    .messages({
+      "string.pattern.base": "Phone number must be 9-13 digits",
+    }),
+  profileImage: Joi.string().optional().allow(""),
+}).min(1);
+
+export const updateStudentProfileSchema = Joi.object({
+  studentId: Joi.string()
+    .pattern(/^[0-9]{13}$/)
+    .optional()
+    .messages({
+      "string.pattern.base": "Student ID must be exactly 13 digits",
+    }),
+  firstNameTH: Joi.string().min(2).max(100).trim().optional().allow(""),
+  lastNameTH: Joi.string().min(2).max(100).trim().optional().allow(""),
+  dateOfBirth: Joi.date().max("now").optional().allow(null),
+  gender: Joi.string().valid("male", "female", "other", "").optional(),
+  cardIssueDate: Joi.date().optional().allow(null),
+  cardExpiryDate: Joi.date()
+    .greater(Joi.ref("cardIssueDate"))
+    .optional()
+    .allow(null)
+    .messages({
+      "date.greater": "Card expiry date must be after issue date",
+    }),
+  address: Joi.object({
+    street: Joi.string().max(200).trim().optional().allow(""),
+    district: Joi.string().max(100).trim().optional().allow(""),
+    province: Joi.string().max(100).trim().optional().allow(""),
+    postalCode: Joi.string()
+      .pattern(/^[0-9]{5}$/)
+      .optional()
+      .allow("")
+      .messages({
+        "string.pattern.base": "Postal code must be 5 digits",
+      }),
+  }).optional(),
+  education: Joi.object({
+    faculty: Joi.string().max(200).trim().optional().allow(""),
+    department: Joi.string().max(200).trim().optional().allow(""),
+    year: Joi.number().integer().min(1).max(6).optional().allow(null),
+    gpa: Joi.number().min(0).max(4.0).optional().allow(null).messages({
+      "number.max": "GPA cannot exceed 4.0",
+      "number.min": "GPA cannot be negative",
+    }),
+  }).optional(),
+  emergencyContact: Joi.object({
+    name: Joi.string().max(100).trim().optional().allow(""),
+    relationship: Joi.string().max(50).trim().optional().allow(""),
+    phoneNumber: Joi.string()
+      .pattern(/^[0-9]{9,13}$/)
+      .optional()
+      .allow("")
+      .messages({
+        "string.pattern.base": "Phone number must be 9-13 digits",
+      }),
+  }).optional(),
+}).min(1);
+
+// ============================================
 // VALIDATION MIDDLEWARE
 // ============================================
 
@@ -209,5 +279,7 @@ export default {
   createUserSchema,
   updateUserSchema,
   userIdSchema,
+  updateProfileSchema,
+  updateStudentProfileSchema,
   validate,
 };

@@ -13,27 +13,27 @@ import ResetEmail from "@/pages/ResetEmail";
 import ResetPassword from "@/pages/ResetPassword";
 import VerifyOtp from "@/pages/VerifyOtp";
 import Notfound from "@/pages/Notfound";
-import Unauthorized from "@/pages/Unauthorized"; // ✨ เพิ่ม
+import Unauthorized from "@/pages/Unauthorized";
 
-import ProtectedRoute from "@/components/ProtectedRoute"; // ✨ เพิ่ม
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 import AdminLayout from "@/layouts/AdminLayout";
-import Dashboard from "@/pages/admin/Dashboard";
+import AdminDashboard from "@/pages/admin/Dashboard";
 import Manage from "@/pages/admin/Manage";
 import Camping from "@/pages/admin/Camping";
 
 import StudentLayout from "@/layouts/StudentLayout";
 import HomeworkList from "@/pages/student/HomeworkList";
-import Calendar from "@/pages/student/Calendar";
+import StudentCalendar from "@/pages/student/Calendar";
 import Schedule from "@/pages/student/Schedule";
+import Profile from "@/pages/student/Profile";
+import ProfileEdit from "@/pages/student/ProfileEdit";
 
-/**
- * ✅ ดีกว่าเดิมยังไง:
- * - ใช้ ProtectedRoute component (cleaner)
- * - มี loading state
- * - มี unauthorized page
- * - แยก logic ออกจาก routes
- */
+// Teacher Portal
+import TeacherLayout from "@/layouts/TeacherLayout";
+import TeacherDashboard from "@/pages/teacher/Dashboard";
+import TeacherClasses from "@/pages/teacher/Classes";
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -47,28 +47,39 @@ export default function AppRoutes() {
         <Route path="/reset-email" element={<ResetEmail />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/unauthorized" element={<Unauthorized />} /> {/* ✨ เพิ่ม */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           {/* 🎓 Student Portal */}
-          <Route
-            element={<ProtectedRoute roles={["student"]} />}
-          >
+          <Route element={<ProtectedRoute roles={["student"]} />}>
             <Route path="/student" element={<StudentLayout />}>
               <Route index element={<Navigate to="/student/homework" replace />} />
               <Route path="homework" element={<HomeworkList />} />
-              <Route path="calendar" element={<Calendar />} />
+              <Route path="calendar" element={<StudentCalendar />} />
               <Route path="schedule" element={<Schedule />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="profile/edit" element={<ProfileEdit />} />
+            </Route>
+          </Route>
+
+          {/* 👨‍🏫 Teacher Portal */}
+          <Route element={<ProtectedRoute roles={["teacher"]} />}>
+            <Route path="/teacher" element={<TeacherLayout />}>
+              <Route index element={<Navigate to="/teacher/dashboard" replace />} />
+              <Route path="dashboard" element={<TeacherDashboard />} />
+              <Route path="classes" element={<TeacherClasses />} />
+              <Route path="attendance" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance</h1><p className="text-gray-500">Coming soon...</p></div>} />
+              <Route path="homework" element={<div className="p-6"><h1 className="text-2xl font-bold">Homework</h1><p className="text-gray-500">Coming soon...</p></div>} />
+              <Route path="calendar" element={<div className="p-6"><h1 className="text-2xl font-bold">Calendar</h1><p className="text-gray-500">Coming soon...</p></div>} />
+              <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-500">Coming soon...</p></div>} />
             </Route>
           </Route>
 
           {/* 🛠 Admin Portal */}
-          <Route
-            element={<ProtectedRoute roles={["admin", "superadmin"]} />}
-          >
+          <Route element={<ProtectedRoute roles={["admin", "superadmin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Dashboard />} />
+              <Route index element={<AdminDashboard />} />
               <Route path="manage" element={<Manage />} />
               <Route path="camping" element={<Camping />} />
             </Route>

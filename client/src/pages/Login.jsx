@@ -55,6 +55,8 @@ export default function Login() {
   // ⭐ ฟังก์ชันช่วยเลือกว่า role ไหนควรไปหน้าไหน
   const getDefaultPath = (role) => {
     if (role === "student") return "/student/homework";
+    if (role === "teacher") return "/teacher/dashboard";
+    if (role === "parent") return "/parent/dashboard";
     if (["admin", "superadmin"].includes(role)) return "/admin";
     return "/";
   };

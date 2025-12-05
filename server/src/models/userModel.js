@@ -12,6 +12,17 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true },
 
+    // Basic Profile Information (for all roles)
+    firstName: { type: String, trim: true, default: "" },
+    lastName: { type: String, trim: true, default: "" },
+    phoneNumber: {
+      type: String,
+      trim: true,
+      default: "",
+      match: [/^[0-9]{9,10}$|^$/, "Phone number must be 9-10 digits"],
+    },
+    profileImage: { type: String, default: "" }, // Base64 or URL
+
     role: {
       type: String,
       enum: ["superadmin", "admin", "teacher", "student", "parent"],

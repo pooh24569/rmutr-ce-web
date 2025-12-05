@@ -1,0 +1,101 @@
+import { useState } from "react";
+import { useProfile } from "@/hooks/useProfile";
+import ProfileEditForm from "@/components/student/ProfileEditForm";
+import StudentHeader from "@/components/student/StudentHeader";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router";
+
+/**
+ * Profile Edit Page
+ * Separate page for editing user profile
+ */
+const ProfileEdit = () => {
+    const navigate = useNavigate();
+    const {
+        profile,
+        loading,
+        updateProfile,
+        updateStudentProfile,
+        uploadImage,
+        fetchProfile,
+    } = useProfile();
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async (basicProfile, studentProfile, imageFile) => {
+        setSaving(true);
+        try {
+            // Upload image if selected
+            if (imageFile) {
+                await uploadImage(imageFile);
+            }
+
+            // Update basic profile
+            await updateProfile(basicProfile);
+
+            // Update student profile if user is a student
+            if (profile?.role === "student") {
+                await updateStudentProfile(studentProfile);
+            }
+
+            // Refresh profile data
+            await fetchProfile();
+
+            // Navigate back to profile page
+            navigate('/student/profile');
+        } catch (error) {
+            console.error("Error saving profile:", error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleCancel = () => {
+        navigate('/student/profile');
+    };
+
+    if (loading && !profile) {
+        return (
+            <div className="flex flex-col h-full">
+                <StudentHeader title="EDIT PROFILE" />
+                <div className="flex-1 flex items-center justify-center bg-[#e5e5e5]">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading profile...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col h-full">
+            <StudentHeader title="EDIT PROFILE" />
+
+            <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
+                {/* Back Button */}
+                <div className="mb-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/student/profile')}
+                        className="flex items-center space-x-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Back to Profile</span>
+                    </Button>
+                </div>
+
+                {/* Edit Form */}
+                <ProfileEditForm
+                    profile={profile}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    loading={saving}
+                />
+            </section>
+        </div>
+    );
+};
+
+export default ProfileEdit;
