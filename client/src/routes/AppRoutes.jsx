@@ -33,6 +33,8 @@ import ProfileEdit from "@/pages/student/ProfileEdit";
 import TeacherLayout from "@/layouts/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/Dashboard";
 import TeacherClasses from "@/pages/teacher/Classes";
+import ClassDetail from "@/pages/teacher/ClassDetail";
+import StartAttendance from "@/pages/teacher/StartAttendance";
 
 export default function AppRoutes() {
   return (
@@ -69,6 +71,8 @@ export default function AppRoutes() {
               <Route index element={<Navigate to="/teacher/dashboard" replace />} />
               <Route path="dashboard" element={<TeacherDashboard />} />
               <Route path="classes" element={<TeacherClasses />} />
+              <Route path="classes/:classId" element={<ClassDetail />} />
+              <Route path="attendance/start/:classId" element={<StartAttendance />} />
               <Route path="attendance" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance</h1><p className="text-gray-500">Coming soon...</p></div>} />
               <Route path="homework" element={<div className="p-6"><h1 className="text-2xl font-bold">Homework</h1><p className="text-gray-500">Coming soon...</p></div>} />
               <Route path="calendar" element={<div className="p-6"><h1 className="text-2xl font-bold">Calendar</h1><p className="text-gray-500">Coming soon...</p></div>} />
@@ -92,3 +96,4 @@ export default function AppRoutes() {
     </BrowserRouter>
   );
 }
+

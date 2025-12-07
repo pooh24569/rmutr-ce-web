@@ -1,10 +1,12 @@
 // src/pages/teacher/Classes.jsx
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2, Eye } from "lucide-react";
 import CreateClassModal from "./components/CreateClassModal";
 import { classService } from "@/services/classService";
 
 const Classes = () => {
+    const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -167,6 +169,13 @@ const Classes = () => {
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                                     <button
+                                        onClick={() => navigate(`/teacher/classes/${classItem._id}`)}
+                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                        <span>View</span>
+                                    </button>
+                                    <button
                                         onClick={() => {
                                             setSelectedClass(classItem);
                                             setShowCreateModal(true);
@@ -181,7 +190,6 @@ const Classes = () => {
                                         className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                        <span>Delete</span>
                                     </button>
                                 </div>
                             </div>

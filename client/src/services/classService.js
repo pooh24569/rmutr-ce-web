@@ -111,6 +111,17 @@ export const classService = {
       throw error.response?.data || error;
     }
   },
+
+  // Import นักศึกษาหลายคน (จาก CSV หรือรายการ)
+  importStudents: async (classId, studentIds) => {
+    try {
+      const response = await api.post(`/classes/${classId}/import`, { studentIds });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default classService;
+

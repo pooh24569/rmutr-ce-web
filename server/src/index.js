@@ -17,6 +17,7 @@ import userAdminRouter from "./routes/userAdminRouter.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
+import attendanceRoutes from "./routes/attendanceRoutes.js";
 
 
 // Connect to database
@@ -156,6 +157,7 @@ app.use("/api/user-admin", userAdminRouter);
 app.use("/api/events", eventRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/classes", classRoutes);
+app.use("/api", attendanceRoutes); // Session & Attendance
 
 
 // ============================================

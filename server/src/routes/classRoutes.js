@@ -9,6 +9,7 @@ import {
   addStudentToClass,
   removeStudentFromClass,
   getAllStudents,
+  importStudentsToClass,
 } from "../controllers/classController.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
@@ -77,6 +78,14 @@ router.get(
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
   getAllStudents
+);
+
+// Import นักศึกษาจาก CSV (หลายคนพร้อมกัน)
+router.post(
+  "/:classId/import",
+  verifyToken,
+  authorizeRoles("teacher", "admin", "superadmin"),
+  importStudentsToClass
 );
 
 // ======================================

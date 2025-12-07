@@ -347,3 +347,105 @@ export const getAllStudents = async (req, res) => {
     });
   }
 };
+
+/**
+ * Import นักศึกษาจาก CSV/รายการรหัส
+ * 
+ * รับ array ของ username หรือ email
+ * หานักศึกษาในระบบ แล้วเพิ่มเข้า Class
+ */
+export const importStudentsToClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const { studentIds } = req.body; // array of username/email
+
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณาระบุรายชื่อนักศึกษา",
+      });
+    }
+
+    const classData = await Class.findById(classId);
+
+    if (!classData) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบรายวิชา",
+      });
+    }
+
+    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
+    if (classData.teacher.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "คุณไม่มีสิทธิ์จัดการรายวิชานี้",
+      });
+    }
+
+    // ค้นหานักศึกษาจาก username หรือ email
+    const cleanedIds = studentIds.map((id) => id.trim().toLowerCase()).filter(Boolean);
+    
+    const students = await User.find({
+      role: "student",
+      $or: [
+        { username: { $in: cleanedIds } },
+        { email: { $in: cleanedIds } },
+      ],
+    });
+
+    // แยกผลลัพธ์
+    const results = {
+      added: [],
+      alreadyExists: [],
+      notFound: [],
+    };
+
+    // หา username/email ที่ไม่พบในระบบ
+    const foundIds = students.map((s) => s.username.toLowerCase())
+      .concat(students.map((s) => s.email?.toLowerCase()).filter(Boolean));
+    
+    results.notFound = cleanedIds.filter((id) => !foundIds.includes(id));
+
+    // เพิ่มนักศึกษาเข้า Class
+    for (const student of students) {
+      if (classData.students.includes(student._id)) {
+        results.alreadyExists.push({
+          username: student.username,
+          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        });
+      } else {
+        classData.students.push(student._id);
+        results.added.push({
+          username: student.username,
+          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        });
+      }
+    }
+
+    await classData.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `เพิ่มนักศึกษาสำเร็จ ${results.added.length} คน`,
+      data: {
+        added: results.added,
+        alreadyExists: results.alreadyExists,
+        notFound: results.notFound,
+        summary: {
+          total: cleanedIds.length,
+          added: results.added.length,
+          alreadyExists: results.alreadyExists.length,
+          notFound: results.notFound.length,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error importing students:", error);
+    return res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการ Import",
+    });
+  }
+};
+
