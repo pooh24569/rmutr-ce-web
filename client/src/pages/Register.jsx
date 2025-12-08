@@ -13,6 +13,8 @@ export default function Register() {
 
   const { values, error, loading, setError, setLoading, onChange, handleError } =
     useAuthForm({
+      firstName: "",
+      lastName: "",
       username: "",
       email: "",
       password: "",
@@ -27,6 +29,11 @@ export default function Register() {
     setError("");
 
     // Client-side validation
+    if (!values.firstName.trim() || !values.lastName.trim()) {
+      setError("กรุณากรอกชื่อ-นามสกุล");
+      return;
+    }
+
     if (!values.username.trim() || !values.email.trim() || values.password.length < 6) {
       setError("กรุณากรอกข้อมูลให้ครบและรหัสผ่านอย่างน้อย 6 ตัวอักษร");
       return;
@@ -40,12 +47,18 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await api.post("/api/auth/register", {
+      // Debug - ดู values ก่อน submit
+      const payload = {
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
         username: values.username.trim(),
         email: values.email.trim(),
         password: values.password,
         role: values.role,
-      });
+      };
+      console.log("📤 Sending to API:", payload);
+
+      await api.post("/api/auth/register", payload);
 
       navigate("/login", { replace: true });
     } catch (err) {
@@ -64,10 +77,44 @@ export default function Register() {
           </div>
         )}
 
+        {/* ชื่อ-นามสกุล */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="firstName" className="mb-1 block text-sm text-neutral-700">
+              First Name
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              placeholder="ชื่อ หรือ First Name"
+              value={values.firstName}
+              onChange={onChange}
+              required
+              className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="lastName" className="mb-1 block text-sm text-neutral-700">
+              Last Name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              placeholder="นามสกุล หรือ Last Name"
+              value={values.lastName}
+              onChange={onChange}
+              required
+              className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white"
+            />
+          </div>
+        </div>
+
         {/* Username */}
         <div>
           <label htmlFor="username" className="mb-1 block text-sm text-neutral-700">
-            Username
+            ID
           </label>
           <input
             id="username"
@@ -90,7 +137,7 @@ export default function Register() {
             id="email"
             name="email"
             type="email"
-            placeholder="example@email.com"
+            placeholder="example@rmutr.ac.th"
             value={values.email}
             onChange={onChange}
             required

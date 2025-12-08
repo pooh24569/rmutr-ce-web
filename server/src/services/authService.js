@@ -8,7 +8,7 @@ import { generateOtp, hashOtp, verifyOtp, isOtpExpired } from "./otpService.js";
 import { sendVerificationOtp, sendPasswordResetOtp } from "./emailService.js";
 import { logger } from "../utils/logger.js";
 
-export const registerUser = async ({ username, email, password, role }) => {
+export const registerUser = async ({ username, email, password, role, firstName, lastName }) => {
   // Check if user exists
   const exists = await userModel.findOne({
     $or: [{ username }, { email: email.toLowerCase().trim() }],
@@ -27,6 +27,8 @@ export const registerUser = async ({ username, email, password, role }) => {
     email: email.toLowerCase().trim(),
     password: hashedPassword,
     role,
+    firstName: firstName?.trim() || "",
+    lastName: lastName?.trim() || "",
   });
 
   // Generate and send OTP

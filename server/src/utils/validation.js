@@ -55,6 +55,8 @@ export const registerSchema = Joi.object({
   username: usernameSchema,
   email: emailSchema,
   password: passwordSchema, // ใช้ password แบบธรรมดา (min 6 chars)
+  firstName: Joi.string().min(1).max(100).trim().optional().allow(""),
+  lastName: Joi.string().min(1).max(100).trim().optional().allow(""),
   role: Joi.string()
     .valid("student", "teacher", "parent", "admin", "superadmin")
     .optional()

@@ -52,14 +52,14 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 5,
+  max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 50, // เพิ่มจาก 5 เป็น 50 สำหรับ dev
   skipSuccessfulRequests: true,
   message: "Too many authentication attempts, please try again later",
 });
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 3,
+  max: 10, // เพิ่มจาก 3 เป็น 10 สำหรับ dev
   message: "Too many OTP requests, please try again later",
 });
 

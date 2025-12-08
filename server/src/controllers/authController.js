@@ -4,7 +4,16 @@ import { logger } from "../utils/logger.js";
 
 export async function register(req, res) {
   try {
-    const { username, password, role, email } = req.body;
+    const { username, password, role, email, firstName, lastName } = req.body;
+
+    // Debug logging
+    console.log("📝 Register Request:", {
+      username,
+      email,
+      firstName,
+      lastName,
+      role,
+    });
 
     const allowedRoles = [
       "student",
@@ -20,6 +29,8 @@ export async function register(req, res) {
       email,
       password,
       role: finalRole,
+      firstName,
+      lastName,
     });
 
     return res.status(201).json({

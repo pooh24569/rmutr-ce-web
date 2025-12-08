@@ -18,21 +18,36 @@ export const ProfileEditForm = ({
 }) => {
     const [selectedImage, setSelectedImage] = useState(null);
 
+    // ตรวจสอบว่าเป็นภาษาไทยหรือไม่
+    const isThai = (text) => /[\u0E00-\u0E7F]/.test(text || "");
+
+    // แยกชื่อไทย/อังกฤษให้ถูกช่อง
+    const firstName = profile?.firstName || "";
+    const lastName = profile?.lastName || "";
+    const firstNameTH = profile?.studentProfile?.firstNameTH || "";
+    const lastNameTH = profile?.studentProfile?.lastNameTH || "";
+
+    // ถ้า firstName เป็นไทย ให้ไปอยู่ช่อง TH แทน
+    const defaultFirstNameEN = !isThai(firstName) ? firstName : "";
+    const defaultLastNameEN = !isThai(lastName) ? lastName : "";
+    const defaultFirstNameTH = firstNameTH || (isThai(firstName) ? firstName : "");
+    const defaultLastNameTH = lastNameTH || (isThai(lastName) ? lastName : "");
+
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm({
         defaultValues: {
-            // Basic profile
-            firstName: profile?.firstName || "",
-            lastName: profile?.lastName || "",
+            // Basic profile - ใช้ค่าที่แยกภาษาแล้ว
+            firstName: defaultFirstNameEN,
+            lastName: defaultLastNameEN,
             phoneNumber: profile?.phoneNumber || "",
 
             // Student profile
             studentId: profile?.studentProfile?.studentId || "",
-            firstNameTH: profile?.studentProfile?.firstNameTH || "",
-            lastNameTH: profile?.studentProfile?.lastNameTH || "",
+            firstNameTH: defaultFirstNameTH,
+            lastNameTH: defaultLastNameTH,
             dateOfBirth: profile?.studentProfile?.dateOfBirth
                 ? new Date(profile.studentProfile.dateOfBirth)
                     .toISOString()

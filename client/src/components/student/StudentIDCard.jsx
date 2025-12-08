@@ -3,9 +3,11 @@ import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const StudentIDCard = ({ profile, onEdit }) => {
-    if (!profile || !profile.studentProfile) return null;
+    // ถ้าไม่มี profile เลย ไม่แสดงอะไร
+    if (!profile) return null;
 
-    const { studentProfile } = profile;
+    // ใช้ค่า default ถ้าไม่มี studentProfile
+    const studentProfile = profile.studentProfile || {};
 
     // Format date to Thai format
     const formatDate = (date) => {
@@ -77,41 +79,63 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                 <div className="bg-blue-50 rounded-lg p-3">
                                     <p className="text-xs text-gray-500">รหัสนักศึกษา / Student ID</p>
                                     <p className="text-2xl font-bold text-blue-600">
-                                        {studentProfile.studentId}
+                                        {studentProfile.studentId || profile.username || "-"}
                                     </p>
                                 </div>
 
-                                {/* Names */}
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className="bg-gray-50 rounded p-2">
-                                        <p className="text-xs text-gray-500">ชื่อ</p>
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {studentProfile.firstNameTH || profile.firstName || "-"}
-                                        </p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded p-2">
-                                        <p className="text-xs text-gray-500">นามสกุล</p>
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {studentProfile.lastNameTH || profile.lastName || "-"}
-                                        </p>
-                                    </div>
-                                </div>
+                                {/* Names - แสดงเฉพาะภาษาที่กรอก */}
+                                {(() => {
+                                    // ตรวจสอบว่าเป็นภาษาไทยหรือไม่
+                                    const isThai = (text) => /[\u0E00-\u0E7F]/.test(text);
 
-                                {/* English Name */}
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className="bg-gray-50 rounded p-2">
-                                        <p className="text-xs text-gray-500">Name</p>
-                                        <p className="text-sm text-gray-700">
-                                            {profile.firstName || "-"}
-                                        </p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded p-2">
-                                        <p className="text-xs text-gray-500">Surname</p>
-                                        <p className="text-sm text-gray-700">
-                                            {profile.lastName || "-"}
-                                        </p>
-                                    </div>
-                                </div>
+                                    const firstName = profile.firstName || "";
+                                    const lastName = profile.lastName || "";
+                                    const firstNameTH = studentProfile.firstNameTH || "";
+                                    const lastNameTH = studentProfile.lastNameTH || "";
+
+                                    // ถ้ามีชื่อไทยใน studentProfile ให้ใช้
+                                    // ถ้าไม่มี ให้เช็คว่า firstName เป็นภาษาไทยไหม
+                                    const thaiFirst = firstNameTH || (isThai(firstName) ? firstName : "");
+                                    const thaiLast = lastNameTH || (isThai(lastName) ? lastName : "");
+                                    const engFirst = !isThai(firstName) ? firstName : "";
+                                    const engLast = !isThai(lastName) ? lastName : "";
+
+                                    return (
+                                        <>
+                                            {/* Thai Name */}
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="bg-gray-50 rounded p-2">
+                                                    <p className="text-xs text-gray-500">ชื่อ</p>
+                                                    <p className="text-sm font-semibold text-gray-800">
+                                                        {thaiFirst || "-"}
+                                                    </p>
+                                                </div>
+                                                <div className="bg-gray-50 rounded p-2">
+                                                    <p className="text-xs text-gray-500">นามสกุล</p>
+                                                    <p className="text-sm font-semibold text-gray-800">
+                                                        {thaiLast || "-"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* English Name */}
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="bg-gray-50 rounded p-2">
+                                                    <p className="text-xs text-gray-500">Name</p>
+                                                    <p className="text-sm text-gray-700">
+                                                        {engFirst || "-"}
+                                                    </p>
+                                                </div>
+                                                <div className="bg-gray-50 rounded p-2">
+                                                    <p className="text-xs text-gray-500">Surname</p>
+                                                    <p className="text-sm text-gray-700">
+                                                        {engLast || "-"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </div>
 
@@ -146,7 +170,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                             {/* Barcode */}
                             <div className="bg-white p-2 rounded">
                                 <Barcode
-                                    value={studentProfile.studentId}
+                                    value={studentProfile.studentId || profile.username || "N/A"}
                                     width={1.5}
                                     height={40}
                                     fontSize={10}
