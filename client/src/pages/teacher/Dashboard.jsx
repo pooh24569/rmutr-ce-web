@@ -76,10 +76,7 @@ const Dashboard = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">Today's Classes</h2>
                 <div className="space-y-3">
-                    {[
-                        { time: "09:00 - 12:00", name: "คณิตศาสตร์วิศวกรรม 1", room: "A101", students: 45 },
-                        { time: "13:00 - 16:00", name: "ฟิสิกส์ 1", room: "B203", students: 38 },
-                    ].map((classItem, index) => (
+                    {[].map((classItem, index) => (
                         <div
                             key={index}
                             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"

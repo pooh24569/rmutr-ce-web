@@ -63,7 +63,13 @@ export const updateUserProfile = async (userId, data) => {
     }
 
     // Update allowed fields
-    const allowedFields = ["firstName", "lastName", "phoneNumber", "profileImage"];
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "phoneNumber",
+      "profileImage",
+    ];
+
     allowedFields.forEach((field) => {
       if (data[field] !== undefined) {
         user[field] = data[field];

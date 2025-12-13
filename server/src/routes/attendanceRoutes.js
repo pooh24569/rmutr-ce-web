@@ -12,8 +12,7 @@ import {
   getStudentAttendanceHistory,
   getClassAttendanceSummary,
 } from "../controllers/attendanceController.js";
-import verifyToken from "../middlewares/authMiddleware.js";
-import authorizeRoles from "../middlewares/roleMiddleware.js";
+import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -21,14 +20,14 @@ const router = express.Router();
  * ============================================================
  * 📚 Session & Attendance Routes
  * ============================================================
- * 
+ *
  * Session Routes (Teacher only):
  * - POST   /sessions/start         - เปิดเรียน
  * - PATCH  /sessions/:sessionId/close - ปิดเรียน
  * - GET    /sessions/open          - ดู Session ที่เปิดอยู่
  * - GET    /sessions/:sessionId    - ดูรายละเอียด Session
  * - GET    /sessions/class/:classId - ดูประวัติ Session ของวิชา
- * 
+ *
  * Attendance Routes:
  * - POST   /attendance/check-in    - เช็คชื่อ (Fingerprint)
  * - POST   /attendance/manual      - เช็คชื่อ Manual (Teacher)
@@ -109,14 +108,11 @@ router.get(
  * @route   POST /api/attendance/check-in
  * @desc    เช็คชื่อด้วยลายนิ้วมือ (จากเครื่องสแกน/Mobile)
  * @access  Public (เครื่องสแกนมี API Key อีกชั้น)
- * 
+ *
  * Note: ในระบบจริงควรมี API Key หรือ Device Token
  *       สำหรับยืนยันว่าเป็นเครื่องสแกนจริง
  */
-router.post(
-  "/attendance/check-in",
-  checkInByFingerprint
-);
+router.post("/attendance/check-in", checkInByFingerprint);
 
 /**
  * @route   POST /api/attendance/manual

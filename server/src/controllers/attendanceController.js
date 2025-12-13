@@ -9,13 +9,13 @@ import Session from "../models/sessionModel.js";
 
 /**
  * ✅ เช็คชื่อด้วยลายนิ้วมือ (Check-in with Fingerprint)
- * 
+ *
  * Flow:
  * 1. รับข้อมูลจากเครื่องสแกน (studentId, deviceId)
  * 2. หา Session ที่เปิดอยู่
  * 3. อัพเดท Attendance record
  * 4. คำนวณสถานะ (มา/สาย)
- * 
+ *
  * Note: API นี้จะถูกเรียกจากเครื่องสแกนหรือ Mobile App
  */
 export const checkInByFingerprint = async (req, res) => {
@@ -81,7 +81,7 @@ export const checkInByFingerprint = async (req, res) => {
     attendance.status = status;
     attendance.method = "FINGERPRINT";
     attendance.deviceId = deviceId || "";
-    
+
     if (location) {
       attendance.location = location;
     }
@@ -94,7 +94,8 @@ export const checkInByFingerprint = async (req, res) => {
     } else if (status === "LATE") {
       session.summary.late += 1;
     }
-    session.summary.absent -= 1;
+    // ✅ FIX: Prevent negative value
+    session.summary.absent = Math.max(0, session.summary.absent - 1);
     await session.save();
 
     // ดึงข้อมูลนักศึกษามาแสดง
@@ -162,7 +163,7 @@ export const manualCheckIn = async (req, res) => {
     attendance.method = "MANUAL";
     attendance.note = note || "";
     attendance.modifiedBy = req.user.id;
-    
+
     if (status !== "ABSENT" && !attendance.checkInTime) {
       attendance.checkInTime = new Date();
     }
@@ -225,9 +226,10 @@ export const getStudentAttendanceHistory = async (req, res) => {
       excused: attendances.filter((a) => a.status === "EXCUSED").length,
     };
 
-    summary.attendanceRate = summary.total > 0
-      ? Math.round(((summary.present + summary.late) / summary.total) * 100)
-      : 0;
+    summary.attendanceRate =
+      summary.total > 0
+        ? Math.round(((summary.present + summary.late) / summary.total) * 100)
+        : 0;
 
     return res.status(200).json({
       success: true,

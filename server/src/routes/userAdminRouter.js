@@ -1,6 +1,5 @@
 import express from "express";
-import verifyToken from "../middlewares/authMiddleware.js";
-import authorizeRoles from "../middlewares/roleMiddleware.js";
+import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 import { canDeleteUser, canAssignRole } from "../middlewares/policies.js";
 import * as UserCtrl from "../controllers/userController.js";
 import { validate, createUserSchema } from "../utils/validation.js";

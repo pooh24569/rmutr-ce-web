@@ -1,48 +1,51 @@
 // src/pages/student/Schedule.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { Calendar, Clock, MapPin, User, BookOpen, RefreshCw } from "lucide-react";
-import { classService } from "@/services/classService";
+import { RefreshCw, User, BookOpen, MapPin, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { enrollmentService } from "@/services/enrollmentService";
 
-// Time slots row (8:00–20:00)
+// Time slots (8:00–20:00)
 const TIME_SLOTS = [
-  "8:00",
-  "9:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
+  { start: "8:00", end: "9:00" },
+  { start: "9:01", end: "10:00" },
+  { start: "10:01", end: "11:00" },
+  { start: "11:01", end: "12:00" },
+  { start: "12:01", end: "13:00" },
+  { start: "13:01", end: "14:00" },
+  { start: "14:01", end: "15:00" },
+  { start: "15:01", end: "16:00" },
+  { start: "16:01", end: "17:00" },
+  { start: "17:01", end: "18:00" },
+  { start: "18:01", end: "19:00" },
+  { start: "19:01", end: "20:00" },
 ];
 
 const DAYS = [
-  { key: "monday", label: "จันทร์", labelEn: "Monday" },
-  { key: "tuesday", label: "อังคาร", labelEn: "Tuesday" },
-  { key: "wednesday", label: "พุธ", labelEn: "Wednesday" },
-  { key: "thursday", label: "พฤหัส", labelEn: "Thursday" },
-  { key: "friday", label: "ศุกร์", labelEn: "Friday" },
-  { key: "saturday", label: "เสาร์", labelEn: "Saturday" },
-  { key: "sunday", label: "อาทิตย์", labelEn: "Sunday" },
+  { key: "sunday", label: "Sunday" },
+  { key: "monday", label: "Monday" },
+  { key: "tuesday", label: "Tuesday" },
+  { key: "wednesday", label: "Wednesday" },
+  { key: "thursday", label: "Thursday" },
+  { key: "friday", label: "Friday" },
+  { key: "saturday", label: "Saturday" },
 ];
 
-// สี gradient สำหรับ Class cards
+// สี background สำหรับ Class cards
 const COLORS = [
-  { bg: "from-blue-400 to-blue-600", text: "text-white" },
-  { bg: "from-purple-400 to-purple-600", text: "text-white" },
-  { bg: "from-green-400 to-green-600", text: "text-white" },
-  { bg: "from-orange-400 to-orange-600", text: "text-white" },
-  { bg: "from-pink-400 to-pink-600", text: "text-white" },
-  { bg: "from-teal-400 to-teal-600", text: "text-white" },
+  { bg: "bg-yellow-100", border: "border-yellow-400", text: "text-gray-800" },
+  { bg: "bg-red-50", border: "border-red-300", text: "text-gray-800" },
+  { bg: "bg-blue-50", border: "border-blue-300", text: "text-gray-800" },
+  { bg: "bg-green-50", border: "border-green-300", text: "text-gray-800" },
+  { bg: "bg-purple-50", border: "border-purple-300", text: "text-gray-800" },
+  { bg: "bg-orange-50", border: "border-orange-300", text: "text-gray-800" },
 ];
 
 const Schedule = () => {
+  const navigate = useNavigate();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const year = 2567; // ปีการศึกษา
 
   useEffect(() => {
     fetchEnrolledClasses();
@@ -52,13 +55,13 @@ const Schedule = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await classService.getEnrolledClasses();
+      const response = await enrollmentService.getMyEnrollments();
       if (response.success) {
         setClasses(response.data);
       }
     } catch (err) {
       console.error("Error fetching classes:", err);
-      setError("ไม่สามารถโหลดตารางเรียนได้");
+      setError(err.response?.data?.message || "ไม่สามารถโหลดตารางเรียนได้");
     } finally {
       setLoading(false);
     }
@@ -72,7 +75,6 @@ const Schedule = () => {
       if (!cls.schedule) return;
 
       cls.schedule.forEach((sch) => {
-        // แปลงเวลาเป็น slot index
         const startHour = parseInt(sch.startTime?.split(":")[0] || "8");
         const endHour = parseInt(sch.endTime?.split(":")[0] || "9");
 
@@ -82,6 +84,7 @@ const Schedule = () => {
           day: sch.day,
           startHour,
           endHour,
+          duration: endHour - startHour,
           classCode: cls.classCode,
           className: cls.className,
           section: cls.section,
@@ -111,43 +114,30 @@ const Schedule = () => {
     return map;
   }, [scheduleEntries]);
 
-  // คำนวณตำแหน่งและขนาดของ block
-  const getBlockStyle = (entry) => {
-    const startSlot = entry.startHour - 8; // 8:00 = slot 0
-    const duration = entry.endHour - entry.startHour;
-    const left = (startSlot / 12) * 100;
-    const width = (duration / 12) * 100;
-    return { left: `${left}%`, width: `${width}%` };
+  const getDayLabel = (day) => {
+    const days = {
+      monday: "จันทร์",
+      tuesday: "อังคาร",
+      wednesday: "พุธ",
+      thursday: "พฤหัส",
+      friday: "ศุกร์",
+      saturday: "เสาร์",
+      sunday: "อาทิตย์",
+    };
+    return days[day] || day;
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">กำลังโหลดตารางเรียน...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <Calendar className="w-6 h-6 text-blue-500" />
-              ตารางเรียน
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              ปีการศึกษา 2567 ภาคเรียนที่ 2
-            </p>
-          </div>
+          <h1 className="text-xl font-bold text-white tracking-wide">
+            STUDY/EXAM SCHEDULE
+          </h1>
           <button
             onClick={fetchEnrolledClasses}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             รีเฟรช
@@ -156,64 +146,78 @@ const Schedule = () => {
       </header>
 
       {/* Content */}
-      <div className="flex-1 bg-gray-50 p-6 overflow-auto">
-        {error ? (
+      <div className="flex-1 p-6 overflow-auto">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-500">กำลังโหลด...</p>
+            </div>
+          </div>
+        ) : error ? (
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-red-600">{error}</p>
+            <p className="text-red-600 mb-4">{error}</p>
             <button
               onClick={fetchEnrolledClasses}
-              className="mt-4 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+              className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
             >
               ลองใหม่
             </button>
           </div>
-        ) : classes.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              ยังไม่มีวิชาที่ลงทะเบียน
-            </h3>
-            <p className="text-gray-500">
-              รอให้อาจารย์เพิ่มคุณเข้าวิชาก่อนนะครับ
-            </p>
-          </div>
         ) : (
           <div className="space-y-6">
+            {/* Year Display */}
+            <div className="flex items-center gap-4">
+              <span className="text-gray-500 text-sm">Year</span>
+              <span className="text-2xl font-bold text-gray-800">{year}</span>
+              {classes.length === 0 && (
+                <span className="text-sm text-gray-400 ml-4">
+                  (ยังไม่มีวิชาลงทะเบียน -{" "}
+                  <button
+                    onClick={() => navigate("/student/registration")}
+                    className="text-red-500 hover:underline"
+                  >
+                    ไปลงทะเบียน
+                  </button>
+                  )
+                </span>
+              )}
+            </div>
+
             {/* Schedule Grid */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              {/* Time header */}
-              <div className="grid grid-cols-[100px_1fr] border-b border-gray-200">
-                <div className="bg-gray-50 border-r border-gray-200 p-3">
-                  <span className="text-xs font-medium text-gray-500">วัน/เวลา</span>
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              {/* Time Header */}
+              <div className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-200 bg-gray-50">
+                <div className="p-2 text-center border-r border-gray-200">
+                  <span className="text-xs text-gray-500">days/</span>
+                  <br />
+                  <span className="text-xs text-gray-500">time</span>
                 </div>
-                <div className="grid grid-cols-12 bg-gray-50">
-                  {TIME_SLOTS.map((time) => (
-                    <div
-                      key={time}
-                      className="text-center py-3 text-xs font-medium text-gray-500 border-r border-gray-100 last:border-r-0"
-                    >
-                      {time}
-                    </div>
-                  ))}
-                </div>
+                {TIME_SLOTS.map((slot, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2 text-center text-xs text-gray-600 border-r border-gray-100 last:border-r-0"
+                  >
+                    {slot.start} - {slot.end}
+                  </div>
+                ))}
               </div>
 
-              {/* Days */}
+              {/* Days Rows */}
               {DAYS.map((day) => (
                 <div
                   key={day.key}
-                  className="grid grid-cols-[100px_1fr] border-b border-gray-100 last:border-b-0"
+                  className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-100 last:border-b-0 min-h-[60px]"
                 >
-                  {/* Day label */}
-                  <div className="bg-gray-50 border-r border-gray-200 p-3 flex flex-col justify-center">
-                    <span className="text-sm font-medium text-gray-800">
+                  {/* Day Label */}
+                  <div className="p-3 border-r border-gray-200 bg-gray-50 flex items-center">
+                    <span className="text-sm font-medium text-gray-700">
                       {day.label}
                     </span>
-                    <span className="text-xs text-gray-400">{day.labelEn}</span>
                   </div>
 
-                  {/* Time slots */}
-                  <div className="relative min-h-[70px]">
+                  {/* Time Grid Background */}
+                  <div className="col-span-12 relative">
                     {/* Grid lines */}
                     <div className="absolute inset-0 grid grid-cols-12">
                       {TIME_SLOTS.map((_, idx) => (
@@ -224,90 +228,106 @@ const Schedule = () => {
                       ))}
                     </div>
 
-                    {/* Class blocks */}
-                    {entriesByDay[day.key]?.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="absolute top-1 bottom-1 px-0.5"
-                        style={getBlockStyle(entry)}
-                      >
-                        <div
-                          className={`h-full bg-gradient-to-r ${entry.color.bg} ${entry.color.text} rounded-lg p-2 shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden`}
-                        >
-                          <div className="text-xs font-bold truncate">
-                            {entry.classCode}
+                    {/* Class Blocks */}
+                    <div className="absolute inset-0 grid grid-cols-12 p-1">
+                      {entriesByDay[day.key]?.map((entry) => {
+                        const startCol = entry.startHour - 8;
+                        const span = entry.duration;
+                        return (
+                          <div
+                            key={entry.id}
+                            className={`${entry.color.bg} ${entry.color.border} ${entry.color.text} border-2 rounded-md p-2 flex flex-col justify-center overflow-hidden`}
+                            style={{
+                              gridColumn: `${startCol + 1} / span ${span}`,
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold bg-yellow-400 text-gray-800 px-1.5 py-0.5 rounded">
+                                {entry.classCode}
+                              </span>
+                            </div>
+                            <div className="text-xs mt-1 truncate">
+                              (ห) {entry.room}
+                            </div>
+                            <div className="text-xs text-gray-600 truncate">
+                              {entry.teacher}
+                            </div>
                           </div>
-                          <div className="text-[10px] opacity-90 truncate">
-                            {entry.className}
-                          </div>
-                          <div className="flex items-center gap-1 mt-1 text-[10px] opacity-80">
-                            <MapPin className="w-3 h-3" />
-                            <span>{entry.room}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Class List */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-800">
-                  รายวิชาที่ลงทะเบียน ({classes.length} วิชา)
-                </h2>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {classes.map((cls, index) => (
-                  <div
-                    key={cls._id}
-                    className="px-6 py-4 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-lg bg-gradient-to-br ${COLORS[index % COLORS.length].bg} flex items-center justify-center text-white font-bold text-lg shadow-sm`}
-                      >
-                        {cls.classCode?.charAt(0) || "?"}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-500">
-                            {cls.classCode}
-                          </span>
-                          <span className="text-gray-300">•</span>
-                          <span className="text-sm text-gray-500">
-                            Section {cls.section}
-                          </span>
-                        </div>
-                        <h3 className="font-semibold text-gray-800 mt-0.5">
+            {/* Subject List Table */}
+            {classes.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        รหัสวิชา
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                        SEC
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        รายวิชา
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        อาจารย์ผู้สอน
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        วัน/เวลาเรียน-ห้อง
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                        สถานะ
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {classes.map((cls) => (
+                      <tr key={cls._id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-800">
+                          {cls.classCode}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">
+                          {cls.section || 1}
+                        </td>
+                        <td className="px-4 py-3 text-gray-800">
                           {cls.className}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <User className="w-4 h-4" />
-                            {cls.teacher?.firstName} {cls.teacher?.lastName}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-700">
+                              {cls.teacher?.firstName} {cls.teacher?.lastName}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">
+                          {cls.schedule?.map((s, i) => (
+                            <div key={i} className="text-xs">
+                              <span className="inline-block bg-gray-100 px-1.5 py-0.5 rounded mr-1">
+                                {getDayLabel(s.day)}
+                              </span>
+                              {s.startTime}-{s.endTime} ห้อง {s.room}
+                            </div>
+                          ))}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            ลงทะเบียนแล้ว
                           </span>
-                          {cls.schedule?.[0] && (
-                            <>
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                {cls.schedule[0].startTime} - {cls.schedule[0].endTime}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                {cls.schedule[0].room}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

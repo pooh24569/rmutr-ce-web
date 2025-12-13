@@ -8,7 +8,8 @@ import ConfirmDialog from "../ConfirmDialog";
 const studentLinks = [
   { href: "/student/homework", label: "HOMEWORK LIST" },
   { href: "/student/calendar", label: "CALENDAR" },
-  { href: "/student/schedule", label: "STUDY/EXAM SCHEDULE" },
+  { href: "/student/schedule", label: "SCHEDULE" },          // ตารางเรียน
+  { href: "/student/registration", label: "REGISTRATION" },  // ลงทะเบียน
   { href: "/student/attendance", label: "CHECK ATTENDANCE" },
   { href: "/student/profile", label: "PROFILE" },
 ];

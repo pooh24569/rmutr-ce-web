@@ -7,7 +7,6 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 
-
 import dbConnect from "./config/dbConnect.js";
 import { logger } from "./utils/logger.js";
 import sanitizeRequest from "./middlewares/sanitize.js";
@@ -18,7 +17,8 @@ import eventRoutes from "./routes/eventRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
-
+import registrationRoutes from "./routes/registrationRoutes.js";
+import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 
 // Connect to database
 await dbConnect();
@@ -41,10 +41,10 @@ app.use(
   })
 );
 
-// Rate Limiters
+// Rate Limiters - เพิ่มสำหรับ Development
 const apiLimiter = rateLimit({
-  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 1 * 60 * 1000, // ลดเหลือ 1 นาที
+  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 2000, // เพิ่มเป็น 2000
   message: "Too many requests from this IP, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
@@ -61,6 +61,15 @@ const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10, // เพิ่มจาก 3 เป็น 10 สำหรับ dev
   message: "Too many OTP requests, please try again later",
+});
+
+// ✅ SECURITY FIX: Add rate limiter for check-in to prevent brute-force
+const checkInLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: Number(process.env.CHECKIN_RATE_LIMIT_MAX) || 10, // 10 attempts per minute
+  message: "Too many check-in attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // ============================================
@@ -146,6 +155,9 @@ app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/send-verify-otp", otpLimiter);
 app.use("/api/auth/send-reset-otp", otpLimiter);
+// ✅ SECURITY FIX: Apply rate limiter to check-in endpoint
+app.use("/api/attendance/check-in", checkInLimiter);
+app.use("/api/sessions/:sessionId/check-in", checkInLimiter);
 
 // ============================================
 // ROUTES
@@ -158,7 +170,8 @@ app.use("/api/events", eventRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api", attendanceRoutes); // Session & Attendance
-
+app.use("/api/registration", registrationRoutes); // Mock Registration Data
+app.use("/api/enrollments", enrollmentRoutes); // Student Enrollment
 
 // ============================================
 // ERROR HANDLING

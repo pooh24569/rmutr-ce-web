@@ -16,7 +16,7 @@ const Camping = () => {
     resolver: zodResolver(campingSchema),
   });
   const onSubmit = (data) => {
-    console.log(data);
+    // TODO: Implement camping creation API call
   };
 
   return (

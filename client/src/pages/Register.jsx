@@ -47,18 +47,14 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Debug - ดู values ก่อน submit
-      const payload = {
+      await api.post("/api/auth/register", {
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         username: values.username.trim(),
         email: values.email.trim(),
         password: values.password,
         role: values.role,
-      };
-      console.log("📤 Sending to API:", payload);
-
-      await api.post("/api/auth/register", payload);
+      });
 
       navigate("/login", { replace: true });
     } catch (err) {

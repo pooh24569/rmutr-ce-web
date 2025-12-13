@@ -6,15 +6,6 @@ export async function register(req, res) {
   try {
     const { username, password, role, email, firstName, lastName } = req.body;
 
-    // Debug logging
-    console.log("📝 Register Request:", {
-      username,
-      email,
-      firstName,
-      lastName,
-      role,
-    });
-
     const allowedRoles = [
       "student",
       "teacher",

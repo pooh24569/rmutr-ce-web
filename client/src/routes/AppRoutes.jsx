@@ -28,6 +28,7 @@ import StudentCalendar from "@/pages/student/Calendar";
 import Schedule from "@/pages/student/Schedule";
 import Profile from "@/pages/student/Profile";
 import ProfileEdit from "@/pages/student/ProfileEdit";
+import Registration from "@/pages/student/Registration";
 
 // Teacher Portal
 import TeacherLayout from "@/layouts/TeacherLayout";
@@ -35,6 +36,7 @@ import TeacherDashboard from "@/pages/teacher/Dashboard";
 import TeacherClasses from "@/pages/teacher/Classes";
 import ClassDetail from "@/pages/teacher/ClassDetail";
 import StartAttendance from "@/pages/teacher/StartAttendance";
+import TeacherProfile from "@/pages/teacher/Profile";
 
 export default function AppRoutes() {
   return (
@@ -62,6 +64,7 @@ export default function AppRoutes() {
               <Route path="schedule" element={<Schedule />} />
               <Route path="profile" element={<Profile />} />
               <Route path="profile/edit" element={<ProfileEdit />} />
+              <Route path="registration" element={<Registration />} />
             </Route>
           </Route>
 
@@ -77,6 +80,7 @@ export default function AppRoutes() {
               <Route path="homework" element={<div className="p-6"><h1 className="text-2xl font-bold">Homework</h1><p className="text-gray-500">Coming soon...</p></div>} />
               <Route path="calendar" element={<div className="p-6"><h1 className="text-2xl font-bold">Calendar</h1><p className="text-gray-500">Coming soon...</p></div>} />
               <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-500">Coming soon...</p></div>} />
+              <Route path="profile" element={<TeacherProfile />} />
             </Route>
           </Route>
 

@@ -1,21 +1,24 @@
 // src/pages/teacher/Classes.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2, Eye, BookOpen, Download } from "lucide-react";
 import CreateClassModal from "./components/CreateClassModal";
 import { classService } from "@/services/classService";
+import registrationService from "@/services/registrationService";
+import { toast } from "sonner";
 
 const Classes = () => {
     const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
+    const [registrationCourses, setRegistrationCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
 
-    // Fetch classes
     useEffect(() => {
         fetchClasses();
+        fetchRegistrationCourses();
     }, []);
 
     const fetchClasses = async () => {
@@ -29,6 +32,58 @@ const Classes = () => {
             console.error("Error fetching classes:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // ดึงวิชาจากระบบทะเบียน และ Auto-Import เข้า Database
+    // แสดงเฉพาะวิชาที่ตรงกับ registration ของอาจารย์คนนี้
+    const fetchRegistrationCourses = async () => {
+        try {
+            const response = await registrationService.getTeachingCourses();
+            if (response.success) {
+                const regCourses = response.data;
+                setRegistrationCourses(regCourses);
+                const regCourseCodes = regCourses.map(c => c.courseCode);
+
+                // Auto-import วิชาที่ยังไม่มีใน Database
+                for (const course of regCourses) {
+                    const existingClass = classes.find(c => c.classCode === course.courseCode);
+                    if (!existingClass) {
+                        try {
+                            const classData = {
+                                classCode: course.courseCode,
+                                className: course.courseName,
+                                section: course.section,
+                                schedule: course.schedule || [],
+                                academicYear: "2567",
+                                semester: "1",
+                                isFromRegistration: true, // บอกว่ามาจากทะเบียน
+                            };
+                            await classService.createClass(classData);
+                        } catch (err) {
+                            console.log(`Class ${course.courseCode} อาจมีอยู่แล้ว`);
+                        }
+                    }
+                }
+                // Fetch classes ใหม่หลัง import
+                const classesResponse = await classService.getMyClasses();
+                if (classesResponse.success) {
+                    // Filter: 
+                    // - แสดง Classes ที่สร้างเอง (isFromRegistration = false/undefined)
+                    // - แสดง Classes จากทะเบียน เฉพาะที่ยังตรง (classCode อยู่ใน regCourseCodes)
+                    const filteredByReg = classesResponse.data.filter(c => {
+                        if (c.isFromRegistration) {
+                            // วิชาจากทะเบียน - แสดงเฉพาะที่ยังตรง
+                            return regCourseCodes.includes(c.classCode);
+                        }
+                        // วิชาที่สร้างเอง - แสดงเสมอ
+                        return true;
+                    });
+                    setClasses(filteredByReg);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching registration courses:", error);
         }
     };
 
@@ -107,6 +162,7 @@ const Classes = () => {
                     className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
             </div>
+
 
             {/* Classes Grid */}
             {loading ? (

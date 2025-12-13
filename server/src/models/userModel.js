@@ -30,8 +30,8 @@ const userSchema = new mongoose.Schema(
     },
     roles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Role" }],
 
-    // Email verification (คงไว้ได้)
-    verifyOtp: { type: String, default: "" },
+    // ✅ Email verification OTP - SECURITY FIX: Now hashed like resetOtpHash
+    verifyOtpHash: { type: String, default: "" },
     verifyOtpExpiry: { type: Number, default: 0 },
     isAccountVerified: { type: Boolean, default: false },
 

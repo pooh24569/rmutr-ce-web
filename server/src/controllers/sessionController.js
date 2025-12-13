@@ -10,7 +10,7 @@ import Class from "../models/classModel.js";
 
 /**
  * 🟢 เปิดเรียน (Start Session)
- * 
+ *
  * Flow:
  * 1. ตรวจสอบว่าอาจารย์เป็นเจ้าของวิชา
  * 2. ตรวจสอบว่าไม่มี Session ที่เปิดอยู่
@@ -22,11 +22,11 @@ export const startSession = async (req, res) => {
   try {
     const {
       classId,
-      date,           // วันที่ (optional, default = วันนี้)
-      startTime,      // เวลาเริ่ม เช่น "09:00"
+      date, // วันที่ (optional, default = วันนี้)
+      startTime, // เวลาเริ่ม เช่น "09:00"
       lateAfterMinutes, // สายหลังกี่นาที เช่น 15
       closeAfterMinutes, // ปิดหลังกี่นาที เช่น 30
-      classEndTime,   // เวลาจบคลาส เช่น "12:00"
+      classEndTime, // เวลาจบคลาส เช่น "12:00"
       room,
       deviceId,
     } = req.body;
@@ -68,7 +68,7 @@ export const startSession = async (req, res) => {
 
     // 4️⃣ คำนวณเวลา
     const [startHour, startMinute] = startTime.split(":").map(Number);
-    
+
     // เวลาสาย = เวลาเริ่ม + lateAfterMinutes
     const lateDate = new Date(today);
     lateDate.setHours(startHour, startMinute + (lateAfterMinutes || 15), 0, 0);
@@ -76,7 +76,12 @@ export const startSession = async (req, res) => {
 
     // เวลาปิด = เวลาเริ่ม + closeAfterMinutes
     const closeDate = new Date(today);
-    closeDate.setHours(startHour, startMinute + (closeAfterMinutes || 30), 0, 0);
+    closeDate.setHours(
+      startHour,
+      startMinute + (closeAfterMinutes || 30),
+      0,
+      0
+    );
     const endTime = `${String(closeDate.getHours()).padStart(2, "0")}:${String(closeDate.getMinutes()).padStart(2, "0")}`;
 
     // 5️⃣ สร้าง Session
@@ -127,17 +132,17 @@ export const startSession = async (req, res) => {
     });
   } catch (error) {
     console.error("Error starting session:", error);
+    // ✅ SECURITY FIX: Don't expose internal error message
     return res.status(500).json({
       success: false,
       message: "เกิดข้อผิดพลาดในการเปิดเรียน",
-      error: error.message,
     });
   }
 };
 
 /**
  * 🔴 ปิดเรียน (Close Session)
- * 
+ *
  * Flow:
  * 1. เปลี่ยนสถานะ Session เป็น CLOSED
  * 2. อัพเดทสรุปผล (present, late, absent)

@@ -27,7 +27,7 @@ export const useProfile = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message;
       setError(errorMessage);
-      toast.error(errorMessage);
+      // Don't show toast on initial load failure
     } finally {
       setLoading(false);
     }

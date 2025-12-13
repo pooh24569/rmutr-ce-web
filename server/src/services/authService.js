@@ -5,10 +5,19 @@ import {
   generateToken,
 } from "../utils/password.js";
 import { generateOtp, hashOtp, verifyOtp, isOtpExpired } from "./otpService.js";
+
+// ✅ SECURITY FIX: Use hash for verification OTP as well
 import { sendVerificationOtp, sendPasswordResetOtp } from "./emailService.js";
 import { logger } from "../utils/logger.js";
 
-export const registerUser = async ({ username, email, password, role, firstName, lastName }) => {
+export const registerUser = async ({
+  username,
+  email,
+  password,
+  role,
+  firstName,
+  lastName,
+}) => {
   // Check if user exists
   const exists = await userModel.findOne({
     $or: [{ username }, { email: email.toLowerCase().trim() }],
@@ -33,7 +42,8 @@ export const registerUser = async ({ username, email, password, role, firstName,
 
   // Generate and send OTP
   const otp = generateOtp();
-  user.verifyOtp = otp;
+  // ✅ SECURITY FIX: Hash OTP before storing (same as resetOtpHash)
+  user.verifyOtpHash = hashOtp(otp);
   user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
   await user.save();
 
@@ -225,7 +235,8 @@ export const sendVerificationOtpCode = async (userId) => {
 
   // Generate OTP
   const otp = generateOtp();
-  user.verifyOtp = otp;
+  // ✅ SECURITY FIX: Hash OTP before storing
+  user.verifyOtpHash = hashOtp(otp);
   user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
@@ -256,23 +267,25 @@ export const verifyUserEmail = async (userId, otp) => {
     throw error;
   }
 
-  // Check OTP
-  if (!user.verifyOtp || user.verifyOtp !== otp) {
-    const error = new Error("Invalid OTP");
+  // Check expiry first
+  if (isOtpExpired(user.verifyOtpExpiry)) {
+    logger.warn("Expired verify OTP attempt", { userId: user._id });
+    const error = new Error("OTP has expired. Please request a new one.");
     error.statusCode = 400;
     throw error;
   }
 
-  // Check expiry
-  if (user.verifyOtpExpiry < Date.now()) {
-    const error = new Error("OTP has expired. Please request a new one.");
+  // ✅ SECURITY FIX: Use timing-safe comparison for hashed OTP
+  if (!user.verifyOtpHash || !verifyOtp(otp, user.verifyOtpHash)) {
+    logger.warn("Invalid verify OTP attempt", { userId: user._id });
+    const error = new Error("Invalid OTP");
     error.statusCode = 400;
     throw error;
   }
 
   // Verify account
   user.isAccountVerified = true;
-  user.verifyOtp = "";
+  user.verifyOtpHash = "";
   user.verifyOtpExpiry = 0;
   await user.save();
 

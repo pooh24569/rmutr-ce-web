@@ -1,6 +1,5 @@
 import express from "express";
-import verifyToken from "../middlewares/authMiddleware.js";
-import authorizeRoles from "../middlewares/roleMiddleware.js";
+import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const userRouter = express.Router();
 

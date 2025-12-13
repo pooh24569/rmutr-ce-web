@@ -11,8 +11,7 @@ import {
   getAllStudents,
   importStudentsToClass,
 } from "../controllers/classController.js";
-import verifyToken from "../middlewares/authMiddleware.js";
-import authorizeRoles from "../middlewares/roleMiddleware.js";
+import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
