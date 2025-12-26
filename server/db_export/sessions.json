@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "6935a423002d2c899d36ce95",
+    "classId": "6935a322002d2c899d36ce3c",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2025-12-06T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:15",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "1132",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 2,
+      "present": 0,
+      "late": 0,
+      "absent": 2
+    },
+    "createdAt": "2025-12-07T15:58:27.335Z",
+    "updatedAt": "2025-12-07T15:58:47.277Z"
+  }
+]

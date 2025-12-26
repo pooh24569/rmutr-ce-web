@@ -12,6 +12,8 @@ export default defineConfig({
   },
   server: {
     // แก้ปัญหา CSP eval blocked
+    host: "0.0.0.0",
+    port: 5173,
     headers: {
       "Content-Security-Policy": "script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none';",
     },

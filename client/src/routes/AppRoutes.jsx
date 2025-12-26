@@ -24,6 +24,8 @@ import Camping from "@/pages/admin/Camping";
 
 import StudentLayout from "@/layouts/StudentLayout";
 import HomeworkList from "@/pages/student/HomeworkList";
+import HomeworkDetail from "@/pages/student/HomeworkDetail";
+import ClassHomework from "@/pages/student/ClassHomework";
 import StudentCalendar from "@/pages/student/Calendar";
 import Schedule from "@/pages/student/Schedule";
 import Profile from "@/pages/student/Profile";
@@ -37,6 +39,9 @@ import TeacherClasses from "@/pages/teacher/Classes";
 import ClassDetail from "@/pages/teacher/ClassDetail";
 import StartAttendance from "@/pages/teacher/StartAttendance";
 import TeacherProfile from "@/pages/teacher/Profile";
+import HomeworkManage from "@/pages/teacher/HomeworkManage";
+import HomeworkSubmissions from "@/pages/teacher/HomeworkSubmissions";
+import TeacherCalendar from "@/pages/teacher/Calendar";
 
 export default function AppRoutes() {
   return (
@@ -60,6 +65,8 @@ export default function AppRoutes() {
             <Route path="/student" element={<StudentLayout />}>
               <Route index element={<Navigate to="/student/homework" replace />} />
               <Route path="homework" element={<HomeworkList />} />
+              <Route path="homework/class/:classId" element={<ClassHomework />} />
+              <Route path="homework/:homeworkId" element={<HomeworkDetail />} />
               <Route path="calendar" element={<StudentCalendar />} />
               <Route path="schedule" element={<Schedule />} />
               <Route path="profile" element={<Profile />} />
@@ -77,8 +84,9 @@ export default function AppRoutes() {
               <Route path="classes/:classId" element={<ClassDetail />} />
               <Route path="attendance/start/:classId" element={<StartAttendance />} />
               <Route path="attendance" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance</h1><p className="text-gray-500">Coming soon...</p></div>} />
-              <Route path="homework" element={<div className="p-6"><h1 className="text-2xl font-bold">Homework</h1><p className="text-gray-500">Coming soon...</p></div>} />
-              <Route path="calendar" element={<div className="p-6"><h1 className="text-2xl font-bold">Calendar</h1><p className="text-gray-500">Coming soon...</p></div>} />
+              <Route path="homework" element={<HomeworkManage />} />
+              <Route path="homework/:homeworkId/submissions" element={<HomeworkSubmissions />} />
+              <Route path="calendar" element={<TeacherCalendar />} />
               <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-500">Coming soon...</p></div>} />
               <Route path="profile" element={<TeacherProfile />} />
             </Route>

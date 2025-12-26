@@ -27,21 +27,16 @@ const StudentSidebar = () => {
   return (
     <aside className="w-60 bg-[#f5f5f5] border-r border-[#dddddd] flex flex-col">
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-[#dddddd]">
+      <div className="h-20 flex items-center px-6">
         <img
           src="/LOGO-RMUTR.png"
           alt="RMUTR"
-          className="h-8 object-contain"
+          className="h-20 object-contain"
         />
       </div>
 
-      {/* Main menu label */}
-      <div className="px-6 pt-6 pb-2 text-[11px] font-semibold text-[#999] uppercase">
-        MAIN MENU
-      </div>
-
       {/* Menu items */}
-      <nav className="flex-1 px-2 space-y-1">
+      <nav className="flex-1 px-2 space-y-1 py-0">
         {studentLinks.map((item) => {
           const active = location.pathname.startsWith(item.href);
 

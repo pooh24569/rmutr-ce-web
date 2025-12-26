@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "6935a423002d2c899d36ce97",
+    "sessionId": "6935a423002d2c899d36ce95",
+    "classId": "6935a322002d2c899d36ce3c",
+    "student": "6935a352002d2c899d36ce49",
+    "date": "2025-12-06T17:00:00.000Z",
+    "checkInTime": null,
+    "status": "ABSENT",
+    "method": "FINGERPRINT",
+    "note": "",
+    "deviceId": "",
+    "location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "modifiedBy": null,
+    "createdAt": "2025-12-07T15:58:27.337Z",
+    "updatedAt": "2025-12-07T15:58:27.337Z"
+  },
+  {
+    "_id": "6935a423002d2c899d36ce98",
+    "sessionId": "6935a423002d2c899d36ce95",
+    "classId": "6935a322002d2c899d36ce3c",
+    "student": "692d4d11151c9c03b03e8235",
+    "date": "2025-12-06T17:00:00.000Z",
+    "checkInTime": null,
+    "status": "ABSENT",
+    "method": "FINGERPRINT",
+    "note": "",
+    "deviceId": "",
+    "location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "modifiedBy": null,
+    "createdAt": "2025-12-07T15:58:27.338Z",
+    "updatedAt": "2025-12-07T15:58:27.338Z"
+  }
+]

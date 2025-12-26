@@ -144,7 +144,7 @@ export const ProfileEditForm = ({
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <Label htmlFor="firstName">First Name (English)</Label>
+                        <Label htmlFor="firstName">First Name </Label>
                         <Input
                             id="firstName"
                             {...register("firstName", { required: "First name is required" })}
@@ -158,7 +158,7 @@ export const ProfileEditForm = ({
                     </div>
 
                     <div>
-                        <Label htmlFor="lastName">Last Name (English)</Label>
+                        <Label htmlFor="lastName">Last Name </Label>
                         <Input
                             id="lastName"
                             {...register("lastName", { required: "Last name is required" })}
@@ -172,12 +172,12 @@ export const ProfileEditForm = ({
                     </div>
 
                     <div>
-                        <Label htmlFor="firstNameTH">ชื่อ (ภาษาไทย)</Label>
+                        <Label htmlFor="firstNameTH">ชื่อ </Label>
                         <Input id="firstNameTH" {...register("firstNameTH")} className="mt-1" />
                     </div>
 
                     <div>
-                        <Label htmlFor="lastNameTH">นามสกุล (ภาษาไทย)</Label>
+                        <Label htmlFor="lastNameTH">นามสกุล </Label>
                         <Input id="lastNameTH" {...register("lastNameTH")} className="mt-1" />
                     </div>
 
@@ -185,6 +185,8 @@ export const ProfileEditForm = ({
                         <Label htmlFor="phoneNumber">Phone Number</Label>
                         <Input
                             id="phoneNumber"
+                            type="tel"
+                            inputMode="numeric"
                             {...register("phoneNumber", {
                                 pattern: {
                                     value: /^[0-9]{9,10}$/,
@@ -192,7 +194,7 @@ export const ProfileEditForm = ({
                                 },
                             })}
                             className="mt-1"
-                            placeholder="0812345678"
+                            onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
                         />
                         {errors.phoneNumber && (
                             <p className="text-red-500 text-sm mt-1">
@@ -407,6 +409,8 @@ export const ProfileEditForm = ({
                             <Label htmlFor="emergencyPhone">Phone Number</Label>
                             <Input
                                 id="emergencyPhone"
+                                type="tel"
+                                inputMode="numeric"
                                 {...register("emergencyPhone", {
                                     pattern: {
                                         value: /^[0-9]{9,10}$/,
@@ -414,7 +418,7 @@ export const ProfileEditForm = ({
                                     },
                                 })}
                                 className="mt-1"
-                                placeholder="0812345678"
+                                onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
                             />
                             {errors.emergencyPhone && (
                                 <p className="text-red-500 text-sm mt-1">

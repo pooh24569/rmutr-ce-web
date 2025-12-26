@@ -57,7 +57,12 @@ const ProfileEdit = () => {
     if (loading && !profile) {
         return (
             <div className="flex flex-col h-full">
-                <StudentHeader title="EDIT PROFILE" />
+                <StudentHeader
+                    breadcrumbs={[
+                        { label: "My Profile", link: "/student/profile" },
+                        { label: "EDIT PROFILE" }
+                    ]}
+                />
                 <div className="flex-1 flex items-center justify-center bg-[#e5e5e5]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
@@ -70,21 +75,14 @@ const ProfileEdit = () => {
 
     return (
         <div className="flex flex-col h-full">
-            <StudentHeader title="EDIT PROFILE" />
+            <StudentHeader
+                breadcrumbs={[
+                    { label: "My Profile", link: "/student/profile" },
+                    { label: "EDIT PROFILE" }
+                ]}
+            />
 
             <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
-                {/* Back Button */}
-                <div className="mb-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate('/student/profile')}
-                        className="flex items-center space-x-2"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        <span>Back to Profile</span>
-                    </Button>
-                </div>
 
                 {/* Edit Form */}
                 <ProfileEditForm

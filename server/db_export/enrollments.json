@@ -1,0 +1,56 @@
+[
+  {
+    "_id": "693dca8b03c8991eabc6123d",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "693bc415e9240e55bdb0a66c",
+    "createdAt": "2025-12-13T20:20:27.598Z",
+    "enrolledAt": "2025-12-13T20:20:27.597Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:53.550Z"
+  },
+  {
+    "_id": "693dcaa403c8991eabc6123e",
+    "class": "693bc3fde9240e55bdb0a64f",
+    "student": "693dc21cad9f02d90b72489c",
+    "createdAt": "2025-12-13T20:20:52.580Z",
+    "enrolledAt": "2025-12-13T20:20:52.580Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:52.580Z"
+  },
+  {
+    "_id": "693dcaa603c8991eabc6123f",
+    "class": "693bc7f8d96b4576b1779fe8",
+    "student": "693dc21cad9f02d90b72489c",
+    "createdAt": "2025-12-13T20:20:54.101Z",
+    "enrolledAt": "2025-12-13T20:20:54.100Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:54.101Z"
+  },
+  {
+    "_id": "693dcaa603c8991eabc61240",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "693dc2f4a0b3932fd25341c7",
+    "createdAt": "2025-12-13T20:20:54.657Z",
+    "enrolledAt": "2025-12-13T20:20:54.657Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:54.657Z"
+  },
+  {
+    "_id": "693dcaa703c8991eabc61241",
+    "class": "693dc2f4a0b3932fd25341c0",
+    "student": "693dc21cad9f02d90b72489c",
+    "createdAt": "2025-12-13T20:20:55.198Z",
+    "enrolledAt": "2025-12-13T20:20:55.197Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:55.198Z"
+  },
+  {
+    "_id": "693dcaa703c8991eabc61242",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "693dc2beb7a3dd2ffcefb7cc",
+    "createdAt": "2025-12-13T20:20:55.812Z",
+    "enrolledAt": "2025-12-13T20:20:55.812Z",
+    "status": "enrolled",
+    "updatedAt": "2025-12-13T20:20:55.812Z"
+  }
+]

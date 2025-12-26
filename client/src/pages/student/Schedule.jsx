@@ -133,7 +133,7 @@ const Schedule = () => {
       <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white tracking-wide">
-            STUDY/EXAM SCHEDULE
+            STUDY SCHEDULE
           </h1>
           <button
             onClick={fetchEnrolledClasses}
@@ -207,7 +207,7 @@ const Schedule = () => {
               {DAYS.map((day) => (
                 <div
                   key={day.key}
-                  className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-100 last:border-b-0 min-h-[60px]"
+                  className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-100 last:border-b-0 h-[80px]"
                 >
                   {/* Day Label */}
                   <div className="p-3 border-r border-gray-200 bg-gray-50 flex items-center">
@@ -217,7 +217,7 @@ const Schedule = () => {
                   </div>
 
                   {/* Time Grid Background */}
-                  <div className="col-span-12 relative">
+                  <div className="col-span-12 relative overflow-hidden">
                     {/* Grid lines */}
                     <div className="absolute inset-0 grid grid-cols-12">
                       {TIME_SLOTS.map((_, idx) => (
@@ -236,22 +236,19 @@ const Schedule = () => {
                         return (
                           <div
                             key={entry.id}
-                            className={`${entry.color.bg} ${entry.color.border} ${entry.color.text} border-2 rounded-md p-2 flex flex-col justify-center overflow-hidden`}
+                            className={`${entry.color.bg} ${entry.color.border} ${entry.color.text} border-2 rounded-lg p-2 flex flex-col justify-center overflow-hidden h-full shadow-sm`}
                             style={{
                               gridColumn: `${startCol + 1} / span ${span}`,
                             }}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold bg-yellow-400 text-gray-800 px-1.5 py-0.5 rounded">
-                                {entry.classCode}
-                              </span>
-                            </div>
-                            <div className="text-xs mt-1 truncate">
-                              (ห) {entry.room}
-                            </div>
-                            <div className="text-xs text-gray-600 truncate">
-                              {entry.teacher}
-                            </div>
+                            {/* รหัสวิชา */}
+                            <span className="inline-block text-xs font-bold bg-yellow-400 text-gray-800 px-2 py-0.5 rounded w-fit">
+                              {entry.classCode}
+                            </span>
+                            {/* ห้องเรียน + อาจารย์ */}
+                            <p className="text-xs text-gray-700 leading-tight mt-1 truncate">
+                              ห้อง {entry.room} • {entry.teacher || "-"}
+                            </p>
                           </div>
                         );
                       })}

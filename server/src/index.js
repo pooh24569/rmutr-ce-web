@@ -6,6 +6,8 @@ import helmet from "helmet";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import dbConnect from "./config/dbConnect.js";
 import { logger } from "./utils/logger.js";
@@ -19,6 +21,12 @@ import classRoutes from "./routes/classRoutes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import homeworkRoutes from "./routes/homeworkRoutes.js";
+
+// ES Module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Connect to database
 await dbConnect();
@@ -43,16 +51,16 @@ app.use(
 
 // Rate Limiters - เพิ่มสำหรับ Development
 const apiLimiter = rateLimit({
-  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 1 * 60 * 1000, // ลดเหลือ 1 นาที
-  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 2000, // เพิ่มเป็น 2000
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 1 * 60 * 1000, // 1 นาที
+  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 5000, // เพิ่มเป็น 5000 สำหรับ dev
   message: "Too many requests from this IP, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 50, // เพิ่มจาก 5 เป็น 50 สำหรับ dev
+  windowMs: 1 * 60 * 1000, // 1 นาทีสำหรับ dev (production ควรเป็น 15 นาที)
+  max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 500, // เพิ่มเป็น 500 สำหรับ dev
   skipSuccessfulRequests: true,
   message: "Too many authentication attempts, please try again later",
 });
@@ -114,6 +122,13 @@ app.use(
 );
 
 // ============================================
+// STATIC FILE SERVING
+// ============================================
+
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+
+// ============================================
 // HEALTH CHECK & INFO ENDPOINTS
 // ============================================
 
@@ -150,14 +165,14 @@ app.get("/health", async (_req, res) => {
 // APPLY RATE LIMITERS TO ROUTES
 // ============================================
 
-app.use("/api/", apiLimiter);
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
-app.use("/api/auth/send-verify-otp", otpLimiter);
-app.use("/api/auth/send-reset-otp", otpLimiter);
-// ✅ SECURITY FIX: Apply rate limiter to check-in endpoint
-app.use("/api/attendance/check-in", checkInLimiter);
-app.use("/api/sessions/:sessionId/check-in", checkInLimiter);
+// ⚠️ DEV MODE: Rate limiters ปิดไว้ชั่วคราว เปิดใช้ตอน production
+// app.use("/api/", apiLimiter);
+// app.use("/api/auth/login", authLimiter);
+// app.use("/api/auth/register", authLimiter);
+// app.use("/api/auth/send-verify-otp", otpLimiter);
+// app.use("/api/auth/send-reset-otp", otpLimiter);
+// app.use("/api/attendance/check-in", checkInLimiter);
+// app.use("/api/sessions/:sessionId/check-in", checkInLimiter);
 
 // ============================================
 // ROUTES
@@ -172,6 +187,8 @@ app.use("/api/classes", classRoutes);
 app.use("/api", attendanceRoutes); // Session & Attendance
 app.use("/api/registration", registrationRoutes); // Mock Registration Data
 app.use("/api/enrollments", enrollmentRoutes); // Student Enrollment
+app.use("/api/dashboard", dashboardRoutes); // Dashboard Statistics
+app.use("/api/homework", homeworkRoutes); // Homework System
 
 // ============================================
 // ERROR HANDLING

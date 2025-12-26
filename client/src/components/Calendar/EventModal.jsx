@@ -205,18 +205,20 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         </div>
 
                         <div>
-                            <label htmlFor="color" className="block text-sm font-medium text-neutral-700 mb-1">
+                            <label htmlFor="color" className="block text-sm font-medium text-neutral-700 mb-1 ml-1">
                                 Color
                             </label>
                             <div className="flex items-center gap-2">
-                                <input
-                                    type="color"
-                                    id="color"
-                                    name="color"
-                                    value={formData.color}
-                                    onChange={handleChange}
-                                    className="w-12 h-10 border border-neutral-300 rounded-lg cursor-pointer"
-                                />
+                                <div className="w-11 h-11 rounded-lg border border-neutral-300 overflow-hidden flex-shrink-0">
+                                    <input
+                                        type="color"
+                                        id="color"
+                                        name="color"
+                                        value={formData.color}
+                                        onChange={handleChange}
+                                        className="w-16 h-16 -m-2.5 cursor-pointer"
+                                    />
+                                </div>
                                 <input
                                     type="text"
                                     value={formData.color}
@@ -313,24 +315,6 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         )}
                     </div>
 
-                    {/* Visibility */}
-                    <div>
-                        <label htmlFor="visibility" className="block text-sm font-medium text-neutral-700 mb-1">
-                            Visibility
-                        </label>
-                        <select
-                            id="visibility"
-                            name="visibility"
-                            value={formData.visibility}
-                            onChange={handleChange}
-                            className="w-full px-3 py-2 border border-neutral-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="private">Private (Only you)</option>
-                            <option value="public">Public (Everyone)</option>
-                            <option value="class">Class</option>
-                            <option value="school">School</option>
-                        </select>
-                    </div>
 
                     {/* Location */}
                     <div>
