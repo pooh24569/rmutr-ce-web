@@ -1,4 +1,3 @@
-// src/config/nodemailer.js
 import nodemailer from "nodemailer";
 import {
   EMAIL_VERIFY_TEMPLATE,
@@ -38,7 +37,6 @@ export async function sendResetPasswordEmail({
   return sendMail({ to, subject, html, text: `Reset link: ${resetLink}` });
 }
 
-// แทนค่า {{key}} ใน template ด้วยค่าจริงจาก vars
 function fillTemplate(tpl, vars) {
   return Object.entries(vars).reduce(
     (acc, [k, v]) => acc.replaceAll(`{{${k}}}`, String(v)),
@@ -46,7 +44,6 @@ function fillTemplate(tpl, vars) {
   );
 }
 
-// ใช้ได้ทั้ง Verify และ Reset OTP โดยส่ง purpose
 export async function sendOtpEmail({
   to,
   otp,
@@ -56,7 +53,6 @@ export async function sendOtpEmail({
 }) {
   const subject = purpose;
 
-  // ✅ เพิ่ม minutes เข้าไปในตัวแปรที่จะส่งเข้า template
   const baseVars = { email, otp, minutes };
 
   let html;

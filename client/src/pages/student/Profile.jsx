@@ -7,10 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import { useNavigate } from "react-router";
 
-/**
- * Profile Page
- * Main page for viewing and editing user profile
- */
 const Profile = () => {
     const navigate = useNavigate();
     const {
@@ -41,7 +37,7 @@ const Profile = () => {
             <StudentHeader title="MY PROFILE" />
 
             <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
-                {/* Content */}
+                {}
                 <StudentIDCard
                     profile={profile}
                     onEdit={() => navigate('/student/profile/edit')}

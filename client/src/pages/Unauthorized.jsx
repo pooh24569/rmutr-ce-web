@@ -1,4 +1,4 @@
-// frontend/src/pages/Unauthorized.jsx
+
 import { Link } from "react-router-dom";
 import { ShieldAlert } from "lucide-react";
 

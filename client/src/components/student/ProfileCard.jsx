@@ -1,9 +1,5 @@
 import { User, Mail, Phone, Calendar, MapPin, GraduationCap } from "lucide-react";
 
-/**
- * Profile Card Component
- * Displays user profile information in read-only mode
- */
 export const ProfileCard = ({ profile }) => {
     if (!profile) return null;
 
@@ -11,7 +7,7 @@ export const ProfileCard = ({ profile }) => {
 
     return (
         <div className="space-y-6">
-            {/* Profile Header */}
+            {}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center space-x-6">
                     <div className="flex-shrink-0">
@@ -52,7 +48,7 @@ export const ProfileCard = ({ profile }) => {
                 </div>
             </div>
 
-            {/* Contact Information */}
+            {}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Contact Information
@@ -71,10 +67,10 @@ export const ProfileCard = ({ profile }) => {
                 </div>
             </div>
 
-            {/* Student Profile */}
+            {}
             {studentProfile && (
                 <>
-                    {/* Student Information */}
+                    {}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Student Information
@@ -129,7 +125,7 @@ export const ProfileCard = ({ profile }) => {
                         </div>
                     </div>
 
-                    {/* Education Information */}
+                    {}
                     {studentProfile.education && (
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -174,7 +170,7 @@ export const ProfileCard = ({ profile }) => {
                         </div>
                     )}
 
-                    {/* Address */}
+                    {}
                     {studentProfile.address && (
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -194,7 +190,7 @@ export const ProfileCard = ({ profile }) => {
                         </div>
                     )}
 
-                    {/* Emergency Contact */}
+                    {}
                     {studentProfile.emergencyContact?.name && (
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">

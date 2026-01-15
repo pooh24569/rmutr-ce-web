@@ -20,7 +20,6 @@ export function authenticate(req, res, next) {
 
 export function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
-    // DEBUG: Log the role check
     console.log("🔐 Auth Check:", {
       userRole: req.user?.role,
       allowedRoles: allowedRoles,
@@ -30,7 +29,7 @@ export function authorizeRoles(...allowedRoles) {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         message: "Access denied",
-        yourRole: req.user?.role, // Show what role was received
+        yourRole: req.user?.role,
         allowedRoles: allowedRoles,
       });
     }
@@ -38,5 +37,4 @@ export function authorizeRoles(...allowedRoles) {
   };
 }
 
-// ให้ default export ชี้ไปที่ authenticate — เพื่อรองรับ import แบบ default ที่มีอยู่
 export default authenticate;

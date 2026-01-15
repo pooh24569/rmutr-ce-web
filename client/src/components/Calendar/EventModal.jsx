@@ -1,4 +1,4 @@
-// frontend/src/components/calendar/EventModal.jsx
+
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
@@ -20,7 +20,6 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
 
-    // Populate form when editing
     useEffect(() => {
         if (event) {
             const start = new Date(event.startDate);
@@ -40,7 +39,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                 location: event.location || "",
             });
         } else {
-            // Reset form for new event
+
             const today = new Date().toISOString().split("T")[0];
             setFormData((prev) => ({
                 ...prev,
@@ -56,7 +55,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
-        // Clear error when user types
+
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: "" }));
         }
@@ -98,7 +97,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
         setSaving(true);
 
         try {
-            // Combine date and time
+
             const startDateTime = formData.allDay
                 ? new Date(formData.startDate)
                 : new Date(`${formData.startDate}T${formData.startTime}`);
@@ -133,7 +132,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                {/* Header */}
+                {}
                 <div className="flex items-center justify-between p-6 border-b border-neutral-200">
                     <h2 className="text-xl font-semibold text-neutral-900">
                         {event ? "Edit Event" : "Create Event"}
@@ -147,9 +146,9 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                     </button>
                 </div>
 
-                {/* Form */}
+                {}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {/* Title */}
+                    {}
                     <div>
                         <label htmlFor="title" className="block text-sm font-medium text-neutral-700 mb-1">
                             Title <span className="text-red-500">*</span>
@@ -167,7 +166,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
                     </div>
 
-                    {/* Description */}
+                    {}
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-1">
                             Description
@@ -183,7 +182,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         />
                     </div>
 
-                    {/* Type and Color */}
+                    {}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="type" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -230,7 +229,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         </div>
                     </div>
 
-                    {/* All Day Toggle */}
+                    {}
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -245,7 +244,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         </label>
                     </div>
 
-                    {/* Start Date/Time */}
+                    {}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="startDate" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -280,7 +279,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         )}
                     </div>
 
-                    {/* End Date/Time */}
+                    {}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="endDate" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -315,8 +314,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         )}
                     </div>
 
-
-                    {/* Location */}
+                    {}
                     <div>
                         <label htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-1">
                             Location
@@ -332,7 +330,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         />
                     </div>
 
-                    {/* Buttons */}
+                    {}
                     <div className="flex gap-3 pt-4">
                         <button
                             type="button"

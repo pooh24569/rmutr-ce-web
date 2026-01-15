@@ -1,4 +1,3 @@
-// backend/src/controllers/authController.js
 import * as authService from "../services/authService.js";
 import { logger } from "../utils/logger.js";
 
@@ -48,14 +47,12 @@ export async function register(req, res) {
   }
 }
 
-// POST /api/auth/login
 export async function login(req, res) {
   try {
     const { username, password } = req.body;
 
     const result = await authService.loginUser({ username, password });
 
-    // Set cookie
     res.cookie("token", result.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -75,7 +72,6 @@ export async function login(req, res) {
       stack: error.stack,
     });
 
-    // Handle email not verified
     if (error.code === "EMAIL_NOT_VERIFIED") {
       return res.status(403).json({
         success: false,
@@ -95,7 +91,6 @@ export async function login(req, res) {
   }
 }
 
-// POST /api/auth/logout
 export async function logout(_req, res) {
   try {
     res.clearCookie("token", {
@@ -117,7 +112,6 @@ export async function logout(_req, res) {
   }
 }
 
-// POST /api/auth/send-reset-otp
 export async function sendResetOTP(req, res) {
   try {
     const email = (req.body.email || "").trim().toLowerCase();
@@ -143,7 +137,6 @@ export async function sendResetOTP(req, res) {
   }
 }
 
-// POST /api/auth/verify-reset-otp
 export async function verifyResetOtp(req, res) {
   try {
     const email = String(req.body.email || "")
@@ -172,7 +165,6 @@ export async function verifyResetOtp(req, res) {
   }
 }
 
-// POST /api/auth/reset-password
 export async function resetPassword(req, res) {
   try {
     const email = String(req.body.email || "")
@@ -203,7 +195,6 @@ export async function resetPassword(req, res) {
   }
 }
 
-// POST /api/auth/send-verify-otp
 export async function sendVerifyOtp(req, res) {
   try {
     const { userId } = req.body;
@@ -229,7 +220,6 @@ export async function sendVerifyOtp(req, res) {
   }
 }
 
-// POST /api/auth/verify-email
 export async function verifyEmail(req, res) {
   try {
     const { userId, otp } = req.body;
@@ -255,7 +245,6 @@ export async function verifyEmail(req, res) {
   }
 }
 
-// POST /api/auth/is-authenticated
 export const isAuthenticated = (req, res) => {
   try {
     return res.json({
@@ -275,13 +264,10 @@ export const isAuthenticated = (req, res) => {
   }
 };
 
-// Legacy methods (ถ้ายังใช้อยู่)
 export async function requestResetPassword(req, res) {
   try {
     const { email = "" } = req.body;
     const normalizedEmail = email.trim().toLowerCase();
-
-    // Implementation here...
 
     return res.json({
       success: true,
@@ -301,7 +287,6 @@ export async function requestResetPassword(req, res) {
 
 export async function confirmResetPassword(req, res) {
   try {
-    // Implementation here...
 
     return res.json({
       success: true,

@@ -1,7 +1,4 @@
-/**
- * Dashboard Routes
- * API routes for dashboard statistics
- */
+
 
 import express from "express";
 import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -12,7 +9,6 @@ import {
 
 const router = express.Router();
 
-// Teacher Dashboard - ต้องเป็น teacher หรือ admin
 router.get(
   "/teacher",
   verifyToken,
@@ -20,7 +16,6 @@ router.get(
   getTeacherDashboard
 );
 
-// Admin Dashboard - ต้องเป็น admin
 router.get(
   "/admin",
   verifyToken,

@@ -1,4 +1,4 @@
-// frontend/src/pages/Login.jsx
+
 import React, { useState } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +10,7 @@ import { EyeIcon, EyeSlashIcon, UserIcon } from "@heroicons/react/24/outline";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();  // ⭐ ใช้ตรงนี้
+  const location = useLocation();
   const [showPw, setShowPw] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -37,10 +37,8 @@ export default function Login() {
         password: values.password,
       });
 
-      // save auth
       login({ user: data.user, token: data.token });
 
-      // ⭐ ถ้ามาจากหน้า protected → กลับไปหน้าเดิมได้เลย
       const from = location.state?.from || getDefaultPath(data.user.role);
 
       navigate(from, { replace: true });
@@ -52,7 +50,6 @@ export default function Login() {
     }
   };
 
-  // ⭐ ฟังก์ชันช่วยเลือกว่า role ไหนควรไปหน้าไหน
   const getDefaultPath = (role) => {
     if (role === "student") return "/student/homework";
     if (role === "teacher") return "/teacher/dashboard";

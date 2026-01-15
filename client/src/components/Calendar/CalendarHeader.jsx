@@ -1,4 +1,4 @@
-// frontend/src/components/calendar/CalendarHeader.jsx
+
 import React from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { getMonthName } from "@/utils/dateUtils";
@@ -15,7 +15,7 @@ export default function CalendarHeader({
 }) {
     return (
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 bg-white">
-            {/* Left Side - Today Button */}
+            {}
             <div className="flex items-center">
                 <button
                     onClick={onToday}
@@ -25,7 +25,7 @@ export default function CalendarHeader({
                 </button>
             </div>
 
-            {/* Center - Month/Year with Navigation */}
+            {}
             <div className="flex items-center gap-2">
                 <button
                     onClick={onPrevMonth}
@@ -48,9 +48,9 @@ export default function CalendarHeader({
                 </button>
             </div>
 
-            {/* Right Side - Add Event */}
+            {}
             <div className="flex items-center">
-                {/* Add Event Button */}
+                {}
                 <button
                     onClick={onAddEvent}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"

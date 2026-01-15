@@ -1,17 +1,13 @@
-// frontend/src/hooks/useEvents.js
+
 import { useState, useCallback } from "react";
 import { eventService } from "@/services/eventService";
 import { toast } from "sonner";
 
-/**
- * Custom hook for event CRUD operations
- */
 export function useEvents() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch events
   const fetchEvents = useCallback(async (params = {}) => {
     setLoading(true);
     setError(null);
@@ -30,7 +26,6 @@ export function useEvents() {
     }
   }, []);
 
-  // Create event
   const createEvent = useCallback(async (eventData) => {
     try {
       const response = await eventService.createEvent(eventData);
@@ -44,7 +39,6 @@ export function useEvents() {
     }
   }, []);
 
-  // Update event
   const updateEvent = useCallback(async (id, eventData) => {
     try {
       const response = await eventService.updateEvent(id, eventData);
@@ -60,7 +54,6 @@ export function useEvents() {
     }
   }, []);
 
-  // Delete event
   const deleteEvent = useCallback(async (id) => {
     try {
       await eventService.deleteEvent(id);

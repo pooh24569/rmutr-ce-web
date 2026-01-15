@@ -2,13 +2,9 @@ import * as profileService from "../services/profileService.js";
 import { successResponse, errorResponse } from "../utils/responseFormatter.js";
 import { logger } from "../utils/logger.js";
 
-/**
- * Get user profile
- * GET /api/profile
- */
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // From auth middleware
+    const userId = req.user.id;
 
     const profile = await profileService.getUserProfile(userId);
 
@@ -22,10 +18,6 @@ export const getProfile = async (req, res) => {
   }
 };
 
-/**
- * Update basic user profile
- * PUT /api/profile
- */
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -45,10 +37,6 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-/**
- * Update student profile
- * PUT /api/profile/student
- */
 export const updateStudentProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -71,10 +59,6 @@ export const updateStudentProfile = async (req, res) => {
   }
 };
 
-/**
- * Upload profile image
- * POST /api/profile/image
- */
 export const uploadProfileImage = async (req, res) => {
   try {
     const userId = req.user.id;

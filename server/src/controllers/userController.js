@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import userModel from "../models/userModel.js";
 
-// GET /api/users
 export async function list(_req, res) {
   try {
     const users = await userModel.find().select("-password");
@@ -11,7 +10,6 @@ export async function list(_req, res) {
   }
 }
 
-// POST /api/users
 export async function create(req, res) {
   try {
     const { username = "", password = "", role, email = "" } = req.body;
@@ -49,7 +47,6 @@ export async function create(req, res) {
   }
 }
 
-// DELETE /api/users/:id
 export async function remove(req, res) {
   try {
     const deleted = await userModel.findByIdAndDelete(req.params.id);

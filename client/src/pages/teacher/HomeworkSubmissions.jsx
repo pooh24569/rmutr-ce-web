@@ -1,4 +1,4 @@
-// src/pages/teacher/HomeworkSubmissions.jsx
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -92,7 +92,7 @@ const HomeworkSubmissions = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate("/teacher/homework")}
@@ -111,7 +111,7 @@ const HomeworkSubmissions = () => {
                 </button>
             </div>
 
-            {/* Stats */}
+            {}
             <div className="grid grid-cols-4 gap-4">
                 <div className="bg-white rounded-xl p-4 border border-gray-100 text-center">
                     <p className="text-2xl font-bold text-gray-800">{submissions.length}</p>
@@ -137,7 +137,7 @@ const HomeworkSubmissions = () => {
                 </div>
             </div>
 
-            {/* Submissions List */}
+            {}
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h2 className="font-semibold text-gray-800">รายชื่อที่ส่ง</h2>
@@ -196,7 +196,7 @@ const HomeworkSubmissions = () => {
                                     </div>
                                 </div>
 
-                                {/* Content Preview */}
+                                {}
                                 {sub.content && (
                                     <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
                                         {sub.content.substring(0, 200)}
@@ -204,13 +204,13 @@ const HomeworkSubmissions = () => {
                                     </div>
                                 )}
 
-                                {/* Attachments */}
+                                {}
                                 {sub.attachments && sub.attachments.length > 0 && (
                                     <div className="mt-3">
                                         <p className="text-sm text-gray-500 mb-2">ไฟล์แนบ ({sub.attachments.length} ไฟล์)</p>
                                         <div className="flex flex-wrap gap-2">
                                             {sub.attachments.map((file, idx) => {
-                                                // รองรับทั้ง field เก่า (filename/originalName) และใหม่ (fileName/fileUrl)
+
                                                 const displayName = file.fileName || file.originalName || file.filename || `ไฟล์ ${idx + 1}`;
                                                 const fileUrl = file.fileUrl || `/uploads/homework/${file.filename}`;
 
@@ -236,7 +236,7 @@ const HomeworkSubmissions = () => {
                 )}
             </div>
 
-            {/* Grade Modal */}
+            {}
             {selectedSubmission && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">

@@ -1,13 +1,13 @@
 import { useForm } from "react-hook-form";
 import React from "react";
-import FormInputs from "@/components/form/FormInputs"; // ✅ ให้ตรงกับไฟล์และ export
+import FormInputs from "@/components/form/FormInputs";
 import TextAreaInput from "@/components/form/TextAreaInput";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const campingSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  price: z.coerce.number().min(0, "Price must be a positive number"), // ✅ แก้ให้ number
+  price: z.coerce.number().min(0, "Price must be a positive number"),
   description: z.string().min(1, "Description is required"),
 });
 
@@ -16,7 +16,7 @@ const Camping = () => {
     resolver: zodResolver(campingSchema),
   });
   const onSubmit = (data) => {
-    // TODO: Implement camping creation API call
+
   };
 
   return (

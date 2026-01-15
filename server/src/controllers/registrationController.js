@@ -1,8 +1,3 @@
-/**
- * Registration Controller
- * จัดการข้อมูลทะเบียน (Mock Data)
- */
-
 import {
   getEnrolledCourses,
   getAllCourses,
@@ -11,23 +6,16 @@ import {
 } from "../data/mockRegistration.js";
 import User from "../models/userModel.js";
 
-/**
- * ดึงรายวิชาที่นักศึกษาลงทะเบียน
- * GET /api/registration/enrolled
- */
 export const getMyEnrolledCourses = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // ดึง studentId จาก StudentProfile
-    // ถ้าไม่มี ให้ใช้ username แทน (สำหรับทดสอบ)
     const StudentProfile = (await import("../models/studentProfileModel.js"))
       .default;
     const profile = await StudentProfile.findOne({ userId });
 
     const studentId = profile?.studentId || req.user.username;
 
-    // ดึงรายวิชาจาก Mock Data
     const courses = getEnrolledCourses(studentId);
 
     return res.status(200).json({
@@ -48,15 +36,10 @@ export const getMyEnrolledCourses = async (req, res) => {
   }
 };
 
-/**
- * ดึงรายวิชาที่อาจารย์สอน
- * GET /api/registration/teaching
- */
 export const getMyTeachingCourses = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // ดึง email และ ชื่อ ของอาจารย์
     const user = await User.findById(userId);
     const teacherEmail = user?.email;
     const teacherName =
@@ -64,7 +47,6 @@ export const getMyTeachingCourses = async (req, res) => {
         ? `${user.firstName} ${user.lastName}`
         : "";
 
-    // ดึงรายวิชาจาก Mock Data (เทียบทั้ง email และชื่อ)
     const courses = getTeacherCourses(teacherEmail, teacherName);
 
     return res.status(200).json({
@@ -86,10 +68,6 @@ export const getMyTeachingCourses = async (req, res) => {
   }
 };
 
-/**
- * ดึงรายวิชาทั้งหมด (สำหรับ Admin/อาจารย์)
- * GET /api/registration/courses
- */
 export const listAllCourses = async (req, res) => {
   try {
     const courses = getAllCourses();
@@ -108,10 +86,6 @@ export const listAllCourses = async (req, res) => {
   }
 };
 
-/**
- * ดึงรายวิชาตาม courseCode
- * GET /api/registration/courses/:courseCode
- */
 export const getCourse = async (req, res) => {
   try {
     const { courseCode } = req.params;

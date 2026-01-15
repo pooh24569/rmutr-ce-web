@@ -1,4 +1,4 @@
-// backend/src/utils/password.js
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 

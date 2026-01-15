@@ -1,4 +1,4 @@
-// frontend/src/components/calendar/CalendarCell.jsx
+
 import React from "react";
 import { isToday, isSameDay } from "@/utils/dateUtils";
 import { getHolidayName } from "@/utils/thaiHolidays";
@@ -23,7 +23,6 @@ export default function CalendarCell({
     const holidayName = getHolidayName(cell.date);
     const isHoliday = !!holidayName;
 
-    // Determine text color
     const getDateColor = () => {
         if (!cell.isCurrentMonth) return "text-neutral-300";
         if (isHoliday || isSunday) return "text-red-500";
@@ -44,7 +43,7 @@ export default function CalendarCell({
                 backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 6px)'
             } : {}}
         >
-            {/* Date Number */}
+            {}
             <div className="flex items-start justify-between mb-1">
                 <span
                     className={`
@@ -58,7 +57,7 @@ export default function CalendarCell({
                     {dateNum}
                 </span>
 
-                {/* Event count indicator */}
+                {}
                 {dayEvents.length > 2 && (
                     <span className="text-[10px] text-neutral-400">
                         +{dayEvents.length - 2}
@@ -66,7 +65,7 @@ export default function CalendarCell({
                 )}
             </div>
 
-            {/* Thai Holiday - with highlight like event card */}
+            {}
             {holidayName && cell.isCurrentMonth && (
                 <div
                     className="flex items-center gap-1.5 px-2 py-1 rounded mb-1"
@@ -79,7 +78,7 @@ export default function CalendarCell({
                 </div>
             )}
 
-            {/* Events */}
+            {}
             <div className="flex-1 space-y-1 overflow-hidden">
                 {dayEvents.slice(0, 2).map((event) => (
                     <EventCard

@@ -1,4 +1,4 @@
-// src/pages/teacher/Dashboard.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -115,7 +115,7 @@ const Dashboard = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -132,7 +132,7 @@ const Dashboard = () => {
                 </button>
             </div>
 
-            {/* Stats Cards */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
@@ -162,7 +162,7 @@ const Dashboard = () => {
                 })}
             </div>
 
-            {/* Today's Classes */}
+            {}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Today's Classes

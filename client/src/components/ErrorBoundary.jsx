@@ -1,4 +1,4 @@
-// frontend/src/components/ErrorBoundary.jsx
+
 import React from "react";
 
 export default class ErrorBoundary extends React.Component {

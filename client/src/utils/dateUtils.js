@@ -1,4 +1,4 @@
-// frontend/src/utils/dateUtils.js
+
 
 export const formatDate = (date, format = "YYYY-MM-DD") => {
   const d = new Date(date);

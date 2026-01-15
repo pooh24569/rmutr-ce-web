@@ -2,14 +2,9 @@ import StudentProfile from "../models/studentProfileModel.js";
 import User from "../models/userModel.js";
 import { logger } from "../utils/logger.js";
 
-/**
- * Get complete user profile (User + StudentProfile if student)
- * @param {string} userId - User ID
- * @returns {Object} Combined profile data
- */
 export const getUserProfile = async (userId) => {
   try {
-    // Get user data
+
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
@@ -30,7 +25,6 @@ export const getUserProfile = async (userId) => {
       isAccountVerified: user.isAccountVerified,
     };
 
-    // If student, get student profile
     if (user.role === "student") {
       const studentProfile = await StudentProfile.findOne({ userId });
       profileData.studentProfile = studentProfile || null;
@@ -46,12 +40,6 @@ export const getUserProfile = async (userId) => {
   }
 };
 
-/**
- * Update basic user profile (firstName, lastName, phoneNumber, profileImage)
- * @param {string} userId - User ID
- * @param {Object} data - Profile data to update
- * @returns {Object} Updated user data
- */
 export const updateUserProfile = async (userId, data) => {
   try {
     const user = await User.findById(userId);
@@ -62,7 +50,6 @@ export const updateUserProfile = async (userId, data) => {
       throw error;
     }
 
-    // Update allowed fields
     const allowedFields = [
       "firstName",
       "lastName",
@@ -98,15 +85,9 @@ export const updateUserProfile = async (userId, data) => {
   }
 };
 
-/**
- * Update or create student profile
- * @param {string} userId - User ID
- * @param {Object} data - Student profile data
- * @returns {Object} Updated/created student profile
- */
 export const updateStudentProfile = async (userId, data) => {
   try {
-    // Verify user exists and is a student
+
     const user = await User.findById(userId);
 
     if (!user) {
@@ -121,11 +102,10 @@ export const updateStudentProfile = async (userId, data) => {
       throw error;
     }
 
-    // Find existing profile or create new one
     let studentProfile = await StudentProfile.findOne({ userId });
 
     if (studentProfile) {
-      // Update existing profile
+
       Object.keys(data).forEach((key) => {
         if (data[key] !== undefined) {
           studentProfile[key] = data[key];
@@ -134,7 +114,7 @@ export const updateStudentProfile = async (userId, data) => {
       await studentProfile.save();
       logger.info("Student profile updated", { userId });
     } else {
-      // Create new profile
+
       studentProfile = await StudentProfile.create({
         userId,
         ...data,
@@ -152,12 +132,6 @@ export const updateStudentProfile = async (userId, data) => {
   }
 };
 
-/**
- * Upload profile image (Base64)
- * @param {string} userId - User ID
- * @param {string} imageData - Base64 encoded image
- * @returns {Object} Updated user with new profile image
- */
 export const uploadProfileImage = async (userId, imageData) => {
   try {
     const user = await User.findById(userId);
@@ -168,7 +142,6 @@ export const uploadProfileImage = async (userId, imageData) => {
       throw error;
     }
 
-    // Validate base64 image format
     if (!imageData.startsWith("data:image/")) {
       const error = new Error("Invalid image format");
       error.statusCode = 400;

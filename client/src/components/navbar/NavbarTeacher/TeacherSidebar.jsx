@@ -1,4 +1,4 @@
-// src/components/navbar/NavbarTeacher/TeacherSidebar.jsx
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -55,7 +55,6 @@ const TeacherSidebar = () => {
     const { profile, fetchProfile } = useProfile();
     const [openConfirm, setOpenConfirm] = useState(false);
 
-    // Auto refresh profile เมื่อ route เปลี่ยน (กลับจากหน้า Profile)
     useEffect(() => {
         fetchProfile();
     }, [location.pathname]);
@@ -65,7 +64,6 @@ const TeacherSidebar = () => {
         window.location.assign("/login");
     };
 
-    // ใช้ข้อมูลจาก profile ก่อน ถ้าไม่มีค่อยใช้จาก user
     const displayName = profile?.firstName || user?.firstName || "";
     const displayLastName = profile?.lastName || user?.lastName || "";
     const displayImage = profile?.profileImage;
@@ -73,7 +71,7 @@ const TeacherSidebar = () => {
 
     return (
         <aside className="w-64 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] text-white flex flex-col min-h-screen">
-            {/* Logo & Title */}
+            {}
             <div className="h-20 flex items-center px-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -86,7 +84,7 @@ const TeacherSidebar = () => {
                 </div>
             </div>
 
-            {/* User Info - กดเพื่อไปหน้า Profile */}
+            {}
             <Link
                 to="/teacher/profile"
                 className="block px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
@@ -110,12 +108,12 @@ const TeacherSidebar = () => {
                 </div>
             </Link>
 
-            {/* Main menu label */}
+            {}
             <div className="px-6 pt-6 pb-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                 Main Menu
             </div>
 
-            {/* Menu items */}
+            {}
             <nav className="flex-1 px-3 space-y-1">
                 {teacherLinks.map((item) => {
                     const active = location.pathname.startsWith(item.href);
@@ -139,7 +137,7 @@ const TeacherSidebar = () => {
                 })}
             </nav>
 
-            {/* Sign out button */}
+            {}
             <div className="p-4 border-t border-white/10">
                 <button
                     type="button"
@@ -151,7 +149,7 @@ const TeacherSidebar = () => {
                 </button>
             </div>
 
-            {/* Confirm dialog */}
+            {}
             <ConfirmDialog
                 show={openConfirm}
                 onCancel={() => setOpenConfirm(false)}

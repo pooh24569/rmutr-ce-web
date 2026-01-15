@@ -15,15 +15,6 @@ import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// ======================================
-// 🔐 ต้อง Login ทุก Route
-// ======================================
-
-// ======================================
-// 👨‍🏫 Teacher Routes
-// ======================================
-
-// สร้าง Class ใหม่ (อาจารย์เท่านั้น)
 router.post(
   "/",
   verifyToken,
@@ -31,7 +22,6 @@ router.post(
   createClass
 );
 
-// ดึง Class ทั้งหมดของอาจารย์
 router.get(
   "/my-classes",
   verifyToken,
@@ -39,7 +29,6 @@ router.get(
   getMyClasses
 );
 
-// แก้ไข Class
 router.put(
   "/:classId",
   verifyToken,
@@ -47,7 +36,6 @@ router.put(
   updateClass
 );
 
-// ลบ Class
 router.delete(
   "/:classId",
   verifyToken,
@@ -55,7 +43,6 @@ router.delete(
   deleteClass
 );
 
-// เพิ่มนักศึกษาเข้า Class
 router.post(
   "/:classId/students",
   verifyToken,
@@ -63,7 +50,6 @@ router.post(
   addStudentToClass
 );
 
-// ลบนักศึกษาออกจาก Class
 router.delete(
   "/:classId/students/:studentId",
   verifyToken,
@@ -71,7 +57,6 @@ router.delete(
   removeStudentFromClass
 );
 
-// ดึงรายชื่อนักศึกษาทั้งหมด (สำหรับเพิ่มเข้า Class)
 router.get(
   "/students/all",
   verifyToken,
@@ -79,7 +64,6 @@ router.get(
   getAllStudents
 );
 
-// Import นักศึกษาจาก CSV (หลายคนพร้อมกัน)
 router.post(
   "/:classId/import",
   verifyToken,
@@ -87,11 +71,6 @@ router.post(
   importStudentsToClass
 );
 
-// ======================================
-// 👨‍🎓 Student Routes
-// ======================================
-
-// ดึง Class ที่นักศึกษาลงทะเบียน
 router.get(
   "/enrolled",
   verifyToken,
@@ -99,11 +78,6 @@ router.get(
   getEnrolledClasses
 );
 
-// ======================================
-// 🔓 Shared Routes (ทุก Role)
-// ======================================
-
-// ดึงข้อมูล Class ตาม ID
 router.get("/:classId", verifyToken, getClassById);
 
 export default router;

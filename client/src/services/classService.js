@@ -1,15 +1,13 @@
-// src/services/classService.js
+
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7001/api";
 
-// สร้าง axios instance พร้อม auth header
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
 
-// เพิ่ม token ใน header ทุก request
 api.interceptors.request.use((config) => {
   const saved = localStorage.getItem("auth");
   if (saved) {
@@ -22,7 +20,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const classService = {
-  // ดึง Class ทั้งหมดของอาจารย์
+
   getMyClasses: async () => {
     try {
       const response = await api.get("/classes/my-classes");
@@ -32,7 +30,6 @@ export const classService = {
     }
   },
 
-  // ดึง Class ที่นักศึกษาลงทะเบียน
   getEnrolledClasses: async () => {
     try {
       const response = await api.get("/classes/enrolled");
@@ -42,7 +39,6 @@ export const classService = {
     }
   },
 
-  // ดึง Class ตาม ID
   getClassById: async (classId) => {
     try {
       const response = await api.get(`/classes/${classId}`);
@@ -52,7 +48,6 @@ export const classService = {
     }
   },
 
-  // สร้าง Class ใหม่
   createClass: async (classData) => {
     try {
       const response = await api.post("/classes", classData);
@@ -62,7 +57,6 @@ export const classService = {
     }
   },
 
-  // อัพเดท Class
   updateClass: async (classId, classData) => {
     try {
       const response = await api.put(`/classes/${classId}`, classData);
@@ -72,7 +66,6 @@ export const classService = {
     }
   },
 
-  // ลบ Class
   deleteClass: async (classId) => {
     try {
       const response = await api.delete(`/classes/${classId}`);
@@ -82,7 +75,6 @@ export const classService = {
     }
   },
 
-  // เพิ่มนักศึกษาเข้า Class
   addStudent: async (classId, studentId) => {
     try {
       const response = await api.post(`/classes/${classId}/students`, { studentId });
@@ -92,7 +84,6 @@ export const classService = {
     }
   },
 
-  // ลบนักศึกษาออกจาก Class
   removeStudent: async (classId, studentId) => {
     try {
       const response = await api.delete(`/classes/${classId}/students/${studentId}`);
@@ -102,7 +93,6 @@ export const classService = {
     }
   },
 
-  // ดึงรายชื่อนักศึกษาทั้งหมด
   getAllStudents: async () => {
     try {
       const response = await api.get("/classes/students/all");
@@ -112,7 +102,6 @@ export const classService = {
     }
   },
 
-  // Import นักศึกษาหลายคน (จาก CSV หรือรายการ)
   importStudents: async (classId, studentIds) => {
     try {
       const response = await api.post(`/classes/${classId}/import`, { studentIds });

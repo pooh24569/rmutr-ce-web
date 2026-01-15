@@ -1,18 +1,10 @@
-// src/pages/teacher/components/ImportStudentsModal.jsx
+
 import React, { useState, useRef } from "react";
 import { X, Upload, FileText, CheckCircle, XCircle, AlertCircle, Download } from "lucide-react";
 import { classService } from "@/services/classService";
 
-/**
- * Modal สำหรับ Import นักศึกษาจาก CSV
- * 
- * รองรับ:
- * - อัพโหลดไฟล์ CSV
- * - วาง (Paste) รายชื่อ
- * - แสดงผลลัพธ์ (สำเร็จ/มีอยู่แล้ว/ไม่พบ)
- */
 const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
-    const [mode, setMode] = useState("paste"); // "paste" or "file"
+    const [mode, setMode] = useState("paste");
     const [inputText, setInputText] = useState("");
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -25,7 +17,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
             setFile(selectedFile);
-            // อ่านไฟล์
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 setInputText(event.target.result);
@@ -35,7 +27,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
     };
 
     const parseStudentIds = (text) => {
-        // แยกด้วย , ; \n \t หรือ space
+
         return text
             .split(/[,;\n\t\s]+/)
             .map((id) => id.trim())
@@ -91,7 +83,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
 
             <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-                {/* Header */}
+                {}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-800">
                         Import นักศึกษา
@@ -101,11 +93,11 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
                     </button>
                 </div>
 
-                {/* Content */}
+                {}
                 <div className="p-6 max-h-[calc(90vh-140px)] overflow-y-auto">
                     {!result ? (
                         <>
-                            {/* Mode Tabs */}
+                            {}
                             <div className="flex gap-2 mb-4">
                                 <button
                                     onClick={() => setMode("paste")}
@@ -186,7 +178,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
                                 </div>
                             )}
 
-                            {/* Summary */}
+                            {}
                             {inputText && (
                                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                                     <p className="text-sm text-blue-800">
@@ -196,9 +188,9 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
                             )}
                         </>
                     ) : (
-                        /* Result */
+
                         <div className="space-y-4">
-                            {/* Summary Cards */}
+                            {}
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                                     <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
@@ -223,7 +215,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
                                 </div>
                             </div>
 
-                            {/* Details */}
+                            {}
                             {result.added.length > 0 && (
                                 <div>
                                     <h4 className="font-medium text-green-700 mb-2">
@@ -275,7 +267,7 @@ const ImportStudentsModal = ({ isOpen, onClose, classId, onSuccess }) => {
                     )}
                 </div>
 
-                {/* Footer */}
+                {}
                 <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
                     {!result ? (
                         <>

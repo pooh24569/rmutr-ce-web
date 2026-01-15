@@ -1,10 +1,6 @@
 import { useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 
-/**
- * Image Upload Component
- * Allows users to upload and preview images
- */
 export const ImageUpload = ({ currentImage, onImageSelect, maxSize = 5 }) => {
     const [preview, setPreview] = useState(currentImage || null);
     const [error, setError] = useState(null);
@@ -14,13 +10,11 @@ export const ImageUpload = ({ currentImage, onImageSelect, maxSize = 5 }) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate file type
         if (!file.type.startsWith("image/")) {
             setError("Please select an image file");
             return;
         }
 
-        // Validate file size (in MB)
         const fileSizeMB = file.size / (1024 * 1024);
         if (fileSizeMB > maxSize) {
             setError(`Image size must be less than ${maxSize}MB`);
@@ -29,7 +23,6 @@ export const ImageUpload = ({ currentImage, onImageSelect, maxSize = 5 }) => {
 
         setError(null);
 
-        // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
             setPreview(reader.result);

@@ -1,4 +1,4 @@
-// backend/src/services/emailService.js
+
 import { sendOtpEmail as sendOtpMail } from "../config/nodemailer.js";
 import { logger } from "../utils/logger.js";
 

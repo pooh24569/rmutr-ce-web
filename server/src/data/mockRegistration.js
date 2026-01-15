@@ -1,11 +1,3 @@
-/**
- * Mock Registration Data
- * ข้อมูลทะเบียนจำลอง (แทน API มหาวิทยาลัย)
- *
- * เมื่อต้องการเชื่อม API จริง ให้เปลี่ยน function ใน registrationService.js
- */
-
-// ข้อมูลรายวิชาจำลอง
 export const mockCourses = [
   {
     courseCode: "CS101",
@@ -159,18 +151,12 @@ export const mockCourses = [
   },
 ];
 
-// ข้อมูลการลงทะเบียนของนักศึกษา (studentId -> courseCode[])
 export const mockEnrollments = {
   1651010541132: ["CS101", "CS102", "MATH201", "ENG101"],
   1651010541001: ["CS101", "MATH201", "PHY101"],
   1651010541002: ["CS102", "ENG101", "PHY101"],
 };
 
-/**
- * ดึงรายวิชาที่นักศึกษาลงทะเบียน
- * @param {string} studentId - รหัสนักศึกษา 13 หลัก
- * @returns {Array} รายวิชาที่ลงทะเบียน
- */
 export const getEnrolledCourses = (studentId) => {
   const enrolledCodes = mockEnrollments[studentId] || [];
   return mockCourses.filter((course) =>
@@ -178,43 +164,26 @@ export const getEnrolledCourses = (studentId) => {
   );
 };
 
-/**
- * ดึงรายวิชาทั้งหมด
- * @returns {Array} รายวิชาทั้งหมด
- */
 export const getAllCourses = () => {
   return mockCourses;
 };
 
-/**
- * ดึงรายวิชาตาม courseCode
- * @param {string} courseCode - รหัสวิชา
- * @returns {Object|null} ข้อมูลรายวิชา
- */
 export const getCourseByCode = (courseCode) => {
   return mockCourses.find((course) => course.courseCode === courseCode) || null;
 };
 
-/**
- * ดึงรายวิชาที่อาจารย์สอน
- * @param {string} teacherEmail - อีเมลอาจารย์
- * @param {string} teacherName - ชื่ออาจารย์ (firstName + lastName)
- * @returns {Array} รายวิชาที่สอน
- */
 export const getTeacherCourses = (teacherEmail, teacherName = "") => {
   if (!teacherEmail && !teacherName) return [];
 
   return mockCourses.filter((course) => {
-    // เทียบ email
+
     const emailMatch =
       teacherEmail &&
       course.instructor.email.toLowerCase() === teacherEmail.toLowerCase();
 
-    // เทียบชื่อ (ถ้ามี)
     const nameMatch =
       teacherName && course.instructor.name.includes(teacherName);
 
-    // ต้องตรงทั้ง email และ ชื่อ (ถ้ามีการส่งชื่อมา)
     if (teacherName) {
       return emailMatch && nameMatch;
     }

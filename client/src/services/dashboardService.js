@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// สร้าง axios instance สำหรับ dashboard
 const dashboardApi = axios.create({
   baseURL: "http://localhost:7001/api",
 });
 
-// Request interceptor - แนบ token
 dashboardApi.interceptors.request.use((config) => {
   const saved = localStorage.getItem("auth");
   if (saved) {
@@ -17,7 +15,6 @@ dashboardApi.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor - handle auth errors
 dashboardApi.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -31,21 +28,13 @@ dashboardApi.interceptors.response.use(
   }
 );
 
-/**
- * Dashboard Service - API calls สำหรับ Dashboard
- */
 export const dashboardService = {
-  /**
-   * ดึงข้อมูล Teacher Dashboard
-   */
+
   getTeacherDashboard: async () => {
     const response = await dashboardApi.get("/dashboard/teacher");
     return response.data;
   },
 
-  /**
-   * ดึงข้อมูล Admin Dashboard
-   */
   getAdminDashboard: async () => {
     const response = await dashboardApi.get("/dashboard/admin");
     return response.data;

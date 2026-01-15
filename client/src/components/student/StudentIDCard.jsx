@@ -16,7 +16,6 @@ export const StudentIDCard = ({ profile, onEdit }) => {
         });
     };
 
-    // ตรวจสอบชื่อไทย/อังกฤษ
     const isThai = (text) => /[\u0E00-\u0E7F]/.test(text);
     const firstName = profile.firstName || "";
     const lastName = profile.lastName || "";
@@ -25,13 +24,12 @@ export const StudentIDCard = ({ profile, onEdit }) => {
     const firstNameEN = !isThai(firstName) ? firstName : "";
     const lastNameEN = !isThai(lastName) ? lastName : "";
 
-    // วันที่ออกบัตร และหมดอายุ
     const issueDate = formatDate(new Date());
     const expiryDate = formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 4)));
 
     return (
         <div className="w-full flex justify-center items-center p-4">
-            {/* Wrapper for scaling */}
+            {}
             <div
                 className="w-full"
                 style={{
@@ -39,12 +37,12 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                     aspectRatio: '1040 / 543'
                 }}
             >
-                {/* Main Card */}
+                {}
                 <div
                     className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-white border border-gray-200"
                 >
 
-                    {/* Edit Button */}
+                    {}
                     {onEdit && (
                         <Button
                             onClick={onEdit}
@@ -55,7 +53,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                     )}
 
                     <div className="flex h-full">
-                        {/* Logo */}
+                        {}
                         <div className="w-45 flex-shrink-0 flex items-center justify-center">
                             <img
                                 src="/LOGO-RMUTR.png"
@@ -64,11 +62,11 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                             />
                         </div>
 
-                        {/* Content */}
+                        {}
                         <div className="flex-1 flex pr-8 py-8 gap-6">
-                            {/* Left: Photo & Barcode */}
+                            {}
                             <div className="flex flex-col items-center justify-center gap-6 w-[40%] -ml-8">
-                                {/* Photo */}
+                                {}
                                 <div className="w-full max-w-[260px]" style={{ aspectRatio: '1/1' }}>
                                     {profile.profileImage ? (
                                         <img
@@ -83,7 +81,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                     )}
                                 </div>
 
-                                {/* Barcode */}
+                                {}
                                 <div className="bg-white p-2 rounded-md ">
                                     <Barcode
                                         value={studentProfile.studentId || profile.username || "0000000000000"}
@@ -96,11 +94,11 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                 </div>
                             </div>
 
-                            {/* Right: Information */}
+                            {}
                             <div className="flex-1  flex-col justify-center py-20 ">
-                                {/* Grid Layout */}
+                                {}
                                 <div className="space-y-4 ">
-                                    {/* Row 1: ID, Issue Date, Expiry - 3 columns */}
+                                    {}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5">รหัสบัตรประจำตัวประชาชน</p>
@@ -118,7 +116,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                         </div>
                                     </div>
 
-                                    {/* Row 2: Thai Name - Changed to 3 columns to align with Row 1 */}
+                                    {}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5 ">ชื่อ</p>
@@ -126,9 +124,9 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                                 {firstNameTH ? `นาย${firstNameTH}` : "-"}
                                             </p>
                                         </div>
-                                        {/* Added ml-5 to match "Issue Date" style */}
-                                        <div className="col-span-2"> 
-                                            <div className="w-1/2"> {/* Limit width to simulate grid col 2 */}
+                                        {}
+                                        <div className="col-span-2">
+                                            <div className="w-1/2"> {}
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">นามสกุล</p>
                                                 <p className="text-base font-semibold text-gray-800 ml-5">
                                                     {lastNameTH || "-"}
@@ -137,7 +135,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                         </div>
                                     </div>
 
-                                    {/* Row 3: English Name - Changed to 3 columns */}
+                                    {}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5">ชื่อภาษาอังกฤษ</p>
@@ -145,7 +143,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                                 {firstNameEN ? `Mr. ${firstNameEN}` : "-"}
                                             </p>
                                         </div>
-                                        {/* Added ml-5 to match "Issue Date" style */}
+                                        {}
                                         <div className="col-span-2">
                                             <div className="w-1/2">
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">นามสกุลภาษาอังกฤษ</p>
@@ -156,7 +154,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                         </div>
                                     </div>
 
-                                    {/* Row 4: Birthday & Nationality - Changed to 3 columns */}
+                                    {}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5">วันเกิด</p>
@@ -164,7 +162,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                                 {formatDate(studentProfile.dateOfBirth)}
                                             </p>
                                         </div>
-                                        {/* Added ml-5 to match "Issue Date" style */}
+                                        {}
                                         <div className="col-span-2">
                                             <div className="w-1/2">
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">สัญชาติ</p>

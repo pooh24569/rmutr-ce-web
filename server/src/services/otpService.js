@@ -1,4 +1,4 @@
-// backend/src/services/otpService.js
+
 import crypto from "crypto";
 
 export const generateOtp = () => {
@@ -14,7 +14,6 @@ export const verifyOtp = (providedOtp, hashedOtp) => {
   const a = Buffer.from(otpHash, "hex");
   const b = Buffer.from(hashedOtp, "hex");
 
-  // ป้องกัน timing attack
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 };

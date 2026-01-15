@@ -6,7 +6,6 @@ import {
 } from "../utils/password.js";
 import { generateOtp, hashOtp, verifyOtp, isOtpExpired } from "./otpService.js";
 
-// ✅ SECURITY FIX: Use hash for verification OTP as well
 import { sendVerificationOtp, sendPasswordResetOtp } from "./emailService.js";
 import { logger } from "../utils/logger.js";
 
@@ -18,7 +17,7 @@ export const registerUser = async ({
   firstName,
   lastName,
 }) => {
-  // Check if user exists
+
   const exists = await userModel.findOne({
     $or: [{ username }, { email: email.toLowerCase().trim() }],
   });
@@ -29,7 +28,6 @@ export const registerUser = async ({
     throw error;
   }
 
-  // Create user
   const hashedPassword = await hashPassword(password);
   const user = await userModel.create({
     username,
@@ -40,11 +38,10 @@ export const registerUser = async ({
     lastName: lastName?.trim() || "",
   });
 
-  // Generate and send OTP
   const otp = generateOtp();
-  // ✅ SECURITY FIX: Hash OTP before storing (same as resetOtpHash)
+
   user.verifyOtpHash = hashOtp(otp);
-  user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+  user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
   const emailResult = await sendVerificationOtp(user, otp, 10);
@@ -66,7 +63,7 @@ export const registerUser = async ({
 };
 
 export const loginUser = async ({ username, password }) => {
-  // Find user
+
   const user = await userModel.findOne({ username }).select("+password");
 
   if (!user) {
@@ -75,7 +72,6 @@ export const loginUser = async ({ username, password }) => {
     throw error;
   }
 
-  // Verify password
   const isPasswordValid = await comparePassword(password, user.password);
 
   if (!isPasswordValid) {
@@ -85,7 +81,6 @@ export const loginUser = async ({ username, password }) => {
     throw error;
   }
 
-  // Check email verification
   const requireEmailVerification =
     process.env.REQUIRE_EMAIL_VERIFICATION === "true";
 
@@ -98,7 +93,6 @@ export const loginUser = async ({ username, password }) => {
     throw error;
   }
 
-  // Generate token
   const token = generateToken(user._id, user.role);
 
   logger.info("User logged in", {
@@ -127,16 +121,13 @@ export const sendResetOtp = async (email) => {
     throw error;
   }
 
-  // Generate OTP
   const otp = generateOtp();
   const otpHash = hashOtp(otp);
 
-  // Save hashed OTP
   user.resetOtpHash = otpHash;
-  user.resetOtpExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+  user.resetOtpExpires = Date.now() + 15 * 60 * 1000;
   await user.save();
 
-  // Send email
   const emailResult = await sendPasswordResetOtp(user, otp, 15);
 
   if (!emailResult.success) {
@@ -159,7 +150,6 @@ export const verifyResetOtpCode = async (email, otp) => {
     throw error;
   }
 
-  // Check expiry
   if (isOtpExpired(user.resetOtpExpires)) {
     logger.warn("Expired OTP attempt", { userId: user._id });
     const error = new Error("OTP has expired");
@@ -167,7 +157,6 @@ export const verifyResetOtpCode = async (email, otp) => {
     throw error;
   }
 
-  // Verify OTP
   const isValid = verifyOtp(otp, user.resetOtpHash);
 
   if (!isValid) {
@@ -191,14 +180,12 @@ export const resetUserPassword = async (email, otp, newPassword) => {
     throw error;
   }
 
-  // Check expiry
   if (isOtpExpired(user.resetOtpExpires)) {
     const error = new Error("OTP has expired");
     error.statusCode = 400;
     throw error;
   }
 
-  // Verify OTP
   const isValid = verifyOtp(otp, user.resetOtpHash);
 
   if (!isValid) {
@@ -207,7 +194,6 @@ export const resetUserPassword = async (email, otp, newPassword) => {
     throw error;
   }
 
-  // Update password
   user.password = await hashPassword(newPassword);
   user.resetOtpHash = "";
   user.resetOtpExpires = 0;
@@ -233,14 +219,12 @@ export const sendVerificationOtpCode = async (userId) => {
     throw error;
   }
 
-  // Generate OTP
   const otp = generateOtp();
-  // ✅ SECURITY FIX: Hash OTP before storing
+
   user.verifyOtpHash = hashOtp(otp);
   user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  // Send email
   const emailResult = await sendVerificationOtp(user, otp, 10);
 
   if (!emailResult.success) {
@@ -267,7 +251,6 @@ export const verifyUserEmail = async (userId, otp) => {
     throw error;
   }
 
-  // Check expiry first
   if (isOtpExpired(user.verifyOtpExpiry)) {
     logger.warn("Expired verify OTP attempt", { userId: user._id });
     const error = new Error("OTP has expired. Please request a new one.");
@@ -275,7 +258,6 @@ export const verifyUserEmail = async (userId, otp) => {
     throw error;
   }
 
-  // ✅ SECURITY FIX: Use timing-safe comparison for hashed OTP
   if (!user.verifyOtpHash || !verifyOtp(otp, user.verifyOtpHash)) {
     logger.warn("Invalid verify OTP attempt", { userId: user._id });
     const error = new Error("Invalid OTP");
@@ -283,7 +265,6 @@ export const verifyUserEmail = async (userId, otp) => {
     throw error;
   }
 
-  // Verify account
   user.isAccountVerified = true;
   user.verifyOtpHash = "";
   user.verifyOtpExpiry = 0;

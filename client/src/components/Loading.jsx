@@ -1,4 +1,4 @@
-// frontend/src/components/Loading.jsx
+
 
 export default function Loading({ fullScreen = false, message = "Loading..." }) {
     if (fullScreen) {

@@ -1,4 +1,4 @@
-// src/pages/student/Registration.jsx
+
 import React, { useState, useEffect } from "react";
 import { enrollmentService } from "@/services/enrollmentService";
 import { toast } from "sonner";
@@ -38,7 +38,7 @@ const Registration = () => {
             const response = await enrollmentService.enrollClass(classId);
             if (response.success) {
                 toast.success("ลงทะเบียนสำเร็จ!");
-                // อัพเดท state
+
                 setClasses(
                     classes.map((c) =>
                         c._id === classId ? { ...c, isEnrolled: true } : c
@@ -60,7 +60,7 @@ const Registration = () => {
             const response = await enrollmentService.dropClass(classId);
             if (response.success) {
                 toast.success("ยกเลิกลงทะเบียนสำเร็จ");
-                // อัพเดท state
+
                 setClasses(
                     classes.map((c) =>
                         c._id === classId ? { ...c, isEnrolled: false } : c
@@ -97,7 +97,7 @@ const Registration = () => {
 
     return (
         <div className="flex flex-col h-full bg-white">
-            {/* Header */}
+            {}
             <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div>
@@ -111,14 +111,14 @@ const Registration = () => {
                         className="flex items-center gap-2 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                     >
                         <RefreshCw className="w-4 h-4" />
-                        รีเฟรช
+                        Refresh
                     </button>
                 </div>
             </header>
 
-            {/* Content */}
+            {}
             <div className="flex-1 p-6 overflow-auto bg-gray-50">
-                {/* Search */}
+                {}
                 <div className="relative mb-6">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -130,7 +130,7 @@ const Registration = () => {
                     />
                 </div>
 
-                {/* Error State */}
+                {}
                 {error && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center mb-6">
                         <p className="text-red-600 mb-4">{error}</p>
@@ -143,7 +143,7 @@ const Registration = () => {
                     </div>
                 )}
 
-                {/* Loading State */}
+                {}
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
@@ -158,7 +158,7 @@ const Registration = () => {
                         <p className="text-sm">ลองค้นหาด้วยคำอื่น หรือติดต่ออาจารย์</p>
                     </div>
                 ) : (
-                    /* Classes Grid */
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredClasses.map((classItem) => (
                             <div
@@ -168,7 +168,7 @@ const Registration = () => {
                                         : "border-gray-200 hover:border-red-300"
                                     }`}
                             >
-                                {/* Header */}
+                                {}
                                 <div
                                     className={`p-4 ${classItem.isEnrolled
                                             ? "bg-green-500"
@@ -186,13 +186,13 @@ const Registration = () => {
                                         </div>
                                         {classItem.isEnrolled && (
                                             <span className="text-xs bg-white text-green-600 px-2 py-1 rounded font-medium">
-                                                ✓ ลงทะเบียนแล้ว
+                                                ลงทะเบียนแล้ว
                                             </span>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* Body */}
+                                {}
                                 <div className="p-4 space-y-3">
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <User className="w-4 h-4" />
@@ -230,7 +230,7 @@ const Registration = () => {
                                         </div>
                                     )}
 
-                                    {/* Actions */}
+                                    {}
                                     <div className="pt-3 border-t">
                                         {classItem.isEnrolled ? (
                                             <button

@@ -1,4 +1,4 @@
-// src/services/sessionService.js
+
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7001/api";
@@ -8,7 +8,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// เพิ่ม token ใน header ทุก request
 api.interceptors.request.use((config) => {
   const saved = localStorage.getItem("auth");
   if (saved) {
@@ -21,9 +20,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const sessionService = {
-  /**
-   * เปิดเรียน (Start Session)
-   */
+
   startSession: async (data) => {
     try {
       const response = await api.post("/sessions/start", data);
@@ -33,9 +30,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * ปิดเรียน (Close Session)
-   */
   closeSession: async (sessionId) => {
     try {
       const response = await api.patch(`/sessions/${sessionId}/close`);
@@ -45,9 +39,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * ดึง Session ที่เปิดอยู่
-   */
   getOpenSessions: async () => {
     try {
       const response = await api.get("/sessions/open");
@@ -57,9 +48,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * ดึงรายละเอียด Session พร้อม Attendance
-   */
   getSessionDetail: async (sessionId) => {
     try {
       const response = await api.get(`/sessions/${sessionId}`);
@@ -69,9 +57,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * ดึงประวัติ Session ของวิชา
-   */
   getClassSessions: async (classId, params = {}) => {
     try {
       const response = await api.get(`/sessions/class/${classId}`, { params });
@@ -81,9 +66,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * เช็คชื่อ Manual (อาจารย์เช็คให้)
-   */
   manualCheckIn: async (data) => {
     try {
       const response = await api.post("/attendance/manual", data);
@@ -93,9 +75,6 @@ export const sessionService = {
     }
   },
 
-  /**
-   * ดูสรุปการเข้าเรียนของวิชา
-   */
   getClassAttendanceSummary: async (classId) => {
     try {
       const response = await api.get(`/attendance/summary/${classId}`);

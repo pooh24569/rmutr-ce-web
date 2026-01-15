@@ -1,4 +1,4 @@
-// frontend/src/hooks/useAuthForm.js
+
 import { useState } from "react";
 
 export function useAuthForm(initialValues) {

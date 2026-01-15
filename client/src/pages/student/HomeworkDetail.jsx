@@ -1,4 +1,4 @@
-// src/pages/student/HomeworkDetail.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -80,7 +80,7 @@ const HomeworkDetail = () => {
             const response = await homeworkService.submitHomework(homeworkId, "", files);
             if (response.success) {
                 toast.success(response.message);
-                // Clear attachments and refresh homework data to show submitted files
+
                 setAttachments([]);
                 fetchHomework();
             }
@@ -136,7 +136,7 @@ const HomeworkDetail = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header Breadcrumb */}
+            {}
             <StudentHeader
                 breadcrumbs={[
                     { label: "HOMEWORK LIST", link: "/student/homework" },
@@ -144,9 +144,9 @@ const HomeworkDetail = () => {
                 ]}
             />
 
-            {/* Main Content */}
+            {}
             <div className="p-6">
-                {/* Back Button */}
+                {}
                 <button
                     onClick={() => navigate("/student/homework")}
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6"
@@ -155,11 +155,11 @@ const HomeworkDetail = () => {
                     <span>Back</span>
                 </button>
 
-                {/* Two Column Layout */}
+                {}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left Column - Homework Info */}
+                    {}
                     <div>
-                        {/* Title & Points */}
+                        {}
                         <div className="mb-4">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-2xl font-bold text-gray-800">
@@ -171,7 +171,7 @@ const HomeworkDetail = () => {
                             </div>
                         </div>
 
-                        {/* Dates */}
+                        {}
                         <div className="flex items-center gap-1 text-sm text-gray-500 mb-6">
                             <Clock className="w-4 h-4" />
                             <span>On {formatDate(homework.createdAt)}</span>
@@ -179,7 +179,7 @@ const HomeworkDetail = () => {
                             <span>Closes {formatDate(homework.dueDate)}</span>
                         </div>
 
-                        {/* Instructions */}
+                        {}
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-gray-700 mb-2">Instructions</h3>
                             <p className="text-gray-600">
@@ -188,14 +188,14 @@ const HomeworkDetail = () => {
                         </div>
                     </div>
 
-                    {/* Right Column - Submit Work */}
+                    {}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        {/* Handle bar */}
+                        {}
                         <div className="flex justify-center mb-4">
                             <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
                         </div>
 
-                        {/* Your Work Section */}
+                        {}
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-gray-700 font-medium">Your work</h3>
                             <span className={`text-sm font-medium ${submissionStatus === "Submitted" ? "text-green-600" : "text-red-500"
@@ -204,10 +204,10 @@ const HomeworkDetail = () => {
                             </span>
                         </div>
 
-                        {/* Attachments Section */}
+                        {}
                         <p className="text-sm text-gray-500 mb-3">Attachments</p>
 
-                        {/* Previously Submitted Files */}
+                        {}
                         {homework.submission?.attachments?.length > 0 && (
                             <div className="mb-4">
                                 <p className="text-xs text-green-600 mb-2">ไฟล์ที่ส่งแล้ว:</p>
@@ -232,7 +232,7 @@ const HomeworkDetail = () => {
                             </div>
                         )}
 
-                        {/* Score & Feedback from Teacher */}
+                        {}
                         {homework.submission?.status === "graded" && (
                             <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                                 <div className="flex items-center justify-between mb-2">
@@ -250,7 +250,7 @@ const HomeworkDetail = () => {
                             </div>
                         )}
 
-                        {/* New File List (to be submitted) */}
+                        {}
                         <div className="space-y-2 mb-4">
                             {attachments.map((attachment, index) => (
                                 <div
@@ -287,7 +287,7 @@ const HomeworkDetail = () => {
                             ))}
                         </div>
 
-                        {/* Add Work Button */}
+                        {}
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
@@ -306,7 +306,7 @@ const HomeworkDetail = () => {
                             accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
                         />
 
-                        {/* Submit Button */}
+                        {}
                         <button
                             onClick={handleSubmit}
                             disabled={submitting || attachments.length === 0}

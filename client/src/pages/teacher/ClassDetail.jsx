@@ -1,4 +1,4 @@
-// src/pages/teacher/ClassDetail.jsx
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -17,12 +17,6 @@ import {
 import { classService } from "@/services/classService";
 import ImportStudentsModal from "./components/ImportStudentsModal";
 
-/**
- * หน้ารายละเอียดวิชา
- * - ดูข้อมูลวิชา
- * - จัดการนักศึกษา (เพิ่ม/ลบ)
- * - เริ่มเช็คชื่อ
- */
 const ClassDetail = () => {
     const { classId } = useParams();
     const navigate = useNavigate();
@@ -57,7 +51,7 @@ const ClassDetail = () => {
         try {
             const response = await classService.getAllStudents();
             if (response.success) {
-                // กรองนักศึกษาที่ยังไม่ได้อยู่ในวิชา
+
                 const enrolledIds = classData.students.map((s) => s._id);
                 const available = response.data.filter(
                     (s) => !enrolledIds.includes(s._id)
@@ -74,9 +68,9 @@ const ClassDetail = () => {
             setAddingStudent(true);
             const response = await classService.addStudent(classId, studentId);
             if (response.success) {
-                // Refresh ข้อมูล
+
                 await fetchClassDetail();
-                // ลบจาก list ที่แสดง
+
                 setAllStudents(allStudents.filter((s) => s._id !== studentId));
             }
         } catch (error) {
@@ -142,7 +136,7 @@ const ClassDetail = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate("/teacher/classes")}
@@ -167,9 +161,9 @@ const ClassDetail = () => {
                 </button>
             </div>
 
-            {/* Info Cards */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Students Count */}
+                {}
                 <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -184,7 +178,7 @@ const ClassDetail = () => {
                     </div>
                 </div>
 
-                {/* Schedule */}
+                {}
                 <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -201,7 +195,7 @@ const ClassDetail = () => {
                     </div>
                 </div>
 
-                {/* Room */}
+                {}
                 <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
@@ -217,7 +211,7 @@ const ClassDetail = () => {
                 </div>
             </div>
 
-            {/* Students List */}
+            {}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <h2 className="text-lg font-semibold text-gray-800">รายชื่อนักศึกษา</h2>
@@ -283,7 +277,7 @@ const ClassDetail = () => {
                 )}
             </div>
 
-            {/* Add Student Modal */}
+            {}
             {showAddStudent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     <div
@@ -291,7 +285,7 @@ const ClassDetail = () => {
                         onClick={() => setShowAddStudent(false)}
                     />
                     <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-hidden">
-                        {/* Header */}
+                        {}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                             <h3 className="text-lg font-semibold">เพิ่มนักศึกษา</h3>
                             <button
@@ -302,7 +296,7 @@ const ClassDetail = () => {
                             </button>
                         </div>
 
-                        {/* Search */}
+                        {}
                         <div className="px-6 py-3 border-b border-gray-100">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -316,7 +310,7 @@ const ClassDetail = () => {
                             </div>
                         </div>
 
-                        {/* List */}
+                        {}
                         <div className="max-h-80 overflow-y-auto">
                             {filteredStudents.length === 0 ? (
                                 <div className="p-6 text-center text-gray-500">
@@ -358,7 +352,7 @@ const ClassDetail = () => {
                     </div>
                 </div>
             )}
-            {/* Import Students Modal */}
+            {}
             <ImportStudentsModal
                 isOpen={showImportModal}
                 onClose={() => setShowImportModal(false)}

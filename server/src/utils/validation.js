@@ -1,8 +1,7 @@
 import Joi from "joi";
 
-// Password validation rules (ผ่อนปรนกว่าเดิม)
 const passwordSchema = Joi.string()
-  .min(6) // ลดจาก 8 เป็น 6
+  .min(6)
   .max(128)
   .required()
   .messages({
@@ -11,7 +10,6 @@ const passwordSchema = Joi.string()
     "any.required": "Password is required",
   });
 
-// Password validation แบบเข้มงวด (สำหรับ production)
 const strongPasswordSchema = Joi.string()
   .min(8)
   .max(128)
@@ -24,7 +22,6 @@ const strongPasswordSchema = Joi.string()
     "string.max": "Password cannot exceed 128 characters",
   });
 
-// Email validation
 const emailSchema = Joi.string()
   .email({ minDomainSegments: 2 })
   .lowercase()
@@ -34,7 +31,6 @@ const emailSchema = Joi.string()
     "string.email": "Please provide a valid email address",
   });
 
-// Username validation
 const usernameSchema = Joi.string()
   .alphanum()
   .min(3)
@@ -47,14 +43,10 @@ const usernameSchema = Joi.string()
     "string.max": "Username cannot exceed 30 characters",
   });
 
-// ============================================
-// AUTH SCHEMAS
-// ============================================
-
 export const registerSchema = Joi.object({
   username: usernameSchema,
   email: emailSchema,
-  password: passwordSchema, // ใช้ password แบบธรรมดา (min 6 chars)
+  password: passwordSchema,
   firstName: Joi.string().min(1).max(100).trim().optional().allow(""),
   lastName: Joi.string().min(1).max(100).trim().optional().allow(""),
   role: Joi.string()
@@ -138,10 +130,6 @@ export const resetPasswordSchema = Joi.object({
   newPassword: passwordSchema,
 });
 
-// ============================================
-// USER SCHEMAS
-// ============================================
-
 export const createUserSchema = Joi.object({
   username: usernameSchema,
   email: emailSchema,
@@ -157,7 +145,7 @@ export const updateUserSchema = Joi.object({
   role: Joi.string()
     .valid("student", "teacher", "parent", "admin", "superadmin")
     .optional(),
-}).min(1); // At least one field must be provided
+}).min(1);
 
 export const userIdSchema = Joi.object({
   id: Joi.string()
@@ -167,10 +155,6 @@ export const userIdSchema = Joi.object({
       "string.pattern.base": "Invalid user ID format",
     }),
 });
-
-// ============================================
-// PROFILE SCHEMAS
-// ============================================
 
 export const updateProfileSchema = Joi.object({
   firstName: Joi.string().min(2).max(50).trim().optional(),
@@ -238,15 +222,11 @@ export const updateStudentProfileSchema = Joi.object({
   }).optional(),
 }).min(1);
 
-// ============================================
-// VALIDATION MIDDLEWARE
-// ============================================
-
 export const validate = (schema, property = "body") => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[property], {
-      abortEarly: false, // Return all errors
-      stripUnknown: true, // Remove unknown fields
+      abortEarly: false,
+      stripUnknown: true,
     });
 
     if (error) {
@@ -262,7 +242,6 @@ export const validate = (schema, property = "body") => {
       });
     }
 
-    // Replace request data with validated data
     req[property] = value;
     next();
   };

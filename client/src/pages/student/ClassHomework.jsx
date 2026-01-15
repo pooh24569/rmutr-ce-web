@@ -1,5 +1,5 @@
-// frontend/src/pages/student/ClassHomework.jsx
-// หน้าแสดงการบ้านของวิชาที่เลือก
+
+
 import React, { useState, useEffect } from "react";
 import {
     FileText,
@@ -30,7 +30,7 @@ const ClassHomework = () => {
             setLoading(true);
             const response = await homeworkService.getMyHomework();
             if (response.success) {
-                // กรองเฉพาะวิชานี้
+
                 const filtered = response.data.filter(
                     (hw) => hw.class?._id === classId
                 );
@@ -111,7 +111,7 @@ const ClassHomework = () => {
             <StudentHeader title="HOMEWORK" />
 
             <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
-                {/* Header */}
+                {}
                 <div className="flex items-center gap-4 mb-6">
                     <button
                         onClick={() => navigate("/student/homework")}
@@ -133,7 +133,7 @@ const ClassHomework = () => {
                     </button>
                 </div>
 
-                {/* Homework List */}
+                {}
                 {homework.length === 0 ? (
                     <div className="bg-white rounded-xl p-8 text-center">
                         <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -154,19 +154,19 @@ const ClassHomework = () => {
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
-                                        {/* หัวข้อ */}
+                                        {}
                                         <h3 className="text-lg font-semibold text-gray-800">
                                             {hw.title}
                                         </h3>
 
-                                        {/* รายละเอียด */}
+                                        {}
                                         {hw.description && (
                                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                                                 {hw.description}
                                             </p>
                                         )}
 
-                                        {/* Info */}
+                                        {}
                                         <div className="flex items-center gap-4 mt-3">
                                             <span className="flex items-center gap-1 text-sm text-gray-500">
                                                 <Clock className="w-4 h-4" />

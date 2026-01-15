@@ -6,10 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/form/ImageUpload";
 
-/**
- * Profile Edit Form Component
- * Form for editing user and student profile
- */
 export const ProfileEditForm = ({
     profile,
     onSave,
@@ -18,16 +14,13 @@ export const ProfileEditForm = ({
 }) => {
     const [selectedImage, setSelectedImage] = useState(null);
 
-    // ตรวจสอบว่าเป็นภาษาไทยหรือไม่
     const isThai = (text) => /[\u0E00-\u0E7F]/.test(text || "");
 
-    // แยกชื่อไทย/อังกฤษให้ถูกช่อง
     const firstName = profile?.firstName || "";
     const lastName = profile?.lastName || "";
     const firstNameTH = profile?.studentProfile?.firstNameTH || "";
     const lastNameTH = profile?.studentProfile?.lastNameTH || "";
 
-    // ถ้า firstName เป็นไทย ให้ไปอยู่ช่อง TH แทน
     const defaultFirstNameEN = !isThai(firstName) ? firstName : "";
     const defaultLastNameEN = !isThai(lastName) ? lastName : "";
     const defaultFirstNameTH = firstNameTH || (isThai(firstName) ? firstName : "");
@@ -39,12 +32,11 @@ export const ProfileEditForm = ({
         formState: { errors },
     } = useForm({
         defaultValues: {
-            // Basic profile - ใช้ค่าที่แยกภาษาแล้ว
+
             firstName: defaultFirstNameEN,
             lastName: defaultLastNameEN,
             phoneNumber: profile?.phoneNumber || "",
 
-            // Student profile
             studentId: profile?.studentProfile?.studentId || "",
             firstNameTH: defaultFirstNameTH,
             lastNameTH: defaultLastNameTH,
@@ -65,19 +57,16 @@ export const ProfileEditForm = ({
                     .split("T")[0]
                 : "",
 
-            // Address
             street: profile?.studentProfile?.address?.street || "",
             district: profile?.studentProfile?.address?.district || "",
             province: profile?.studentProfile?.address?.province || "",
             postalCode: profile?.studentProfile?.address?.postalCode || "",
 
-            // Education
             faculty: profile?.studentProfile?.education?.faculty || "",
             department: profile?.studentProfile?.education?.department || "",
             year: profile?.studentProfile?.education?.year || "",
             gpa: profile?.studentProfile?.education?.gpa || "",
 
-            // Emergency contact
             emergencyName: profile?.studentProfile?.emergencyContact?.name || "",
             emergencyRelationship:
                 profile?.studentProfile?.emergencyContact?.relationship || "",
@@ -87,7 +76,7 @@ export const ProfileEditForm = ({
     });
 
     const onSubmit = async (data) => {
-        // Split data into basic profile and student profile
+
         const basicProfile = {
             firstName: data.firstName,
             lastName: data.lastName,
@@ -126,7 +115,7 @@ export const ProfileEditForm = ({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Profile Image */}
+            {}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Profile Image
@@ -137,7 +126,7 @@ export const ProfileEditForm = ({
                 />
             </div>
 
-            {/* Basic Information */}
+            {}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Basic Information
@@ -205,7 +194,7 @@ export const ProfileEditForm = ({
                 </div>
             </div>
 
-            {/* Student Information */}
+            {}
             {profile?.role === "student" && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -280,7 +269,7 @@ export const ProfileEditForm = ({
                 </div>
             )}
 
-            {/* Education */}
+            {}
             {profile?.role === "student" && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Education</h3>
@@ -335,7 +324,7 @@ export const ProfileEditForm = ({
                 </div>
             )}
 
-            {/* Address */}
+            {}
             {profile?.role === "student" && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Address</h3>
@@ -380,7 +369,7 @@ export const ProfileEditForm = ({
                 </div>
             )}
 
-            {/* Emergency Contact */}
+            {}
             {profile?.role === "student" && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -430,7 +419,7 @@ export const ProfileEditForm = ({
                 </div>
             )}
 
-            {/* Form Actions */}
+            {}
             <div className="flex justify-end space-x-4">
                 <Button
                     type="button"

@@ -1,4 +1,4 @@
-// src/pages/teacher/components/CreateClassModal.jsx
+
 import React, { useState, useEffect } from "react";
 import { X, Plus, Trash2, Clock, MapPin } from "lucide-react";
 import { classService } from "@/services/classService";
@@ -24,7 +24,7 @@ const initialFormData = {
     className: "",
     section: "",
     description: "",
-    academicYear: new Date().getFullYear() + 543 + "", // พ.ศ.
+    academicYear: new Date().getFullYear() + 543 + "",
     semester: "1",
     schedule: [{ day: "monday", startTime: "09:00", endTime: "12:00", room: "" }],
 };
@@ -108,15 +108,15 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
+            {}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal */}
+            {}
             <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-                {/* Header */}
+                {}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h2 className="text-xl font-bold text-gray-800">
                         {editData ? "Edit Class" : "Create New Class"}
@@ -129,7 +129,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
                     </button>
                 </div>
 
-                {/* Body */}
+                {}
                 <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-140px)]">
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
@@ -137,7 +137,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
                         </div>
                     )}
 
-                    {/* Class Code & Name */}
+                    {}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -198,7 +198,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
                         />
                     </div>
 
-                    {/* Academic Year & Semester */}
+                    {}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -234,7 +234,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
                         </div>
                     </div>
 
-                    {/* Schedule */}
+                    {}
                     <div>
                         <div className="flex items-center justify-between mb-2">
                             <label className="block text-sm font-medium text-gray-700">
@@ -319,7 +319,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit, editData, onRefresh }) =>
                     </div>
                 </form>
 
-                {/* Footer */}
+                {}
                 <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
                     <button
                         type="button"

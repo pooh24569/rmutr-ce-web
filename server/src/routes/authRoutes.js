@@ -14,7 +14,6 @@ import {
   resetPassword,
 } from "../controllers/authController.js";
 
-// Import validation schemas
 import {
   validate,
   registerSchema,
@@ -30,16 +29,10 @@ import {
 
 const authRouter = express.Router();
 
-// ============================================
-// PUBLIC ROUTES
-// ============================================
-
-// Registration & Login
 authRouter.post("/register", validate(registerSchema), register);
 authRouter.post("/login", validate(loginSchema), login);
 authRouter.post("/logout", logout);
 
-// Password Reset (Link Method)
 authRouter.post(
   "/request-reset",
   validate(requestResetSchema),
@@ -51,7 +44,6 @@ authRouter.post(
   confirmResetPassword
 );
 
-// Password Reset (OTP Method)
 authRouter.post("/send-reset-otp", validate(sendResetOtpSchema), sendResetOTP);
 authRouter.post(
   "/verify-reset-otp",
@@ -64,18 +56,12 @@ authRouter.post(
   resetPassword
 );
 
-// Email Verification
 authRouter.post(
   "/verify-email",
   validate(verifyEmailSchema),
   verifyEmail
 );
 
-// ============================================
-// PROTECTED ROUTES
-// ============================================
-
-// Email Verification OTP (requires authentication)
 authRouter.post(
   "/send-verify-otp",
   verifyToken,
@@ -83,7 +69,6 @@ authRouter.post(
   sendVerifyOtp
 );
 
-// Check authentication status
 authRouter.post("/is-authenticated", verifyToken, isAuthenticated);
 authRouter.get("/is-authenticated", verifyToken, isAuthenticated);
 

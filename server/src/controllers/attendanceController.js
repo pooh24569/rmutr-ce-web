@@ -1,28 +1,10 @@
 import Attendance from "../models/attendanceModel.js";
 import Session from "../models/sessionModel.js";
 
-/**
- * ============================================================
- * 📋 Attendance Controller - จัดการการเช็คชื่อ
- * ============================================================
- */
-
-/**
- * ✅ เช็คชื่อด้วยลายนิ้วมือ (Check-in with Fingerprint)
- *
- * Flow:
- * 1. รับข้อมูลจากเครื่องสแกน (studentId, deviceId)
- * 2. หา Session ที่เปิดอยู่
- * 3. อัพเดท Attendance record
- * 4. คำนวณสถานะ (มา/สาย)
- *
- * Note: API นี้จะถูกเรียกจากเครื่องสแกนหรือ Mobile App
- */
 export const checkInByFingerprint = async (req, res) => {
   try {
     const { studentId, sessionId, deviceId, location } = req.body;
 
-    // 1️⃣ หา Session
     const session = await Session.findById(sessionId);
 
     if (!session) {
@@ -39,7 +21,6 @@ export const checkInByFingerprint = async (req, res) => {
       });
     }
 
-    // 2️⃣ หา Attendance record
     const attendance = await Attendance.findOne({
       sessionId,
       student: studentId,
@@ -60,23 +41,20 @@ export const checkInByFingerprint = async (req, res) => {
       });
     }
 
-    // 3️⃣ คำนวณสถานะ
     const now = new Date();
     const checkInTimeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
     let status = "PRESENT";
 
-    // เปรียบเทียบเวลา
     if (checkInTimeStr > session.lateTime) {
       status = "LATE";
     }
 
     if (checkInTimeStr > session.endTime) {
-      // หมดเวลาแล้ว ยังให้เช็คได้แต่เป็นสาย
+
       status = "LATE";
     }
 
-    // 4️⃣ อัพเดท Attendance
     attendance.checkInTime = now;
     attendance.status = status;
     attendance.method = "FINGERPRINT";
@@ -88,17 +66,15 @@ export const checkInByFingerprint = async (req, res) => {
 
     await attendance.save();
 
-    // 5️⃣ อัพเดท Session summary
     if (status === "PRESENT") {
       session.summary.present += 1;
     } else if (status === "LATE") {
       session.summary.late += 1;
     }
-    // ✅ FIX: Prevent negative value
+
     session.summary.absent = Math.max(0, session.summary.absent - 1);
     await session.save();
 
-    // ดึงข้อมูลนักศึกษามาแสดง
     await attendance.populate("student", "username firstName lastName");
 
     return res.status(200).json({
@@ -119,9 +95,6 @@ export const checkInByFingerprint = async (req, res) => {
   }
 };
 
-/**
- * ✏️ เช็คชื่อ Manual (อาจารย์เช็คให้)
- */
 export const manualCheckIn = async (req, res) => {
   try {
     const { sessionId, studentId, status, note } = req.body;
@@ -135,7 +108,6 @@ export const manualCheckIn = async (req, res) => {
       });
     }
 
-    // ตรวจสอบสิทธิ์
     if (session.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -155,10 +127,8 @@ export const manualCheckIn = async (req, res) => {
       });
     }
 
-    // บันทึกสถานะเดิม
     const oldStatus = attendance.status;
 
-    // อัพเดท
     attendance.status = status;
     attendance.method = "MANUAL";
     attendance.note = note || "";
@@ -170,13 +140,10 @@ export const manualCheckIn = async (req, res) => {
 
     await attendance.save();
 
-    // อัพเดท Session summary
-    // ลบค่าเดิม
     if (oldStatus === "PRESENT") session.summary.present -= 1;
     if (oldStatus === "LATE") session.summary.late -= 1;
     if (oldStatus === "ABSENT") session.summary.absent -= 1;
 
-    // เพิ่มค่าใหม่
     if (status === "PRESENT") session.summary.present += 1;
     if (status === "LATE") session.summary.late += 1;
     if (status === "ABSENT") session.summary.absent += 1;
@@ -199,13 +166,10 @@ export const manualCheckIn = async (req, res) => {
   }
 };
 
-/**
- * 📊 ดึงประวัติเช็คชื่อของนักศึกษา
- */
 export const getStudentAttendanceHistory = async (req, res) => {
   try {
     const { classId } = req.params;
-    const studentId = req.user.id; // ดูของตัวเอง
+    const studentId = req.user.id;
 
     const attendances = await Attendance.find({
       classId,
@@ -217,7 +181,6 @@ export const getStudentAttendanceHistory = async (req, res) => {
       })
       .sort({ date: -1 });
 
-    // คำนวณสรุป
     const summary = {
       total: attendances.length,
       present: attendances.filter((a) => a.status === "PRESENT").length,
@@ -247,20 +210,15 @@ export const getStudentAttendanceHistory = async (req, res) => {
   }
 };
 
-/**
- * 📈 ดึงสรุปการเข้าเรียนของวิชา (สำหรับอาจารย์)
- */
 export const getClassAttendanceSummary = async (req, res) => {
   try {
     const { classId } = req.params;
 
-    // นับจำนวน Session ทั้งหมด
     const totalSessions = await Session.countDocuments({
       classId,
       status: "CLOSED",
     });
 
-    // ดึง Attendance ทั้งหมด group by student
     const studentSummary = await Attendance.aggregate([
       {
         $match: {

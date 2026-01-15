@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const studentProfileSchema = new mongoose.Schema(
   {
-    // Reference to User
+
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -10,7 +10,6 @@ const studentProfileSchema = new mongoose.Schema(
       unique: true,
     },
 
-    // Student ID (รหัสนักศึกษา)
     studentId: {
       type: String,
       required: true,
@@ -19,7 +18,6 @@ const studentProfileSchema = new mongoose.Schema(
       match: [/^[0-9]{13}$/, "Student ID must be exactly 13 digits"],
     },
 
-    // Thai Name
     firstNameTH: {
       type: String,
       trim: true,
@@ -31,7 +29,6 @@ const studentProfileSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Personal Information
     dateOfBirth: {
       type: Date,
       default: null,
@@ -42,7 +39,6 @@ const studentProfileSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Student Card Information
     cardIssueDate: {
       type: Date,
       default: null,
@@ -52,7 +48,6 @@ const studentProfileSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Address
     address: {
       street: { type: String, trim: true, default: "" },
       district: { type: String, trim: true, default: "" },
@@ -65,7 +60,6 @@ const studentProfileSchema = new mongoose.Schema(
       },
     },
 
-    // Education Information
     education: {
       faculty: { type: String, trim: true, default: "" },
       department: { type: String, trim: true, default: "" },
@@ -83,7 +77,6 @@ const studentProfileSchema = new mongoose.Schema(
       },
     },
 
-    // Emergency Contact
     emergencyContact: {
       name: { type: String, trim: true, default: "" },
       relationship: { type: String, trim: true, default: "" },
@@ -101,7 +94,6 @@ const studentProfileSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster queries
 studentProfileSchema.index({ userId: 1 });
 studentProfileSchema.index({ studentId: 1 });
 

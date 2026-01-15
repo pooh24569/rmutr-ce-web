@@ -1,4 +1,4 @@
-// frontend/src/context/AuthContext.jsx
+
 import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
@@ -24,18 +24,13 @@ const getInitialAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(getInitialAuth);
-  const [loading, setLoading] = useState(true); // ✨ เพิ่ม loading
+  const [loading, setLoading] = useState(true);
 
-  // ✨ Check auth on mount
   useEffect(() => {
-    // Simulate checking token validity
+
     const checkAuth = async () => {
       try {
-        // ถ้ามี token อาจจะ verify กับ backend
-        // const response = await api.get("/api/auth/verify");
-        // if (!response.data.success) {
-        //   logout();
-        // }
+
       } catch (error) {
         console.error("Auth check failed:", error);
       } finally {
@@ -64,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     () => ({
       user: auth.user,
       token: auth.token,
-      loading, // ✨ export loading
+      loading,
       login,
       logout,
       hasPermission,

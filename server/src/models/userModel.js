@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true },
 
-    // Basic Profile Information (for all roles)
     firstName: { type: String, trim: true, default: "" },
     lastName: { type: String, trim: true, default: "" },
     phoneNumber: {
@@ -21,7 +20,7 @@ const userSchema = new mongoose.Schema(
       default: "",
       match: [/^[0-9]{9,10}$|^$/, "Phone number must be 9-10 digits"],
     },
-    profileImage: { type: String, default: "" }, // Base64 or URL
+    profileImage: { type: String, default: "" },
 
     role: {
       type: String,
@@ -30,18 +29,15 @@ const userSchema = new mongoose.Schema(
     },
     roles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Role" }],
 
-    // ✅ Email verification OTP - SECURITY FIX: Now hashed like resetOtpHash
     verifyOtpHash: { type: String, default: "" },
     verifyOtpExpiry: { type: Number, default: 0 },
     isAccountVerified: { type: Boolean, default: false },
 
-    // Link reset แบบเดิม
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
 
-    // ✅ OTP reset แบบ hash + หมดอายุ (แทน resetOtp / resetOtpExpireAt เดิม)
     resetOtpHash: { type: String, default: "" },
-    resetOtpExpires: { type: Number, default: 0 }, // ms timestamp
+    resetOtpExpires: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
 );

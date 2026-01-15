@@ -1,19 +1,12 @@
-/**
- * Upload Middleware
- * จัดการการอัพโหลดไฟล์
- */
-
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// สร้างโฟลเดอร์ uploads ถ้ายังไม่มี
 const uploadDir = "uploads/homework";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// กำหนดที่เก็บไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -25,7 +18,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// กำหนดประเภทไฟล์ที่อนุญาต
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "image/jpeg",
@@ -51,12 +43,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// สร้าง multer instance
 export const uploadHomework = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // จำกัด 10MB ต่อไฟล์
+    fileSize: 10 * 1024 * 1024,
   },
 });
 

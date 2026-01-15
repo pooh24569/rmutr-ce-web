@@ -1,38 +1,26 @@
-/**
- * Dashboard Controller
- * API สำหรับ Dashboard statistics
- */
-
 import Class from "../models/classModel.js";
 import Session from "../models/sessionModel.js";
 import Attendance from "../models/attendanceModel.js";
 import User from "../models/userModel.js";
 
-/**
- * GET /api/dashboard/teacher
- * ดึงสถิติสำหรับ Teacher Dashboard
- */
 export const getTeacherDashboard = async (req, res) => {
   try {
     const teacherId = req.user.id;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 1. นับจำนวน Classes ของอาจารย์
     const classes = await Class.find({ teacher: teacherId })
       .populate("students", "_id")
       .lean();
 
     const totalClasses = classes.length;
 
-    // 2. นับจำนวนนักศึกษาทั้งหมด (unique)
     const studentIds = new Set();
     classes.forEach((cls) => {
       cls.students?.forEach((s) => studentIds.add(s._id.toString()));
     });
     const totalStudents = studentIds.size;
 
-    // 3. คำนวณ attendance rate วันนี้
     const classIds = classes.map((c) => c._id);
     const todaySessions = await Session.find({
       classId: { $in: classIds },
@@ -57,7 +45,6 @@ export const getTeacherDashboard = async (req, res) => {
           : 0;
     }
 
-    // 4. ดึง classes ที่มีเรียนวันนี้
     const dayOfWeek = [
       "sunday",
       "monday",
@@ -86,7 +73,6 @@ export const getTeacherDashboard = async (req, res) => {
       })
       .sort((a, b) => a.time.localeCompare(b.time));
 
-    // 5. ดึง recent sessions
     const recentSessions = await Session.find({
       classId: { $in: classIds },
     })
@@ -124,13 +110,9 @@ export const getTeacherDashboard = async (req, res) => {
   }
 };
 
-/**
- * GET /api/dashboard/admin
- * ดึงสถิติสำหรับ Admin Dashboard
- */
 export const getAdminDashboard = async (req, res) => {
   try {
-    // นับจำนวน users ตาม role
+
     const userCounts = await User.aggregate([
       { $group: { _id: "$role", count: { $sum: 1 } } },
     ]);
@@ -150,17 +132,14 @@ export const getAdminDashboard = async (req, res) => {
         stats.admins += item.count;
     });
 
-    // นับ classes ทั้งหมด
     stats.totalClasses = await Class.countDocuments();
 
-    // นับ sessions วันนี้
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     stats.todaySessions = await Session.countDocuments({
       date: { $gte: today },
     });
 
-    // Recent users
     const recentUsers = await User.find()
       .sort({ createdAt: -1 })
       .limit(5)

@@ -1,11 +1,11 @@
-// frontend/src/pages/teacher/Calendar.jsx
+
 import React from "react";
 import Calendar from "@/components/calendar/Calendar";
 
 export default function TeacherCalendarPage() {
     return (
         <div className="flex flex-col h-full">
-            {/* Header */}
+            {}
             <header className="h-16 flex items-center px-8 border-b border-[#dddddd] bg-white">
                 <div>
                     <h1 className="text-xs font-semibold tracking-wide text-blue-600 uppercase">

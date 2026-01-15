@@ -1,4 +1,4 @@
-// frontend/src/routes/AppRoutes.jsx
+
 import React from "react";
 import {
   BrowserRouter,
@@ -31,8 +31,8 @@ import Schedule from "@/pages/student/Schedule";
 import Profile from "@/pages/student/Profile";
 import ProfileEdit from "@/pages/student/ProfileEdit";
 import Registration from "@/pages/student/Registration";
+import MyClasses from "@/pages/student/MyClasses";
 
-// Teacher Portal
 import TeacherLayout from "@/layouts/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/Dashboard";
 import TeacherClasses from "@/pages/teacher/Classes";
@@ -47,10 +47,10 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Root */}
+        {}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Public Auth Routes */}
+        {}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-email" element={<ResetEmail />} />
@@ -58,9 +58,9 @@ export default function AppRoutes() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Protected Routes */}
+        {}
         <Route element={<ProtectedRoute />}>
-          {/* 🎓 Student Portal */}
+          {}
           <Route element={<ProtectedRoute roles={["student"]} />}>
             <Route path="/student" element={<StudentLayout />}>
               <Route index element={<Navigate to="/student/homework" replace />} />
@@ -72,10 +72,11 @@ export default function AppRoutes() {
               <Route path="profile" element={<Profile />} />
               <Route path="profile/edit" element={<ProfileEdit />} />
               <Route path="registration" element={<Registration />} />
+              <Route path="myclasses" element={<MyClasses />} />
             </Route>
           </Route>
 
-          {/* 👨‍🏫 Teacher Portal */}
+          {}
           <Route element={<ProtectedRoute roles={["teacher"]} />}>
             <Route path="/teacher" element={<TeacherLayout />}>
               <Route index element={<Navigate to="/teacher/dashboard" replace />} />
@@ -92,7 +93,7 @@ export default function AppRoutes() {
             </Route>
           </Route>
 
-          {/* 🛠 Admin Portal */}
+          {}
           <Route element={<ProtectedRoute roles={["admin", "superadmin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
@@ -102,7 +103,7 @@ export default function AppRoutes() {
           </Route>
         </Route>
 
-        {/* 404 */}
+        {}
         <Route path="*" element={<Notfound />} />
       </Routes>
     </BrowserRouter>

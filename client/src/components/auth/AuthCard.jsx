@@ -1,4 +1,4 @@
-// frontend/src/components/auth/AuthCard.jsx
+
 import AuthBackground from "./AuthBackground";
 
 export default function AuthCard({ children, title, subtitle }) {

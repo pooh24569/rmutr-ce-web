@@ -1,4 +1,4 @@
-// src/components/navbar/ConfirmDialog.jsx
+
 import React from "react";
 
 export default function ConfirmDialog({ show, onConfirm, onCancel }) {
@@ -7,7 +7,7 @@ export default function ConfirmDialog({ show, onConfirm, onCancel }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="w-[90vw] max-w-sm rounded-2xl bg-white shadow-2xl border border-neutral-200 p-6 space-y-5 animate-in fade-in-0 zoom-in-95">
-                {/* Icon */}
+                {}
                 <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto">
                     <svg
                         className="w-6 h-6 text-red-600"
@@ -22,7 +22,7 @@ export default function ConfirmDialog({ show, onConfirm, onCancel }) {
                     </svg>
                 </div>
 
-                {/* Title & Text */}
+                {}
                 <div className="text-center space-y-1">
                     <h2 className="text-lg font-semibold text-neutral-900">
                         Sign out?
@@ -32,7 +32,7 @@ export default function ConfirmDialog({ show, onConfirm, onCancel }) {
                     </p>
                 </div>
 
-                {/* Buttons */}
+                {}
                 <div className="flex justify-end gap-3 pt-2">
                     <button
                         type="button"

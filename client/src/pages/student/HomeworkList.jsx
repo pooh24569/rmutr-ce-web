@@ -1,12 +1,11 @@
-// frontend/src/pages/student/HomeworkList.jsx
-// หน้ารวมวิชา - แสดงกล่องวิชาให้คลิกเข้าไป
+
+
 import React, { useState, useEffect, useMemo } from "react";
 import { FileText, RefreshCw, BookOpen, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { homeworkService } from "@/services/homeworkService";
 import StudentHeader from "@/components/student/StudentHeader";
 
-// สีสำหรับกล่องวิชา
 const COLORS = [
   { bg: "bg-gradient-to-br from-blue-500 to-blue-600", light: "bg-blue-50" },
   { bg: "bg-gradient-to-br from-purple-500 to-purple-600", light: "bg-purple-50" },
@@ -42,7 +41,6 @@ const HomeworkList = () => {
     }
   };
 
-  // จัดกลุ่มการบ้านตามวิชา
   const groupedClasses = useMemo(() => {
     const groups = {};
     homework.forEach((hw) => {
@@ -91,7 +89,7 @@ const HomeworkList = () => {
       <StudentHeader title="HOMEWORK" />
 
       <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
-        {/* Header Actions */}
+        {}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-800">วิชาของฉัน</h2>
@@ -135,7 +133,7 @@ const HomeworkList = () => {
                   onClick={() => navigate(`/student/homework/class/${cls.classId}`)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-100 group"
                 >
-                  {/* Header สี */}
+                  {}
                   <div className={`${color.bg} p-5 relative`}>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
@@ -151,7 +149,7 @@ const HomeworkList = () => {
                     <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
                   </div>
 
-                  {/* Stats */}
+                  {}
                   <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -185,7 +183,7 @@ const HomeworkList = () => {
                       </span>
                     </div>
 
-                    {/* Progress bar */}
+                    {}
                     <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden flex">
                       {cls.graded > 0 && (
                         <div

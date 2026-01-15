@@ -1,4 +1,4 @@
-// src/components/navbar/NavberStudent/StudentSidebar.jsx
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -6,10 +6,11 @@ import { LogOut } from "lucide-react";
 import ConfirmDialog from "../ConfirmDialog";
 
 const studentLinks = [
+  { href: "/student/myclasses", label: "MY CLASSES" },
   { href: "/student/homework", label: "HOMEWORK LIST" },
   { href: "/student/calendar", label: "CALENDAR" },
-  { href: "/student/schedule", label: "SCHEDULE" },          // ตารางเรียน
-  { href: "/student/registration", label: "REGISTRATION" },  // ลงทะเบียน
+  { href: "/student/schedule", label: "SCHEDULE" },
+  { href: "/student/registration", label: "REGISTRATION" },
   { href: "/student/attendance", label: "CHECK ATTENDANCE" },
   { href: "/student/profile", label: "PROFILE" },
 ];
@@ -26,7 +27,7 @@ const StudentSidebar = () => {
 
   return (
     <aside className="w-60 bg-[#f5f5f5] border-r border-[#dddddd] flex flex-col">
-      {/* Logo */}
+      {}
       <div className="h-20 flex items-center px-6">
         <img
           src="/LOGO-RMUTR.png"
@@ -35,7 +36,7 @@ const StudentSidebar = () => {
         />
       </div>
 
-      {/* Menu items */}
+      {}
       <nav className="flex-1 px-2 space-y-1 py-0">
         {studentLinks.map((item) => {
           const active = location.pathname.startsWith(item.href);
@@ -59,7 +60,7 @@ const StudentSidebar = () => {
         })}
       </nav>
 
-      {/* Sign out button */}
+      {}
       <button
         type="button"
         onClick={() => setOpenConfirm(true)}
@@ -69,7 +70,7 @@ const StudentSidebar = () => {
         <span>Sign out</span>
       </button>
 
-      {/* Confirm dialog */}
+      {}
       <ConfirmDialog
         show={openConfirm}
         onCancel={() => setOpenConfirm(false)}

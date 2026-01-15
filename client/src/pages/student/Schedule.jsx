@@ -1,10 +1,9 @@
-// src/pages/student/Schedule.jsx
+
 import React, { useState, useEffect, useMemo } from "react";
 import { RefreshCw, User, BookOpen, MapPin, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { enrollmentService } from "@/services/enrollmentService";
 
-// Time slots (8:00–20:00)
 const TIME_SLOTS = [
   { start: "8:00", end: "9:00" },
   { start: "9:01", end: "10:00" },
@@ -30,7 +29,6 @@ const DAYS = [
   { key: "saturday", label: "Saturday" },
 ];
 
-// สี background สำหรับ Class cards
 const COLORS = [
   { bg: "bg-yellow-100", border: "border-yellow-400", text: "text-gray-800" },
   { bg: "bg-red-50", border: "border-red-300", text: "text-gray-800" },
@@ -45,7 +43,7 @@ const Schedule = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const year = 2567; // ปีการศึกษา
+  const year = 2567;
 
   useEffect(() => {
     fetchEnrolledClasses();
@@ -67,7 +65,6 @@ const Schedule = () => {
     }
   };
 
-  // แปลง schedule entries เป็น format ที่ใช้แสดง
   const scheduleEntries = useMemo(() => {
     const entries = [];
 
@@ -100,7 +97,6 @@ const Schedule = () => {
     return entries;
   }, [classes]);
 
-  // Group entries by day
   const entriesByDay = useMemo(() => {
     const map = {};
     DAYS.forEach((d) => (map[d.key] = []));
@@ -129,7 +125,7 @@ const Schedule = () => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
+      {}
       <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white tracking-wide">
@@ -140,12 +136,12 @@ const Schedule = () => {
             className="flex items-center gap-2 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
-            รีเฟรช
+            Refresh
           </button>
         </div>
       </header>
 
-      {/* Content */}
+      {}
       <div className="flex-1 p-6 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -166,12 +162,9 @@ const Schedule = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Year Display */}
-            <div className="flex items-center gap-4">
-              <span className="text-gray-500 text-sm">Year</span>
-              <span className="text-2xl font-bold text-gray-800">{year}</span>
-              {classes.length === 0 && (
-                <span className="text-sm text-gray-400 ml-4">
+            {classes.length === 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">
                   (ยังไม่มีวิชาลงทะเบียน -{" "}
                   <button
                     onClick={() => navigate("/student/registration")}
@@ -181,12 +174,12 @@ const Schedule = () => {
                   </button>
                   )
                 </span>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Schedule Grid */}
+            {}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {/* Time Header */}
+              {}
               <div className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-200 bg-gray-50">
                 <div className="p-2 text-center border-r border-gray-200">
                   <span className="text-xs text-gray-500">days/</span>
@@ -203,22 +196,22 @@ const Schedule = () => {
                 ))}
               </div>
 
-              {/* Days Rows */}
+              {}
               {DAYS.map((day) => (
                 <div
                   key={day.key}
                   className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-100 last:border-b-0 h-[80px]"
                 >
-                  {/* Day Label */}
+                  {}
                   <div className="p-3 border-r border-gray-200 bg-gray-50 flex items-center">
                     <span className="text-sm font-medium text-gray-700">
                       {day.label}
                     </span>
                   </div>
 
-                  {/* Time Grid Background */}
+                  {}
                   <div className="col-span-12 relative overflow-hidden">
-                    {/* Grid lines */}
+                    {}
                     <div className="absolute inset-0 grid grid-cols-12">
                       {TIME_SLOTS.map((_, idx) => (
                         <div
@@ -228,7 +221,7 @@ const Schedule = () => {
                       ))}
                     </div>
 
-                    {/* Class Blocks */}
+                    {}
                     <div className="absolute inset-0 grid grid-cols-12 p-1">
                       {entriesByDay[day.key]?.map((entry) => {
                         const startCol = entry.startHour - 8;
@@ -241,11 +234,11 @@ const Schedule = () => {
                               gridColumn: `${startCol + 1} / span ${span}`,
                             }}
                           >
-                            {/* รหัสวิชา */}
+                            {}
                             <span className="inline-block text-xs font-bold bg-yellow-400 text-gray-800 px-2 py-0.5 rounded w-fit">
                               {entry.classCode}
                             </span>
-                            {/* ห้องเรียน + อาจารย์ */}
+                            {}
                             <p className="text-xs text-gray-700 leading-tight mt-1 truncate">
                               ห้อง {entry.room} • {entry.teacher || "-"}
                             </p>
@@ -258,7 +251,7 @@ const Schedule = () => {
               ))}
             </div>
 
-            {/* Subject List Table */}
+            {}
             {classes.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">

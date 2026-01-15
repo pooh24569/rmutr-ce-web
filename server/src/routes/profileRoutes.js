@@ -14,25 +14,12 @@ import {
 
 const profileRouter = express.Router();
 
-// All routes require authentication
 profileRouter.use(verifyToken);
 
-/**
- * GET /api/profile
- * Get current user's profile
- */
 profileRouter.get("/", getProfile);
 
-/**
- * PUT /api/profile
- * Update basic user profile (firstName, lastName, phoneNumber, profileImage)
- */
 profileRouter.put("/", validate(updateProfileSchema), updateProfile);
 
-/**
- * PUT /api/profile/student
- * Update student-specific profile (only for students)
- */
 profileRouter.put(
   "/student",
   authorizeRoles("student"),
@@ -40,10 +27,6 @@ profileRouter.put(
   updateStudentProfile
 );
 
-/**
- * POST /api/profile/image
- * Upload profile image (Base64)
- */
 profileRouter.post("/image", uploadProfileImage);
 
 export default profileRouter;

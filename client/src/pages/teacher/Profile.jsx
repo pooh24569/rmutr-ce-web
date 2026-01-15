@@ -5,10 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Edit, User, Mail, Phone, Save, X, Camera } from "lucide-react";
 
-/**
- * Teacher Profile Page
- * หน้าดู/แก้ไข Profile สำหรับอาจารย์
- */
 const TeacherProfile = () => {
     const { profile, loading, updateProfile, uploadImage, fetchProfile } = useProfile();
     const [isEditing, setIsEditing] = useState(false);
@@ -19,7 +15,6 @@ const TeacherProfile = () => {
         phoneNumber: "",
     });
 
-    // เมื่อ profile โหลดเสร็จ ให้ set ค่าเริ่มต้น
     useState(() => {
         if (profile) {
             setFormData({
@@ -59,20 +54,18 @@ const TeacherProfile = () => {
     const handleImageUpload = async (e) => {
         const file = e.target.files?.[0];
 
-        // ตรวจสอบว่ามีไฟล์และเป็น File/Blob จริง
         if (!file || !(file instanceof Blob)) {
             console.error("No valid file selected");
             return;
         }
 
-        // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
         if (file.size > 5 * 1024 * 1024) {
             alert("ไฟล์ใหญ่เกินไป (สูงสุด 5MB)");
             return;
         }
 
         try {
-            // ส่ง file ไปให้ uploadImage (hook จะแปลงเป็น base64 เอง)
+
             await uploadImage(file);
             await fetchProfile();
         } catch (error) {
@@ -95,10 +88,10 @@ const TeacherProfile = () => {
     return (
         <div className="p-6 max-w-4xl mx-auto">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                {/* Header */}
+                {}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-white">
                     <div className="flex items-center gap-6">
-                        {/* Profile Image */}
+                        {}
                         <div className="relative">
                             <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
                                 {profile?.profileImage ? (
@@ -143,10 +136,10 @@ const TeacherProfile = () => {
                     </div>
                 </div>
 
-                {/* Content */}
+                {}
                 <div className="p-6">
                     {isEditing ? (
-                        /* Edit Mode */
+
                         <div className="space-y-6">
                             <h2 className="text-lg font-semibold text-gray-800">แก้ไขข้อมูลส่วนตัว</h2>
 
@@ -201,7 +194,7 @@ const TeacherProfile = () => {
                             </div>
                         </div>
                     ) : (
-                        /* View Mode */
+
                         <div className="space-y-6">
                             <h2 className="text-lg font-semibold text-gray-800">ข้อมูลส่วนตัว</h2>
 

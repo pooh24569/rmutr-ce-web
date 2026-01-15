@@ -6,7 +6,6 @@ import { validate, createUserSchema } from "../utils/validation.js";
 
 const router = express.Router();
 
-// GET /api/user-admin
 router.get(
   "/",
   verifyToken,
@@ -14,17 +13,15 @@ router.get(
   UserCtrl.list
 );
 
-// POST /api/user-admin
 router.post(
   "/",
   verifyToken,
   authorizeRoles("superadmin", "admin"),
-  validate(createUserSchema), // ✅ ตรวจ username/email/password/role ด้วย Joi
+  validate(createUserSchema),
   canAssignRole,
   UserCtrl.create
 );
 
-// DELETE /api/user-admin/:id
 router.delete(
   "/:id",
   verifyToken,

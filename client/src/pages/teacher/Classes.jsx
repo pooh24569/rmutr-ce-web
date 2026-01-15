@@ -1,4 +1,4 @@
-// src/pages/teacher/Classes.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2, Eye, BookOpen, Download } from "lucide-react";
@@ -35,8 +35,6 @@ const Classes = () => {
         }
     };
 
-    // ดึงวิชาจากระบบทะเบียน และ Auto-Import เข้า Database
-    // แสดงเฉพาะวิชาที่ตรงกับ registration ของอาจารย์คนนี้
     const fetchRegistrationCourses = async () => {
         try {
             const response = await registrationService.getTeachingCourses();
@@ -45,7 +43,6 @@ const Classes = () => {
                 setRegistrationCourses(regCourses);
                 const regCourseCodes = regCourses.map(c => c.courseCode);
 
-                // Auto-import วิชาที่ยังไม่มีใน Database
                 for (const course of regCourses) {
                     const existingClass = classes.find(c => c.classCode === course.courseCode);
                     if (!existingClass) {
@@ -57,7 +54,7 @@ const Classes = () => {
                                 schedule: course.schedule || [],
                                 academicYear: "2567",
                                 semester: "1",
-                                isFromRegistration: true, // บอกว่ามาจากทะเบียน
+                                isFromRegistration: true,
                             };
                             await classService.createClass(classData);
                         } catch (err) {
@@ -65,18 +62,16 @@ const Classes = () => {
                         }
                     }
                 }
-                // Fetch classes ใหม่หลัง import
+
                 const classesResponse = await classService.getMyClasses();
                 if (classesResponse.success) {
-                    // Filter: 
-                    // - แสดง Classes ที่สร้างเอง (isFromRegistration = false/undefined)
-                    // - แสดง Classes จากทะเบียน เฉพาะที่ยังตรง (classCode อยู่ใน regCourseCodes)
+
                     const filteredByReg = classesResponse.data.filter(c => {
                         if (c.isFromRegistration) {
-                            // วิชาจากทะเบียน - แสดงเฉพาะที่ยังตรง
+
                             return regCourseCodes.includes(c.classCode);
                         }
-                        // วิชาที่สร้างเอง - แสดงเสมอ
+
                         return true;
                     });
                     setClasses(filteredByReg);
@@ -133,7 +128,7 @@ const Classes = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">My Classes</h1>
@@ -151,7 +146,7 @@ const Classes = () => {
                 </button>
             </div>
 
-            {/* Search */}
+            {}
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -163,8 +158,7 @@ const Classes = () => {
                 />
             </div>
 
-
-            {/* Classes Grid */}
+            {}
             {loading ? (
                 <div className="flex items-center justify-center h-64">
                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -182,7 +176,7 @@ const Classes = () => {
                             key={classItem._id}
                             className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
                         >
-                            {/* Card Header */}
+                            {}
                             <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600 p-4 relative">
                                 <div className="absolute top-2 right-2">
                                     <div className="relative">
@@ -197,7 +191,7 @@ const Classes = () => {
                                 </div>
                             </div>
 
-                            {/* Card Body */}
+                            {}
                             <div className="p-4 space-y-3">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Users className="w-4 h-4" />
@@ -206,7 +200,7 @@ const Classes = () => {
                                     <span>Section {classItem.section}</span>
                                 </div>
 
-                                {/* Schedule */}
+                                {}
                                 {classItem.schedule?.length > 0 && (
                                     <div className="space-y-1">
                                         {classItem.schedule.slice(0, 2).map((sch, idx) => (
@@ -222,7 +216,7 @@ const Classes = () => {
                                     </div>
                                 )}
 
-                                {/* Actions */}
+                                {}
                                 <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                                     <button
                                         onClick={() => navigate(`/teacher/classes/${classItem._id}`)}
@@ -254,7 +248,7 @@ const Classes = () => {
                 </div>
             )}
 
-            {/* Create/Edit Modal */}
+            {}
             {showCreateModal && (
                 <CreateClassModal
                     isOpen={showCreateModal}
@@ -271,7 +265,6 @@ const Classes = () => {
     );
 };
 
-// Fallback icon component
 const BookOpenIcon = ({ className }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />

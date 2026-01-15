@@ -1,11 +1,10 @@
-// frontend/src/pages/Register.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import AuthCard from "@/components/auth/AuthCard";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-
 
 export default function Register() {
   const navigate = useNavigate();
@@ -28,7 +27,6 @@ export default function Register() {
 
     setError("");
 
-    // Client-side validation
     if (!values.firstName.trim() || !values.lastName.trim()) {
       setError("กรุณากรอกชื่อ-นามสกุล");
       return;
@@ -73,7 +71,7 @@ export default function Register() {
           </div>
         )}
 
-        {/* ชื่อ-นามสกุล */}
+        {}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="firstName" className="mb-1 block text-sm text-neutral-700">
@@ -107,7 +105,7 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Username */}
+        {}
         <div>
           <label htmlFor="username" className="mb-1 block text-sm text-neutral-700">
             ID
@@ -124,7 +122,7 @@ export default function Register() {
           />
         </div>
 
-        {/* Email */}
+        {}
         <div>
           <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
             Email
@@ -141,7 +139,7 @@ export default function Register() {
           />
         </div>
 
-        {/* Password */}
+        {}
         <div>
           <label htmlFor="password" className="mb-1 block text-sm text-neutral-700">
             Password
@@ -171,7 +169,7 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Confirm Password */}
+        {}
         <div>
           <label htmlFor="confirmPassword" className="mb-1 block text-sm text-neutral-700">
             Confirm Password
@@ -188,7 +186,7 @@ export default function Register() {
           />
         </div>
 
-        {/* Role */}
+        {}
         <div>
           <label htmlFor="role" className="mb-1 block text-sm text-neutral-700">
             Role
@@ -206,7 +204,7 @@ export default function Register() {
           </select>
         </div>
 
-        {/* Submit */}
+        {}
         <button
           type="submit"
           disabled={loading || !values.username || !values.email || !values.password}

@@ -2,27 +2,20 @@ import Enrollment from "../models/enrollmentModel.js";
 import Class from "../models/classModel.js";
 import { logger } from "../utils/logger.js";
 
-/**
- * ดึงวิชาที่เปิดให้ลงทะเบียน (วิชาทั้งหมดที่ active)
- * GET /api/enrollments/available
- */
 export const getAvailableClasses = async (req, res) => {
   try {
     const studentId = req.user.id;
 
-    // ดึงวิชาทั้งหมดที่ active
     const classes = await Class.find({ isActive: true })
       .populate("teacher", "firstName lastName email")
       .sort({ createdAt: -1 });
 
-    // ดึงวิชาที่นักศึกษาลงทะเบียนแล้ว
     const enrollments = await Enrollment.find({
       student: studentId,
       status: "enrolled",
     });
     const enrolledClassIds = enrollments.map((e) => e.class.toString());
 
-    // เพิ่ม flag ว่าลงทะเบียนแล้วหรือยัง
     const classesWithEnrollment = classes.map((c) => ({
       ...c.toObject(),
       isEnrolled: enrolledClassIds.includes(c._id.toString()),
@@ -42,10 +35,6 @@ export const getAvailableClasses = async (req, res) => {
   }
 };
 
-/**
- * ดึงวิชาที่ลงทะเบียนแล้ว
- * GET /api/enrollments/my
- */
 export const getMyEnrollments = async (req, res) => {
   try {
     const studentId = req.user.id;
@@ -63,7 +52,6 @@ export const getMyEnrollments = async (req, res) => {
       })
       .sort({ enrolledAt: -1 });
 
-    // ✅ FIX: Filter out enrollments where class was deleted (null)
     const classes = enrollments
       .filter((e) => e.class != null)
       .map((e) => ({
@@ -86,16 +74,11 @@ export const getMyEnrollments = async (req, res) => {
   }
 };
 
-/**
- * ลงทะเบียนวิชา
- * POST /api/enrollments/:classId
- */
 export const enrollClass = async (req, res) => {
   try {
     const studentId = req.user.id;
     const { classId } = req.params;
 
-    // ตรวจสอบว่าวิชามีอยู่จริง
     const classExists = await Class.findById(classId);
     if (!classExists) {
       return res.status(404).json({
@@ -104,8 +87,6 @@ export const enrollClass = async (req, res) => {
       });
     }
 
-    // ✅ FIX: Use findOneAndUpdate to prevent race condition
-    // Note: enrolledAt only in $setOnInsert to avoid ConflictingUpdateOperators error
     const result = await Enrollment.findOneAndUpdate(
       { student: studentId, class: classId },
       {
@@ -121,16 +102,15 @@ export const enrollClass = async (req, res) => {
       {
         upsert: true,
         new: true,
-        rawResult: true, // Get info about whether document was inserted
+        rawResult: true,
       }
     );
 
     const enrollment = result.value;
     const wasInserted = !result.lastErrorObject?.updatedExisting;
 
-    // ถ้าเป็นการ upsert ใหม่ หรือเปลี่ยนจาก dropped เป็น enrolled
     if (wasInserted || result.lastErrorObject?.updatedExisting) {
-      // เพิ่มนักศึกษาเข้าใน Class (ถ้ายังไม่มี)
+
       await Class.findByIdAndUpdate(classId, {
         $addToSet: { students: studentId },
       });
@@ -150,10 +130,6 @@ export const enrollClass = async (req, res) => {
   }
 };
 
-/**
- * ยกเลิกลงทะเบียนวิชา
- * DELETE /api/enrollments/:classId
- */
 export const dropClass = async (req, res) => {
   try {
     const studentId = req.user.id;
@@ -172,11 +148,9 @@ export const dropClass = async (req, res) => {
       });
     }
 
-    // เปลี่ยนสถานะเป็น dropped
     enrollment.status = "dropped";
     await enrollment.save();
 
-    // ลบนักศึกษาออกจาก Class
     await Class.findByIdAndUpdate(classId, {
       $pull: { students: studentId },
     });

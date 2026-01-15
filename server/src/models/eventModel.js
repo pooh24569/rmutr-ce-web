@@ -1,4 +1,4 @@
-// backend/src/models/eventModel.js
+
 import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema(
@@ -61,7 +61,6 @@ const eventSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
 eventSchema.index({ startDate: 1, endDate: 1 });
 eventSchema.index({ createdBy: 1, startDate: 1 });
 

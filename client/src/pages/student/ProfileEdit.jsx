@@ -6,10 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 
-/**
- * Profile Edit Page
- * Separate page for editing user profile
- */
 const ProfileEdit = () => {
     const navigate = useNavigate();
     const {
@@ -25,23 +21,19 @@ const ProfileEdit = () => {
     const handleSave = async (basicProfile, studentProfile, imageFile) => {
         setSaving(true);
         try {
-            // Upload image if selected
+
             if (imageFile) {
                 await uploadImage(imageFile);
             }
 
-            // Update basic profile
             await updateProfile(basicProfile);
 
-            // Update student profile if user is a student
             if (profile?.role === "student") {
                 await updateStudentProfile(studentProfile);
             }
 
-            // Refresh profile data
             await fetchProfile();
 
-            // Navigate back to profile page
             navigate('/student/profile');
         } catch (error) {
             console.error("Error saving profile:", error);
@@ -84,7 +76,7 @@ const ProfileEdit = () => {
 
             <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
 
-                {/* Edit Form */}
+                {}
                 <ProfileEditForm
                     profile={profile}
                     onSave={handleSave}

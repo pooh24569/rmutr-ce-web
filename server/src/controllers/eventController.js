@@ -1,4 +1,3 @@
-// backend/src/controllers/eventController.js
 import Event from "../models/eventModel.js";
 import { logger } from "../utils/logger.js";
 
@@ -7,7 +6,6 @@ export const getEvents = async (req, res) => {
     const userId = req.user.id;
     const { startDate, endDate, type } = req.query;
 
-    // Build query
     const query = {
       $or: [
         { createdBy: userId },
@@ -16,13 +14,11 @@ export const getEvents = async (req, res) => {
       ],
     };
 
-    // Date range filter
     if (startDate && endDate) {
       query.startDate = { $lte: new Date(endDate) };
       query.endDate = { $gte: new Date(startDate) };
     }
 
-    // Type filter
     if (type) {
       query.type = type;
     }
@@ -47,7 +43,6 @@ export const getEvents = async (req, res) => {
   }
 };
 
-// GET /api/events/:id
 export const getEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,7 +60,6 @@ export const getEvent = async (req, res) => {
       });
     }
 
-    // Check permission
     if (
       event.visibility === "private" &&
       String(event.createdBy._id) !== userId
@@ -89,7 +83,6 @@ export const getEvent = async (req, res) => {
   }
 };
 
-// POST /api/events
 export const createEvent = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -105,7 +98,6 @@ export const createEvent = async (req, res) => {
       location,
     } = req.body;
 
-    // Validation
     if (!title || !startDate || !endDate) {
       return res.status(400).json({
         success: false,
@@ -149,7 +141,6 @@ export const createEvent = async (req, res) => {
   }
 };
 
-// PUT /api/events/:id
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -164,7 +155,6 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    // Check permission
     if (String(event.createdBy) !== userId) {
       return res.status(403).json({
         success: false,
@@ -172,7 +162,6 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    // Update fields
     const allowedFields = [
       "title",
       "description",
@@ -209,7 +198,6 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-// DELETE /api/events/:id
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -224,7 +212,6 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Check permission
     if (String(event.createdBy) !== userId) {
       return res.status(403).json({
         success: false,
@@ -249,7 +236,6 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-// GET /api/events/types
 export const getEventTypes = async (_req, res) => {
   return res.json({
     success: true,

@@ -1,4 +1,4 @@
-// src/pages/teacher/StartAttendance.jsx
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -16,13 +16,6 @@ import {
 import { classService } from "@/services/classService";
 import { sessionService } from "@/services/sessionService";
 
-/**
- * หน้าเริ่มเช็คชื่อ
- * - ตั้งค่าเวลา (เริ่ม, สาย, ปิด)
- * - เปิด Session
- * - ดูสถานะ Real-time
- * - ปิด Session
- */
 const StartAttendance = () => {
     const { classId } = useParams();
     const navigate = useNavigate();
@@ -34,7 +27,6 @@ const StartAttendance = () => {
     const [starting, setStarting] = useState(false);
     const [closing, setClosing] = useState(false);
 
-    // Form state
     const [formData, setFormData] = useState({
         startTime: "",
         lateAfterMinutes: 15,
@@ -53,7 +45,7 @@ const StartAttendance = () => {
             const response = await classService.getClassById(classId);
             if (response.success) {
                 setClassData(response.data);
-                // ตั้งค่าเริ่มต้นจาก schedule
+
                 if (response.data.schedule?.length > 0) {
                     const sch = response.data.schedule[0];
                     setFormData((prev) => ({
@@ -75,7 +67,7 @@ const StartAttendance = () => {
         try {
             const response = await sessionService.getOpenSessions();
             if (response.success && response.data.length > 0) {
-                // หา session ของวิชานี้
+
                 const session = response.data.find(
                     (s) => s.classId._id === classId || s.classId === classId
                 );
@@ -184,7 +176,7 @@ const StartAttendance = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate(`/teacher/classes/${classId}`)}
@@ -200,7 +192,7 @@ const StartAttendance = () => {
                 </div>
             </div>
 
-            {/* ถ้ายังไม่ได้เปิด Session */}
+            {}
             {!activeSession ? (
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -208,7 +200,7 @@ const StartAttendance = () => {
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        {/* Start Time */}
+                        {}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 เวลาเริ่มเรียน
@@ -223,7 +215,7 @@ const StartAttendance = () => {
                             />
                         </div>
 
-                        {/* Late After */}
+                        {}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 สายหลังกี่นาที
@@ -242,7 +234,7 @@ const StartAttendance = () => {
                             </select>
                         </div>
 
-                        {/* Close After */}
+                        {}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 ปิดรับเช็คชื่อหลังกี่นาที
@@ -260,7 +252,7 @@ const StartAttendance = () => {
                             </select>
                         </div>
 
-                        {/* Room */}
+                        {}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 ห้องเรียน
@@ -277,7 +269,7 @@ const StartAttendance = () => {
                         </div>
                     </div>
 
-                    {/* Start Button */}
+                    {}
                     <button
                         onClick={handleStartSession}
                         disabled={starting || !formData.startTime || !formData.room}
@@ -288,9 +280,9 @@ const StartAttendance = () => {
                     </button>
                 </div>
             ) : (
-                /* ถ้าเปิด Session แล้ว */
+
                 <>
-                    {/* Session Info */}
+                    {}
                     <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-6 text-white">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
@@ -321,7 +313,7 @@ const StartAttendance = () => {
                         </div>
                     </div>
 
-                    {/* Stats */}
+                    {}
                     <div className="grid grid-cols-3 gap-4">
                         <div className="bg-white rounded-xl p-4 border border-gray-100 text-center">
                             <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-500" />
@@ -346,7 +338,7 @@ const StartAttendance = () => {
                         </div>
                     </div>
 
-                    {/* Attendance List */}
+                    {}
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-100">
                             <h2 className="text-lg font-semibold text-gray-800">
@@ -395,7 +387,7 @@ const StartAttendance = () => {
                         </div>
                     </div>
 
-                    {/* Close Button */}
+                    {}
                     <button
                         onClick={handleCloseSession}
                         disabled={closing}

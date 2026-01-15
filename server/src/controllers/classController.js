@@ -1,22 +1,18 @@
 import Class from "../models/classModel.js";
 import User from "../models/userModel.js";
 
-/**
- * สร้าง Class ใหม่ (อาจารย์เท่านั้น)
- */
 export const createClass = async (req, res) => {
   try {
-    const { 
-      classCode, 
-      className, 
-      section, 
-      description, 
-      schedule, 
-      academicYear, 
-      semester 
+    const {
+      classCode,
+      className,
+      section,
+      description,
+      schedule,
+      academicYear,
+      semester
     } = req.body;
 
-    // ตรวจสอบว่ามี Class ซ้ำหรือไม่
     const existingClass = await Class.findOne({
       classCode,
       section,
@@ -31,7 +27,6 @@ export const createClass = async (req, res) => {
       });
     }
 
-    // สร้าง Class ใหม่
     const newClass = new Class({
       classCode,
       className,
@@ -40,7 +35,7 @@ export const createClass = async (req, res) => {
       schedule,
       academicYear,
       semester,
-      teacher: req.user.id, // อาจารย์ที่ login อยู่
+      teacher: req.user.id,
       students: [],
     });
 
@@ -60,9 +55,6 @@ export const createClass = async (req, res) => {
   }
 };
 
-/**
- * ดึง Class ทั้งหมดของอาจารย์
- */
 export const getMyClasses = async (req, res) => {
   try {
     const classes = await Class.find({ teacher: req.user.id })
@@ -82,9 +74,6 @@ export const getMyClasses = async (req, res) => {
   }
 };
 
-/**
- * ดึง Class ที่นักศึกษาลงทะเบียน
- */
 export const getEnrolledClasses = async (req, res) => {
   try {
     const classes = await Class.find({ students: req.user.id })
@@ -104,9 +93,6 @@ export const getEnrolledClasses = async (req, res) => {
   }
 };
 
-/**
- * ดึงข้อมูล Class ตาม ID
- */
 export const getClassById = async (req, res) => {
   try {
     const { classId } = req.params;
@@ -135,9 +121,6 @@ export const getClassById = async (req, res) => {
   }
 };
 
-/**
- * แก้ไข Class (อาจารย์เจ้าของเท่านั้น)
- */
 export const updateClass = async (req, res) => {
   try {
     const { classId } = req.params;
@@ -152,7 +135,6 @@ export const updateClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
     if (classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -160,7 +142,6 @@ export const updateClass = async (req, res) => {
       });
     }
 
-    // อัพเดท
     Object.keys(updates).forEach((key) => {
       if (key !== "teacher" && key !== "students") {
         classData[key] = updates[key];
@@ -183,9 +164,6 @@ export const updateClass = async (req, res) => {
   }
 };
 
-/**
- * ลบ Class (อาจารย์เจ้าของเท่านั้น)
- */
 export const deleteClass = async (req, res) => {
   try {
     const { classId } = req.params;
@@ -199,7 +177,6 @@ export const deleteClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
     if (classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -222,9 +199,6 @@ export const deleteClass = async (req, res) => {
   }
 };
 
-/**
- * เพิ่มนักศึกษาเข้า Class
- */
 export const addStudentToClass = async (req, res) => {
   try {
     const { classId } = req.params;
@@ -239,7 +213,6 @@ export const addStudentToClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
     if (classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -247,7 +220,6 @@ export const addStudentToClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่านักศึกษามีอยู่จริง
     const student = await User.findById(studentId);
     if (!student || student.role !== "student") {
       return res.status(404).json({
@@ -256,7 +228,6 @@ export const addStudentToClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่านักศึกษาอยู่ใน Class แล้วหรือยัง
     if (classData.students.includes(studentId)) {
       return res.status(400).json({
         success: false,
@@ -264,7 +235,6 @@ export const addStudentToClass = async (req, res) => {
       });
     }
 
-    // เพิ่มนักศึกษา
     classData.students.push(studentId);
     await classData.save();
 
@@ -282,9 +252,6 @@ export const addStudentToClass = async (req, res) => {
   }
 };
 
-/**
- * ลบนักศึกษาออกจาก Class
- */
 export const removeStudentFromClass = async (req, res) => {
   try {
     const { classId, studentId } = req.params;
@@ -298,7 +265,6 @@ export const removeStudentFromClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
     if (classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -306,7 +272,6 @@ export const removeStudentFromClass = async (req, res) => {
       });
     }
 
-    // ลบนักศึกษา
     classData.students = classData.students.filter(
       (s) => s.toString() !== studentId
     );
@@ -326,9 +291,6 @@ export const removeStudentFromClass = async (req, res) => {
   }
 };
 
-/**
- * ดึงรายชื่อนักศึกษาทั้งหมด (สำหรับเพิ่มเข้า Class)
- */
 export const getAllStudents = async (req, res) => {
   try {
     const students = await User.find({ role: "student" })
@@ -348,16 +310,10 @@ export const getAllStudents = async (req, res) => {
   }
 };
 
-/**
- * Import นักศึกษาจาก CSV/รายการรหัส
- * 
- * รับ array ของ username หรือ email
- * หานักศึกษาในระบบ แล้วเพิ่มเข้า Class
- */
 export const importStudentsToClass = async (req, res) => {
   try {
     const { classId } = req.params;
-    const { studentIds } = req.body; // array of username/email
+    const { studentIds } = req.body;
 
     if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
       return res.status(400).json({
@@ -375,7 +331,6 @@ export const importStudentsToClass = async (req, res) => {
       });
     }
 
-    // ตรวจสอบว่าเป็นอาจารย์เจ้าของวิชา
     if (classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
@@ -383,9 +338,8 @@ export const importStudentsToClass = async (req, res) => {
       });
     }
 
-    // ค้นหานักศึกษาจาก username หรือ email
     const cleanedIds = studentIds.map((id) => id.trim().toLowerCase()).filter(Boolean);
-    
+
     const students = await User.find({
       role: "student",
       $or: [
@@ -394,20 +348,17 @@ export const importStudentsToClass = async (req, res) => {
       ],
     });
 
-    // แยกผลลัพธ์
     const results = {
       added: [],
       alreadyExists: [],
       notFound: [],
     };
 
-    // หา username/email ที่ไม่พบในระบบ
     const foundIds = students.map((s) => s.username.toLowerCase())
       .concat(students.map((s) => s.email?.toLowerCase()).filter(Boolean));
-    
+
     results.notFound = cleanedIds.filter((id) => !foundIds.includes(id));
 
-    // เพิ่มนักศึกษาเข้า Class
     for (const student of students) {
       if (classData.students.includes(student._id)) {
         results.alreadyExists.push({

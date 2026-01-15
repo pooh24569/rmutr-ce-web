@@ -1,23 +1,13 @@
-/**
- * Homework Controller
- * API สำหรับจัดการการบ้าน
- */
-
 import Homework from "../models/homeworkModel.js";
 import Submission from "../models/submissionModel.js";
 import Class from "../models/classModel.js";
 
-/**
- * สร้างการบ้านใหม่ (Teacher)
- * POST /api/homework
- */
 export const createHomework = async (req, res) => {
   try {
     const teacherId = req.user.id;
     const { classId, title, description, maxScore, dueDate, attachments } =
       req.body;
 
-    // ตรวจสอบว่าเป็นอาจารย์ของวิชานี้
     const classData = await Class.findById(classId);
     if (!classData) {
       return res.status(404).json({ success: false, message: "ไม่พบวิชานี้" });
@@ -49,10 +39,6 @@ export const createHomework = async (req, res) => {
   }
 };
 
-/**
- * ดึงการบ้านทั้งหมดของวิชา (Teacher/Student)
- * GET /api/homework/class/:classId
- */
 export const getHomeworkByClass = async (req, res) => {
   try {
     const { classId } = req.params;
@@ -74,21 +60,15 @@ export const getHomeworkByClass = async (req, res) => {
   }
 };
 
-/**
- * ดึงการบ้านทั้งหมดของนักศึกษา (จากทุกวิชาที่ลงทะเบียน)
- * GET /api/homework/my
- */
 export const getMyHomework = async (req, res) => {
   try {
     const studentId = req.user.id;
 
-    // หาวิชาที่ลงทะเบียน
     const enrolledClasses = await Class.find({ students: studentId }).select(
       "_id"
     );
     const classIds = enrolledClasses.map((c) => c._id);
 
-    // ดึงการบ้านทั้งหมด
     const homework = await Homework.find({
       class: { $in: classIds },
       status: "published",
@@ -97,13 +77,11 @@ export const getMyHomework = async (req, res) => {
       .populate("teacher", "firstName lastName")
       .sort({ dueDate: 1 });
 
-    // ดึง submission ที่ส่งแล้ว
     const submissions = await Submission.find({
       student: studentId,
       homework: { $in: homework.map((h) => h._id) },
     });
 
-    // รวมข้อมูล
     const homeworkWithStatus = homework.map((hw) => {
       const submission = submissions.find(
         (s) => s.homework.toString() === hw._id.toString()
@@ -132,10 +110,6 @@ export const getMyHomework = async (req, res) => {
   }
 };
 
-/**
- * ดึงรายละเอียดการบ้าน
- * GET /api/homework/:homeworkId
- */
 export const getHomeworkById = async (req, res) => {
   try {
     const { homeworkId } = req.params;
@@ -149,7 +123,6 @@ export const getHomeworkById = async (req, res) => {
       return res.status(404).json({ success: false, message: "ไม่พบการบ้าน" });
     }
 
-    // ถ้าเป็นนักศึกษา ดึง submission ของตัวเองด้วย
     let submission = null;
     if (userId && req.user?.role === "student") {
       submission = await Submission.findOne({
@@ -171,20 +144,15 @@ export const getHomeworkById = async (req, res) => {
   }
 };
 
-/**
- * ส่งการบ้าน (Student)
- * POST /api/homework/:homeworkId/submit
- */
 export const submitHomework = async (req, res) => {
   try {
     const studentId = req.user.id;
     const { homeworkId } = req.params;
     const { content } = req.body;
 
-    // รับไฟล์แนบจาก multer
     const files = req.files || [];
     const attachments = files.map((file) => {
-      // แก้ปัญหา encoding ภาษาไทย
+
       const decodedName = Buffer.from(file.originalname, "latin1").toString(
         "utf8"
       );
@@ -196,13 +164,11 @@ export const submitHomework = async (req, res) => {
       };
     });
 
-    // ตรวจสอบการบ้าน
     const homework = await Homework.findById(homeworkId);
     if (!homework) {
       return res.status(404).json({ success: false, message: "ไม่พบการบ้าน" });
     }
 
-    // ตรวจสอบว่านักศึกษาลงทะเบียนวิชานี้
     const classData = await Class.findById(homework.class);
     if (!classData.students.includes(studentId)) {
       return res
@@ -210,10 +176,8 @@ export const submitHomework = async (req, res) => {
         .json({ success: false, message: "คุณไม่ได้ลงทะเบียนวิชานี้" });
     }
 
-    // ตรวจสอบว่าส่งช้าหรือไม่
     const isLate = new Date() > new Date(homework.dueDate);
 
-    // สร้างหรืออัพเดท submission
     const submission = await Submission.findOneAndUpdate(
       { homework: homeworkId, student: studentId },
       {
@@ -237,10 +201,6 @@ export const submitHomework = async (req, res) => {
   }
 };
 
-/**
- * ดู submissions ทั้งหมดของการบ้าน (Teacher)
- * GET /api/homework/:homeworkId/submissions
- */
 export const getSubmissions = async (req, res) => {
   try {
     const { homeworkId } = req.params;
@@ -259,10 +219,6 @@ export const getSubmissions = async (req, res) => {
   }
 };
 
-/**
- * ให้คะแนนการบ้าน (Teacher)
- * PUT /api/homework/submissions/:submissionId/grade
- */
 export const gradeSubmission = async (req, res) => {
   try {
     const { submissionId } = req.params;
@@ -296,10 +252,6 @@ export const gradeSubmission = async (req, res) => {
   }
 };
 
-/**
- * ลบการบ้าน (Teacher)
- * DELETE /api/homework/:homeworkId
- */
 export const deleteHomework = async (req, res) => {
   try {
     const teacherId = req.user.id;
@@ -315,7 +267,6 @@ export const deleteHomework = async (req, res) => {
         .json({ success: false, message: "คุณไม่ได้สร้างการบ้านนี้" });
     }
 
-    // ลบ submissions ที่เกี่ยวข้อง
     await Submission.deleteMany({ homework: homeworkId });
     await Homework.findByIdAndDelete(homeworkId);
 

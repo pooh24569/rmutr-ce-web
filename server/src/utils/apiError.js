@@ -1,4 +1,4 @@
-// backend/src/utils/apiError.js
+
 
 export class ApiError extends Error {
   constructor(statusCode, message, isOperational = true, stack = "") {
@@ -14,12 +14,10 @@ export class ApiError extends Error {
   }
 }
 
-// Helper function
 export const createError = (statusCode, message) => {
   return new ApiError(statusCode, message);
 };
 
-// Common errors
 export const notFoundError = (resource = "Resource") => {
   return new ApiError(404, `${resource} not found`);
 };

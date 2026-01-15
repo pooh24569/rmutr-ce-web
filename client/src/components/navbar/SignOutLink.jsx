@@ -1,4 +1,4 @@
-// src/components/navbar/SignOutLink.jsx
+
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";

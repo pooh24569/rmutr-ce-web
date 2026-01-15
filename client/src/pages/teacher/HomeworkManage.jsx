@@ -1,4 +1,4 @@
-// src/pages/teacher/HomeworkManage.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,7 +22,6 @@ const HomeworkManage = () => {
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
-    // Form state
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -126,7 +125,7 @@ const HomeworkManage = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">จัดการการบ้าน</h1>
@@ -141,7 +140,7 @@ const HomeworkManage = () => {
                 </button>
             </div>
 
-            {/* Class Selector */}
+            {}
             <div className="flex items-center gap-4">
                 <label className="text-sm font-medium text-gray-700">เลือกวิชา:</label>
                 <select
@@ -163,7 +162,7 @@ const HomeworkManage = () => {
                 </button>
             </div>
 
-            {/* Homework List */}
+            {}
             {homework.length === 0 ? (
                 <div className="bg-white rounded-xl p-8 text-center border border-gray-100">
                     <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -214,7 +213,7 @@ const HomeworkManage = () => {
                 </div>
             )}
 
-            {/* Create Modal */}
+            {}
             {showCreateModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">

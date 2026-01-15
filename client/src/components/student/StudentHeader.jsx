@@ -1,8 +1,8 @@
-// frontend/src/components/student/StudentHeader.jsx
+
 import { Link } from "react-router-dom";
 
 export default function StudentHeader({ title, subtitle, breadcrumbs }) {
-  // ถ้ามี breadcrumbs ให้แสดงแบบ link ได้
+
   if (breadcrumbs && breadcrumbs.length > 0) {
     return (
       <header className="h-16 flex items-center px-8 border-b border-[#dddddd] bg-white">
@@ -36,7 +36,6 @@ export default function StudentHeader({ title, subtitle, breadcrumbs }) {
     );
   }
 
-  // แบบเดิม (ไม่มี breadcrumbs)
   return (
     <header className="h-16 flex items-center px-8 border-b border-[#dddddd] bg-white">
       <div>

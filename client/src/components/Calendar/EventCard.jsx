@@ -1,4 +1,4 @@
-// frontend/src/components/calendar/EventCard.jsx
+
 import React from "react";
 import { X } from "lucide-react";
 
@@ -15,12 +15,11 @@ export default function EventCard({ event, onClick, onEdit, onDelete }) {
         }
     };
 
-    // Get background color
     const getBackgroundColor = () => {
         if (event.color) {
             return event.color;
         }
-        // Default colors by event type
+
         const colors = {
             personal: "#9CA3AF",
             holiday: "#EF4444",
@@ -43,12 +42,12 @@ export default function EventCard({ event, onClick, onEdit, onDelete }) {
                 backgroundColor: bgColor + "20",
             }}
         >
-            {/* Color bar on the left */}
+            {}
             <div
                 className="w-1 h-3.5 rounded-full flex-shrink-0"
                 style={{ backgroundColor: bgColor }}
             />
-            {/* Event title */}
+            {}
             <span
                 className="text-[14px] font-medium truncate flex-1"
                 style={{ color: bgColor }}
@@ -56,7 +55,7 @@ export default function EventCard({ event, onClick, onEdit, onDelete }) {
                 {event.title}
             </span>
 
-            {/* Delete button - show on hover */}
+            {}
             <button
                 onClick={handleDelete}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-100 transition-opacity"

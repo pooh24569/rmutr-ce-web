@@ -1,4 +1,4 @@
-// src/context/ProfileContext.jsx
+
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { profileService } from "@/services/profileService";
 import { toast } from "sonner";
@@ -6,11 +6,6 @@ import { useAuth } from "./AuthContext";
 
 const ProfileContext = createContext(null);
 
-/**
- * Convert file to base64
- * @param {File} file - File to convert
- * @returns {Promise<string>} Base64 string
- */
 const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -26,9 +21,6 @@ export const ProfileProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    /**
-     * Fetch user profile
-     */
     const fetchProfile = useCallback(async () => {
         if (!isAuthenticated) return;
 
@@ -50,10 +42,6 @@ export const ProfileProvider = ({ children }) => {
         }
     }, [isAuthenticated]);
 
-    /**
-     * Update basic profile
-     * @param {Object} data - Profile data to update
-     */
     const updateProfile = async (data) => {
         setLoading(true);
         setError(null);
@@ -76,10 +64,6 @@ export const ProfileProvider = ({ children }) => {
         }
     };
 
-    /**
-     * Update student profile
-     * @param {Object} data - Student profile data
-     */
     const updateStudentProfile = async (data) => {
         setLoading(true);
         setError(null);
@@ -105,15 +89,11 @@ export const ProfileProvider = ({ children }) => {
         }
     };
 
-    /**
-     * Upload profile image
-     * @param {File} file - Image file
-     */
     const uploadImage = async (file) => {
         setLoading(true);
         setError(null);
         try {
-            // Convert file to base64
+
             const base64 = await fileToBase64(file);
 
             const response = await profileService.uploadProfileImage(base64);
@@ -137,7 +117,6 @@ export const ProfileProvider = ({ children }) => {
         }
     };
 
-    // Fetch profile when authenticated
     useEffect(() => {
         if (isAuthenticated) {
             fetchProfile();
@@ -165,7 +144,7 @@ export const ProfileProvider = ({ children }) => {
 
 export const useProfile = () => {
     const context = useContext(ProfileContext);
-    // ถ้าไม่มี context ให้ return default values แทน throw error
+
     if (!context) {
         return {
             profile: null,

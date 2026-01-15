@@ -1,4 +1,4 @@
-// src/pages/VerifyOtp.jsx
+
 import React, { useState, useRef } from "react";
 import api from "@/lib/api";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -16,20 +16,19 @@ export default function VerifyOtp() {
   const inputsRef = useRef([]);
 
   const handleChange = (index, value) => {
-    // เอาเฉพาะตัวเลข 1 ตัว
+
     const v = value.replace(/\D/g, "").slice(0, 1);
     const next = [...digits];
     next[index] = v;
     setDigits(next);
 
-    // ถ้าพิมพ์แล้วเลื่อนไปช่องถัดไป
     if (v && index < 5) {
       inputsRef.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
-    // backspace แล้วถอยกลับช่องก่อนหน้า
+
     if (e.key === "Backspace" && !digits[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
@@ -54,7 +53,7 @@ export default function VerifyOtp() {
 
     setLoading(true);
     try {
-      // ✅ ใช้ endpoint reset-password OTP
+
       const { data } = await api.post(`/api/auth/verify-reset-otp`, {
         email,
         otp: code,
@@ -65,7 +64,6 @@ export default function VerifyOtp() {
         return;
       }
 
-      // ไปหน้าตั้งรหัสผ่านใหม่
       navigate(
         `/reset-password?email=${encodeURIComponent(
           email
@@ -112,7 +110,7 @@ export default function VerifyOtp() {
         border border-white/10
         overflow-hidden
       ">
-        {/* วงกลมแสง background */}
+        {}
         <div className="pointer-events-none absolute -top-24 -left-24 h-56 w-56 rounded-full bg-pink-500/25 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-56 w-56 rounded-full bg-purple-500/25 blur-3xl" />
 
@@ -128,7 +126,7 @@ export default function VerifyOtp() {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
-            {/* กล่อง OTP 6 ช่อง */}
+            {}
             <div className="flex justify-center gap-2 mb-3">
               {digits.map((digit, i) => (
                 <input
@@ -155,12 +153,12 @@ export default function VerifyOtp() {
               ))}
             </div>
 
-            {/* ข้อความ error */}
+            {}
             <p className="text-sm text-red-400 mb-3 text-center min-h-[1.25rem]">
               {error}
             </p>
 
-            {/* ปุ่ม */}
+            {}
             <button
               type="submit"
               disabled={loading}
