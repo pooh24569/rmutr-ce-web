@@ -6,36 +6,38 @@ import { enrollmentService } from "@/services/enrollmentService";
 
 const TIME_SLOTS = [
   { start: "8:00", end: "9:00" },
-  { start: "9:01", end: "10:00" },
-  { start: "10:01", end: "11:00" },
-  { start: "11:01", end: "12:00" },
-  { start: "12:01", end: "13:00" },
-  { start: "13:01", end: "14:00" },
-  { start: "14:01", end: "15:00" },
-  { start: "15:01", end: "16:00" },
-  { start: "16:01", end: "17:00" },
-  { start: "17:01", end: "18:00" },
-  { start: "18:01", end: "19:00" },
-  { start: "19:01", end: "20:00" },
+  { start: "9:00", end: "10:00" },
+  { start: "10:00", end: "11:00" },
+  { start: "11:00", end: "12:00" },
+  { start: "12:00", end: "13:00" },
+  { start: "13:00", end: "14:00" },
+  { start: "14:00", end: "15:00" },
+  { start: "15:00", end: "16:00" },
+  { start: "16:00", end: "17:00" },
+  { start: "17:00", end: "18:00" },
+  { start: "18:00", end: "19:00" },
+  { start: "19:00", end: "20:00" },
+  { start: "20:00", end: "21:00" },
+  { start: "21:00", end: "22:00" },
 ];
 
 const DAYS = [
-  { key: "sunday", label: "Sunday" },
-  { key: "monday", label: "Monday" },
-  { key: "tuesday", label: "Tuesday" },
-  { key: "wednesday", label: "Wednesday" },
-  { key: "thursday", label: "Thursday" },
-  { key: "friday", label: "Friday" },
-  { key: "saturday", label: "Saturday" },
+  { key: "monday", label: "จันทร์" },
+  { key: "tuesday", label: "อังคาร" },
+  { key: "wednesday", label: "พุธ" },
+  { key: "thursday", label: "พฤหัสบดี" },
+  { key: "friday", label: "ศุกร์" },
+  { key: "saturday", label: "เสาร์" },
+  { key: "sunday", label: "อาทิตย์" },
 ];
 
 const COLORS = [
-  { bg: "bg-yellow-100", border: "border-yellow-400", text: "text-gray-800" },
-  { bg: "bg-red-50", border: "border-red-300", text: "text-gray-800" },
-  { bg: "bg-blue-50", border: "border-blue-300", text: "text-gray-800" },
-  { bg: "bg-green-50", border: "border-green-300", text: "text-gray-800" },
-  { bg: "bg-purple-50", border: "border-purple-300", text: "text-gray-800" },
-  { bg: "bg-orange-50", border: "border-orange-300", text: "text-gray-800" },
+  { bg: "bg-yellow-50", leftBorder: "border-l-4 border-l-pink-500" },
+  { bg: "bg-green-50", leftBorder: "border-l-4 border-l-green-500" },
+  { bg: "bg-blue-50", leftBorder: "border-l-4 border-l-blue-500" },
+  { bg: "bg-orange-50", leftBorder: "border-l-4 border-l-orange-500" },
+  { bg: "bg-purple-50", leftBorder: "border-l-4 border-l-purple-500" },
+  { bg: "bg-red-50", leftBorder: "border-l-4 border-l-red-500" },
 ];
 
 const Schedule = () => {
@@ -125,7 +127,7 @@ const Schedule = () => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {}
+      { }
       <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white tracking-wide">
@@ -141,7 +143,7 @@ const Schedule = () => {
         </div>
       </header>
 
-      {}
+      { }
       <div className="flex-1 p-6 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -177,81 +179,91 @@ const Schedule = () => {
               </div>
             )}
 
-            {}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {}
-              <div className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-200 bg-gray-50">
+            { }
+            <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+              { }
+              <div className="grid grid-cols-[80px_repeat(14,minmax(70px,1fr))] border-b border-gray-200 bg-gray-100">
                 <div className="p-2 text-center border-r border-gray-200">
-                  <span className="text-xs text-gray-500">days/</span>
-                  <br />
-                  <span className="text-xs text-gray-500">time</span>
+                  <span className="text-xs text-gray-600 font-medium">วัน/เวลา</span>
                 </div>
                 {TIME_SLOTS.map((slot, idx) => (
                   <div
                     key={idx}
-                    className="p-2 text-center text-xs text-gray-600 border-r border-gray-100 last:border-r-0"
+                    className="p-2 text-center text-[10px] text-gray-600 border-r border-gray-200 last:border-r-0 whitespace-nowrap"
                   >
                     {slot.start} - {slot.end}
                   </div>
                 ))}
               </div>
 
-              {}
-              {DAYS.map((day) => (
-                <div
-                  key={day.key}
-                  className="grid grid-cols-[100px_repeat(12,1fr)] border-b border-gray-100 last:border-b-0 h-[80px]"
-                >
-                  {}
-                  <div className="p-3 border-r border-gray-200 bg-gray-50 flex items-center">
-                    <span className="text-sm font-medium text-gray-700">
-                      {day.label}
-                    </span>
-                  </div>
+              { }
+              {DAYS.map((day) => {
+                const dayEntries = entriesByDay[day.key] || [];
 
-                  {}
-                  <div className="col-span-12 relative overflow-hidden">
-                    {}
-                    <div className="absolute inset-0 grid grid-cols-12">
-                      {TIME_SLOTS.map((_, idx) => (
-                        <div
-                          key={idx}
-                          className="border-r border-gray-50 last:border-r-0"
-                        />
-                      ))}
+                return (
+                  <div
+                    key={day.key}
+                    className="grid grid-cols-[80px_repeat(14,minmax(70px,1fr))] border-b border-gray-100 last:border-b-0 h-[50px]"
+                  >
+                    { }
+                    <div className="p-2 border-r border-gray-200 bg-gray-50 flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-700">
+                        {day.label}
+                      </span>
                     </div>
 
-                    {}
-                    <div className="absolute inset-0 grid grid-cols-12 p-1">
-                      {entriesByDay[day.key]?.map((entry) => {
-                        const startCol = entry.startHour - 8;
-                        const span = entry.duration;
-                        return (
+                    { }
+                    <div className="col-span-14 relative">
+                      { }
+                      <div className="absolute inset-0 grid grid-cols-14">
+                        {TIME_SLOTS.map((_, idx) => (
                           <div
-                            key={entry.id}
-                            className={`${entry.color.bg} ${entry.color.border} ${entry.color.text} border-2 rounded-lg p-2 flex flex-col justify-center overflow-hidden h-full shadow-sm`}
-                            style={{
-                              gridColumn: `${startCol + 1} / span ${span}`,
-                            }}
-                          >
-                            {}
-                            <span className="inline-block text-xs font-bold bg-yellow-400 text-gray-800 px-2 py-0.5 rounded w-fit">
-                              {entry.classCode}
-                            </span>
-                            {}
-                            <p className="text-xs text-gray-700 leading-tight mt-1 truncate">
-                              ห้อง {entry.room} • {entry.teacher || "-"}
-                            </p>
-                          </div>
-                        );
-                      })}
+                            key={idx}
+                            className="border-r border-gray-100 last:border-r-0"
+                          />
+                        ))}
+                      </div>
+
+                      { }
+                      <div
+                        className="absolute inset-0 p-0.5 grid"
+                        style={{
+                          gridTemplateColumns: 'repeat(14, minmax(70px, 1fr))',
+                          gridTemplateRows: '1fr',
+                          gridAutoFlow: 'column',
+                        }}
+                      >
+                        {dayEntries.map((entry) => {
+                          const startCol = entry.startHour - 8;
+                          const span = entry.duration;
+
+                          return (
+                            <div
+                              key={entry.id}
+                              className={`${entry.color.bg} ${entry.color.leftBorder} px-2 flex flex-col justify-center overflow-hidden h-full`}
+                              style={{
+                                gridColumn: `${startCol + 1} / span ${span}`,
+                              }}
+                            >
+                              { }
+                              <span className="text-xs font-bold text-gray-800 leading-tight truncate">
+                                {entry.classCode} ({entry.section || "1"})
+                              </span>
+                              { }
+                              <p className="text-[12px] text-gray-600 leading-tight truncate">
+                                {entry.teacher || "-"}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {}
+            { }
             {classes.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">

@@ -10,7 +10,7 @@ export const createClass = async (req, res) => {
       description,
       schedule,
       academicYear,
-      semester
+      semester,
     } = req.body;
 
     const existingClass = await Class.findOne({
@@ -338,14 +338,13 @@ export const importStudentsToClass = async (req, res) => {
       });
     }
 
-    const cleanedIds = studentIds.map((id) => id.trim().toLowerCase()).filter(Boolean);
+    const cleanedIds = studentIds
+      .map((id) => id.trim().toLowerCase())
+      .filter(Boolean);
 
     const students = await User.find({
       role: "student",
-      $or: [
-        { username: { $in: cleanedIds } },
-        { email: { $in: cleanedIds } },
-      ],
+      $or: [{ username: { $in: cleanedIds } }, { email: { $in: cleanedIds } }],
     });
 
     const results = {
@@ -354,7 +353,8 @@ export const importStudentsToClass = async (req, res) => {
       notFound: [],
     };
 
-    const foundIds = students.map((s) => s.username.toLowerCase())
+    const foundIds = students
+      .map((s) => s.username.toLowerCase())
       .concat(students.map((s) => s.email?.toLowerCase()).filter(Boolean));
 
     results.notFound = cleanedIds.filter((id) => !foundIds.includes(id));
@@ -399,4 +399,3 @@ export const importStudentsToClass = async (req, res) => {
     });
   }
 };
-
