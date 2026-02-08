@@ -43,24 +43,29 @@ import HomeworkManage from "@/pages/teacher/HomeworkManage";
 import HomeworkSubmissions from "@/pages/teacher/HomeworkSubmissions";
 import TeacherCalendar from "@/pages/teacher/Calendar";
 
+import ParentLogin from "@/pages/parent/ParentLogin";
+import ParentLayout from "@/layouts/ParentLayout";
+import ParentDashboard from "@/pages/parent/Dashboard";
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {}
+        { }
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {}
+        { }
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-email" element={<ResetEmail />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/parent/login" element={<ParentLogin />} />
 
-        {}
+        { }
         <Route element={<ProtectedRoute />}>
-          {}
+          { }
           <Route element={<ProtectedRoute roles={["student"]} />}>
             <Route path="/student" element={<StudentLayout />}>
               <Route index element={<Navigate to="/student/homework" replace />} />
@@ -76,7 +81,7 @@ export default function AppRoutes() {
             </Route>
           </Route>
 
-          {}
+          { }
           <Route element={<ProtectedRoute roles={["teacher"]} />}>
             <Route path="/teacher" element={<TeacherLayout />}>
               <Route index element={<Navigate to="/teacher/dashboard" replace />} />
@@ -93,7 +98,7 @@ export default function AppRoutes() {
             </Route>
           </Route>
 
-          {}
+          { }
           <Route element={<ProtectedRoute roles={["admin", "superadmin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
@@ -103,7 +108,12 @@ export default function AppRoutes() {
           </Route>
         </Route>
 
-        {}
+        {/* Parent Routes - uses separate auth (parentToken) */}
+        <Route path="/parent" element={<ParentLayout />}>
+          <Route index element={<ParentDashboard />} />
+        </Route>
+
+        { }
         <Route path="*" element={<Notfound />} />
       </Routes>
     </BrowserRouter>

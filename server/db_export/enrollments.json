@@ -33,7 +33,7 @@
     "createdAt": "2025-12-13T20:20:54.657Z",
     "enrolledAt": "2025-12-13T20:20:54.657Z",
     "status": "enrolled",
-    "updatedAt": "2025-12-13T20:20:54.657Z"
+    "updatedAt": "2026-01-14T16:04:22.991Z"
   },
   {
     "_id": "693dcaa703c8991eabc61241",
@@ -42,7 +42,7 @@
     "createdAt": "2025-12-13T20:20:55.198Z",
     "enrolledAt": "2025-12-13T20:20:55.197Z",
     "status": "enrolled",
-    "updatedAt": "2025-12-13T20:20:55.198Z"
+    "updatedAt": "2026-01-15T06:12:14.474Z"
   },
   {
     "_id": "693dcaa703c8991eabc61242",
@@ -52,5 +52,32 @@
     "enrolledAt": "2025-12-13T20:20:55.812Z",
     "status": "enrolled",
     "updatedAt": "2025-12-13T20:20:55.812Z"
+  },
+  {
+    "_id": "6968f1f3e8cf164e8f27c9c1",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "6968ef2921436f1144c7f62f",
+    "createdAt": "2026-01-15T13:56:03.797Z",
+    "enrolledAt": "2026-01-15T13:56:03.796Z",
+    "status": "dropped",
+    "updatedAt": "2026-01-15T13:56:42.552Z"
+  },
+  {
+    "_id": "6968f258e8cf164e8f27c9c2",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "6968f24ca833ab4458a9145c",
+    "createdAt": "2026-01-15T13:57:44.692Z",
+    "enrolledAt": "2026-01-15T13:57:44.691Z",
+    "status": "enrolled",
+    "updatedAt": "2026-01-15T15:37:34.940Z"
+  },
+  {
+    "_id": "69695536e8cf164e8f27c9c4",
+    "student": "693dc21cad9f02d90b72489c",
+    "class": "69695527a833ab4458a91b49",
+    "createdAt": "2026-01-15T20:59:34.089Z",
+    "enrolledAt": "2026-01-15T20:59:34.089Z",
+    "status": "enrolled",
+    "updatedAt": "2026-01-15T20:59:34.089Z"
   }
 ]

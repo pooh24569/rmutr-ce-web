@@ -1,0 +1,41 @@
+/* AnimatedEye Animation Styles */
+
+/* Blink animation for eye outline and iris */
+@keyframes eye-blink {
+  0%, 5% {
+    transform: scaleY(0.1);  /* 1. กระพริบตา */
+  }
+  10%, 90% {
+    transform: scaleY(1);    /* 2. ลืมตา */
+  }
+  95%, 100% {
+    transform: scaleY(0.1);  /* 5. กระพริบตา */
+  }
+}
+
+/* Pupil look left-right animation */
+@keyframes pupil-look {
+  0%, 20% {
+    transform: translateX(0);     /* เริ่มต้น */
+  }
+  30%, 50% {
+    transform: translateX(-1.5px); /* 3. มองซ้าย */
+  }
+  60%, 80% {
+    transform: translateX(1.5px);  /* 4. มองขวา */
+  }
+  90%, 100% {
+    transform: translateX(0);     /* กลับตรงกลาง */
+  }
+}
+
+/* Apply animations on hover */
+.group:hover .animated-eye .eye-outline,
+.group:hover .animated-eye .eye-iris {
+  transform-origin: center;
+  animation: eye-blink 2s ease-in-out infinite;
+}
+
+.group:hover .animated-eye .eye-pupil {
+  animation: pupil-look 2s ease-in-out infinite;
+}

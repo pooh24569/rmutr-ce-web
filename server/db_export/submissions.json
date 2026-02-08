@@ -1,0 +1,25 @@
+[
+  {
+    "_id": "69694b3ee8cf164e8f27c9c3",
+    "student": "693dc21cad9f02d90b72489c",
+    "homework": "69694b27a833ab4458a91922",
+    "attachments": [
+      {
+        "fileName": "writing68 -2-3.pdf",
+        "fileUrl": "/uploads/homework/1768508222792-358737711.pdf",
+        "fileType": "application/pdf",
+        "uploadedAt": "2026-01-15T20:17:02.838Z",
+        "_id": "69694b3ea833ab4458a91936"
+      }
+    ],
+    "content": "",
+    "createdAt": "2026-01-15T20:17:02.842Z",
+    "feedback": "",
+    "gradedAt": "2026-01-15T20:17:29.014Z",
+    "isLate": false,
+    "score": 50,
+    "status": "graded",
+    "submittedAt": "2026-01-15T20:17:02.841Z",
+    "updatedAt": "2026-01-15T20:17:29.015Z"
+  }
+]

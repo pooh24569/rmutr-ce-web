@@ -26,31 +26,6 @@
     "isFromRegistration": true
   },
   {
-    "_id": "693bc415e9240e55bdb0a66c",
-    "classCode": "PNG1112",
-    "className": "dadadadad",
-    "section": "1",
-    "description": "",
-    "schedule": [
-      {
-        "day": "monday",
-        "startTime": "09:00",
-        "endTime": "12:00",
-        "room": "31313",
-        "_id": "693bc415e9240e55bdb0a66d"
-      }
-    ],
-    "teacher": "69334f762ff4add116ca0034",
-    "students": [
-      "693dc21cad9f02d90b72489c"
-    ],
-    "academicYear": "2568",
-    "semester": "1",
-    "isActive": true,
-    "createdAt": "2025-12-12T07:28:21.084Z",
-    "updatedAt": "2025-12-13T20:20:53.553Z"
-  },
-  {
     "_id": "693bc7f8d96b4576b1779fe8",
     "classCode": "CS102",
     "className": "การเขียนโปรแกรมคอมพิวเตอร์ 2",
@@ -126,7 +101,7 @@
     "isActive": true,
     "isFromRegistration": false,
     "createdAt": "2025-12-13T19:48:04.391Z",
-    "updatedAt": "2025-12-13T20:20:55.208Z"
+    "updatedAt": "2026-01-15T06:12:14.477Z"
   },
   {
     "_id": "693dc2f4a0b3932fd25341c7",
@@ -152,6 +127,6 @@
     "isActive": true,
     "isFromRegistration": false,
     "createdAt": "2025-12-13T19:48:04.406Z",
-    "updatedAt": "2025-12-13T20:20:54.660Z"
+    "updatedAt": "2026-01-14T16:04:22.994Z"
   }
 ]

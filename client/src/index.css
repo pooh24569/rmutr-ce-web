@@ -2,10 +2,114 @@
 @import "tw-animate-css";
 
 @layer components {
-    .container {
-        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-    }
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
 }
 
+/* Shake Animation for Sign Out button */
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
 
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
 
+.group:hover .group-hover\:animate-shake {
+  animation: shake 0.4s ease-in-out infinite;
+}
+
+/* Eye Animation for View button - blink and look left-right */
+@keyframes eye-look {
+  0%, 100% {
+    transform: translateX(0) scaleY(1);
+  }
+  10%, 15% {
+    transform: translateX(0) scaleY(0.1);
+  }
+  25% {
+    transform: translateX(-2px) scaleY(1);
+  }
+  50% {
+    transform: translateX(2px) scaleY(1);
+  }
+  60%, 65% {
+    transform: translateX(0) scaleY(0.1);
+  }
+  75% {
+    transform: translateX(0) scaleY(1);
+  }
+}
+
+.animate-eye-look {
+  animation: eye-look 1.5s ease-in-out infinite;
+}
+
+.group:hover .group-hover\:animate-eye-look {
+  animation: eye-look 1.5s ease-in-out infinite;
+}
+
+/* Eye Blink Animation */
+@keyframes eye-blink {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  5%, 10% {
+    transform: scaleY(0.1);
+  }
+  50%, 55% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Pupil Look Left-Right Animation */
+@keyframes pupil-look {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  15%, 35% {
+    transform: translateX(-1.5px);
+  }
+  40%, 45% {
+    transform: translateX(0);
+  }
+  60%, 80% {
+    transform: translateX(1.5px);
+  }
+  85%, 95% {
+    transform: translateX(0);
+  }
+}
+
+.group:hover .animate-eye-blink {
+  animation: eye-blink 2s ease-in-out infinite;
+}
+
+.group:hover .animate-pupil-look {
+  animation: pupil-look 2s ease-in-out infinite;
+}
+
+/* Simple Blink Animation for Eye icon */
+@keyframes blink {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  45%, 55% {
+    transform: scaleY(0.1);
+  }
+}
+
+.group:hover .group-hover\:animate-blink {
+  transform-origin: center;
+  animation: blink 1s ease-in-out 1;
+}

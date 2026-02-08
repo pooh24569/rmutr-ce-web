@@ -76,7 +76,7 @@ const ProfileEdit = () => {
 
             <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
 
-                {}
+                { }
                 <ProfileEditForm
                     profile={profile}
                     onSave={handleSave}

@@ -24,14 +24,14 @@ const teacherLinks = [
     },
     {
         href: "/teacher/classes",
-        label: "My Classes",
+        label: "Classes",
         icon: BookOpen
     },
-    {
-        href: "/teacher/attendance",
-        label: "Attendance",
-        icon: ClipboardList
-    },
+    // {
+    //     href: "/teacher/attendance",
+    //     label: "Attendance",
+    //     icon: ClipboardList
+    // },
     {
         href: "/teacher/homework",
         label: "Homework",
@@ -42,11 +42,11 @@ const teacherLinks = [
         label: "Calendar",
         icon: CalendarDays
     },
-    {
-        href: "/teacher/reports",
-        label: "Reports",
-        icon: BarChart3
-    },
+    // {
+    //     href: "/teacher/reports",
+    //     label: "Reports",
+    //     icon: BarChart3
+    // },
 ];
 
 const TeacherSidebar = () => {
@@ -71,7 +71,7 @@ const TeacherSidebar = () => {
 
     return (
         <aside className="w-64 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] text-white flex flex-col min-h-screen">
-            {}
+            { }
             <div className="h-20 flex items-center px-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -84,7 +84,7 @@ const TeacherSidebar = () => {
                 </div>
             </div>
 
-            {}
+            { }
             <Link
                 to="/teacher/profile"
                 className="block px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
@@ -108,12 +108,12 @@ const TeacherSidebar = () => {
                 </div>
             </Link>
 
-            {}
+            { }
             <div className="px-6 pt-6 pb-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                 Main Menu
             </div>
 
-            {}
+            { }
             <nav className="flex-1 px-3 space-y-1">
                 {teacherLinks.map((item) => {
                     const active = location.pathname.startsWith(item.href);
@@ -137,19 +137,19 @@ const TeacherSidebar = () => {
                 })}
             </nav>
 
-            {}
+            {/* Sign Out Button */}
             <div className="p-4 border-t border-white/10">
                 <button
                     type="button"
                     onClick={() => setOpenConfirm(true)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-gray-300 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all duration-200"
+                    className="group w-full flex items-center justify-center px-5 py-3 text-sm text-gray-300 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all duration-500 ease-out relative overflow-hidden"
                 >
-                    <LogOut className="w-5 h-5" />
-                    <span>Sign Out</span>
+                    <LogOut className="w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2" />
+                    <span className="ml-2 transition-all duration-500 ease-out group-hover:opacity-0 group-hover:absolute">Sign Out</span>
                 </button>
             </div>
 
-            {}
+            { }
             <ConfirmDialog
                 show={openConfirm}
                 onCancel={() => setOpenConfirm(false)}

@@ -75,7 +75,7 @@ const MyClasses = () => {
                 {}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-800">รายวิชาของฉัน</h2>
+                        <h2 className="text-xl font-bold text-gray-800">รายวิชา</h2>
                         <p className="text-sm text-gray-500">
                             ลงทะเบียนแล้ว {classes.length} วิชา
                         </p>
@@ -124,8 +124,8 @@ const MyClasses = () => {
                                             <BookOpen className="w-6 h-6 text-white" />
                                         </div>
                                         <div className="text-white">
-                                            <h3 className="font-bold text-lg">{cls.classCode}</h3>
-                                            <p className="text-white/80 text-sm truncate max-w-[150px]">
+                                            <h3 className="font-extrabold text-lg">{cls.classCode}</h3>
+                                            <p className="text-white/100 text-sm truncate max-w-[200px]">
                                                 {cls.className}
                                             </p>
                                         </div>

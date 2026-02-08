@@ -128,25 +128,15 @@ const Classes = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {}
+            { }
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">My Classes</h1>
-                    <p className="text-gray-500">Manage your classes and students</p>
+                    <h1 className="text-2xl font-bold text-gray-800">Classes</h1>
+                    <p className="text-gray-500">View your assigned classes and students</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setSelectedClass(null);
-                        setShowCreateModal(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25"
-                >
-                    <Plus className="w-5 h-5" />
-                    <span>Create Class</span>
-                </button>
             </div>
 
-            {}
+            { }
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -158,7 +148,7 @@ const Classes = () => {
                 />
             </div>
 
-            {}
+            { }
             {loading ? (
                 <div className="flex items-center justify-center h-64">
                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -176,22 +166,15 @@ const Classes = () => {
                             key={classItem._id}
                             className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
                         >
-                            {}
+                            { }
                             <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600 p-4 relative">
-                                <div className="absolute top-2 right-2">
-                                    <div className="relative">
-                                        <button className="p-1 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
-                                            <MoreVertical className="w-5 h-5 text-white" />
-                                        </button>
-                                    </div>
-                                </div>
                                 <div className="text-white">
                                     <p className="text-sm font-medium opacity-80">{classItem.classCode}</p>
                                     <h3 className="text-lg font-bold truncate">{classItem.className}</h3>
                                 </div>
                             </div>
 
-                            {}
+                            { }
                             <div className="p-4 space-y-3">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Users className="w-4 h-4" />
@@ -200,7 +183,7 @@ const Classes = () => {
                                     <span>Section {classItem.section}</span>
                                 </div>
 
-                                {}
+                                { }
                                 {classItem.schedule?.length > 0 && (
                                     <div className="space-y-1">
                                         {classItem.schedule.slice(0, 2).map((sch, idx) => (
@@ -216,30 +199,14 @@ const Classes = () => {
                                     </div>
                                 )}
 
-                                {}
+                                { }
                                 <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                                     <button
                                         onClick={() => navigate(`/teacher/classes/${classItem._id}`)}
-                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                        className="group flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                     >
-                                        <Eye className="w-4 h-4" />
+                                        <Eye className="w-4 h-4 group-hover:animate-blink" />
                                         <span>View</span>
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setSelectedClass(classItem);
-                                            setShowCreateModal(true);
-                                        }}
-                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        <span>Edit</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteClass(classItem._id)}
-                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -248,7 +215,7 @@ const Classes = () => {
                 </div>
             )}
 
-            {}
+            { }
             {showCreateModal && (
                 <CreateClassModal
                     isOpen={showCreateModal}

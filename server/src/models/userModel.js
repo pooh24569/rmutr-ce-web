@@ -22,13 +22,46 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: { type: String, default: "" },
 
+    // ===== Role System =====
     role: {
       type: String,
-      enum: ["superadmin", "admin", "teacher", "student", "parent"],
+      enum: [
+        "superadmin",
+        "admin",
+        "central_registrar", // ทะเบียนกลาง
+        "faculty_registrar", // เจ้าหน้าที่ทะเบียนคณะ
+        "dept_head", // หัวหน้าสาขา
+        "instructor", // อาจารย์ประจำวิชา
+        "student",
+        "parent",
+      ],
       default: "student",
     },
     roles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Role" }],
 
+    // ===== Role Scoping =====
+    // คณะที่สังกัด (for faculty_registrar, dept_head, instructor)
+    faculty: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Faculty",
+      default: null,
+    },
+
+    // สาขาที่สังกัด (for dept_head, instructor)
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      default: null,
+    },
+
+    // ===== Advisor Flags =====
+    // เป็นอาจารย์ประจำห้อง (Class Advisor)
+    isClassAdvisor: {
+      type: Boolean,
+      default: false,
+    },
+
+    // ===== Account Verification =====
     verifyOtpHash: { type: String, default: "" },
     verifyOtpExpiry: { type: Number, default: 0 },
     isAccountVerified: { type: Boolean, default: false },
@@ -39,7 +72,7 @@ const userSchema = new mongoose.Schema(
     resetOtpHash: { type: String, default: "" },
     resetOtpExpires: { type: Number, default: 0 },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

@@ -23,6 +23,10 @@ import registrationRoutes from "./routes/registrationRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import homeworkRoutes from "./routes/homeworkRoutes.js";
+import parentRoutes from "./routes/parentRoutes.js";
+import academicRoutes from "./routes/academicRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
+import studentRegistrationRoutes from "./routes/studentRegistrationRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +43,7 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'"],
       },
     },
-  })
+  }),
 );
 
 const apiLimiter = rateLimit({
@@ -102,7 +106,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["set-cookie"],
-  })
+  }),
 );
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
@@ -147,6 +151,10 @@ app.use("/api/registration", registrationRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/homework", homeworkRoutes);
+app.use("/api/parent", parentRoutes);
+app.use("/api/academic", academicRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/student-registration", studentRegistrationRoutes);
 
 app.use((req, res) => {
   logger.warn(`404 - Route not found: ${req.method} ${req.originalUrl}`);
@@ -211,9 +219,9 @@ app.use((err, req, res, _next) => {
 
 const PORT = process.env.PORT || 7001;
 const server = app.listen(PORT, () => {
-  logger.info(`🚀 Server running on port ${PORT}`);
-  logger.info(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-  logger.info(`🔗 API Base: http://localhost:${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
+  logger.info(`API Base: http://localhost:${PORT}`);
 });
 
 const gracefulShutdown = (signal) => {
@@ -230,7 +238,7 @@ const gracefulShutdown = (signal) => {
 
   setTimeout(() => {
     logger.error(
-      "Could not close connections in time, forcefully shutting down"
+      "Could not close connections in time, forcefully shutting down",
     );
     process.exit(1);
   }, 30000);

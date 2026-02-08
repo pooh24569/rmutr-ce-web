@@ -115,7 +115,7 @@ const Dashboard = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {}
+            { }
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -132,7 +132,7 @@ const Dashboard = () => {
                 </button>
             </div>
 
-            {}
+            { }
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
@@ -162,7 +162,7 @@ const Dashboard = () => {
                 })}
             </div>
 
-            {}
+            { }
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Today's Classes
@@ -221,7 +221,7 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                     onClick={() => navigate("/teacher/classes")}
                     className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25 flex flex-col items-start"
@@ -229,14 +229,6 @@ const Dashboard = () => {
                     <BookOpen className="w-6 h-6 mb-2" />
                     <span className="font-medium">My Classes</span>
                     <span className="text-sm text-blue-100">View all your classes</span>
-                </button>
-                <button
-                    onClick={() => navigate("/teacher/classes/new")}
-                    className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-500/25 flex flex-col items-start"
-                >
-                    <Plus className="w-6 h-6 mb-2" />
-                    <span className="font-medium">Create Class</span>
-                    <span className="text-sm text-purple-100">Start a new class</span>
                 </button>
                 <button
                     onClick={() => navigate("/teacher/profile")}
@@ -290,8 +282,8 @@ const Dashboard = () => {
                                     )}
                                     <span
                                         className={`px-2 py-1 text-xs rounded-full ${session.status === "CLOSED"
-                                                ? "bg-gray-100 text-gray-600"
-                                                : "bg-green-100 text-green-600"
+                                            ? "bg-gray-100 text-gray-600"
+                                            : "bg-green-100 text-green-600"
                                             }`}
                                     >
                                         {session.status}

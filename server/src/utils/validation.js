@@ -1,14 +1,10 @@
 import Joi from "joi";
 
-const passwordSchema = Joi.string()
-  .min(6)
-  .max(128)
-  .required()
-  .messages({
-    "string.min": "Password must be at least 6 characters long",
-    "string.max": "Password cannot exceed 128 characters",
-    "any.required": "Password is required",
-  });
+const passwordSchema = Joi.string().min(6).max(128).required().messages({
+  "string.min": "Password must be at least 6 characters long",
+  "string.max": "Password cannot exceed 128 characters",
+  "any.required": "Password is required",
+});
 
 const strongPasswordSchema = Joi.string()
   .min(8)
@@ -170,28 +166,53 @@ export const updateProfileSchema = Joi.object({
 }).min(1);
 
 export const updateStudentProfileSchema = Joi.object({
+  // Personal Information
   studentId: Joi.string()
     .pattern(/^[0-9]{13}$/)
     .optional()
     .messages({
       "string.pattern.base": "Student ID must be exactly 13 digits",
     }),
-  firstNameTH: Joi.string().min(2).max(100).trim().optional().allow(""),
-  lastNameTH: Joi.string().min(2).max(100).trim().optional().allow(""),
-  dateOfBirth: Joi.date().max("now").optional().allow(null),
-  gender: Joi.string().valid("male", "female", "other", "").optional(),
+  nationality: Joi.string().max(100).trim().optional().allow(""),
+  nationalId: Joi.string().max(20).trim().optional().allow(""),
   cardIssueDate: Joi.date().optional().allow(null),
-  cardExpiryDate: Joi.date()
-    .greater(Joi.ref("cardIssueDate"))
-    .optional()
-    .allow(null)
-    .messages({
-      "date.greater": "Card expiry date must be after issue date",
-    }),
+  cardExpiryDate: Joi.date().optional().allow(null),
+  prefix: Joi.string().max(20).trim().optional().allow(""),
+  firstNameTH: Joi.string().max(100).trim().optional().allow(""),
+  lastNameTH: Joi.string().max(100).trim().optional().allow(""),
+  firstNameEN: Joi.string().max(100).trim().optional().allow(""),
+  lastNameEN: Joi.string().max(100).trim().optional().allow(""),
+  dateOfBirth: Joi.date().max("now").optional().allow(null),
+  birthProvince: Joi.string().max(100).trim().optional().allow(""),
+  ethnicity: Joi.string().max(100).trim().optional().allow(""),
+  religion: Joi.string().max(100).trim().optional().allow(""),
+  bloodType: Joi.string().valid("A", "B", "AB", "O", "").optional(),
+  maritalStatus: Joi.string().max(50).trim().optional().allow(""),
+  talents: Joi.string().max(500).trim().optional().allow(""),
+  sports: Joi.string().max(500).trim().optional().allow(""),
+  height: Joi.number().min(0).max(300).optional().allow(null),
+  weight: Joi.number().min(0).max(500).optional().allow(null),
+  gender: Joi.string().valid("male", "female", "other", "").optional(),
+
+  // Previous Education
+  previousEducation: Joi.object({
+    schoolName: Joi.string().max(200).trim().optional().allow(""),
+    qualification: Joi.string().max(100).trim().optional().allow(""),
+    graduationDate: Joi.date().optional().allow(null),
+    gpa: Joi.number().min(0).max(4.0).optional().allow(null),
+  }).optional(),
+
+  // Address
   address: Joi.object({
-    street: Joi.string().max(200).trim().optional().allow(""),
-    district: Joi.string().max(100).trim().optional().allow(""),
+    houseCode: Joi.string().max(50).trim().optional().allow(""),
+    village: Joi.string().max(100).trim().optional().allow(""),
+    houseNumber: Joi.string().max(50).trim().optional().allow(""),
+    moo: Joi.string().max(20).trim().optional().allow(""),
+    soi: Joi.string().max(100).trim().optional().allow(""),
+    road: Joi.string().max(100).trim().optional().allow(""),
     province: Joi.string().max(100).trim().optional().allow(""),
+    district: Joi.string().max(100).trim().optional().allow(""),
+    subDistrict: Joi.string().max(100).trim().optional().allow(""),
     postalCode: Joi.string()
       .pattern(/^[0-9]{5}$/)
       .optional()
@@ -199,7 +220,54 @@ export const updateStudentProfileSchema = Joi.object({
       .messages({
         "string.pattern.base": "Postal code must be 5 digits",
       }),
+    homePhone: Joi.string().max(20).trim().optional().allow(""),
+    mobilePhone: Joi.string().max(20).trim().optional().allow(""),
+    email: Joi.string().email().optional().allow(""),
   }).optional(),
+
+  // Father Information
+  father: Joi.object({
+    nationality: Joi.string().max(100).trim().optional().allow(""),
+    nationalId: Joi.string().max(20).trim().optional().allow(""),
+    prefix: Joi.string().max(20).trim().optional().allow(""),
+    firstName: Joi.string().max(100).trim().optional().allow(""),
+    lastName: Joi.string().max(100).trim().optional().allow(""),
+    status: Joi.string().max(50).trim().optional().allow(""),
+    education: Joi.string().max(100).trim().optional().allow(""),
+    dateOfBirth: Joi.date().optional().allow(null),
+  }).optional(),
+
+  // Mother Information
+  mother: Joi.object({
+    nationality: Joi.string().max(100).trim().optional().allow(""),
+    nationalId: Joi.string().max(20).trim().optional().allow(""),
+    prefix: Joi.string().max(20).trim().optional().allow(""),
+    firstName: Joi.string().max(100).trim().optional().allow(""),
+    lastName: Joi.string().max(100).trim().optional().allow(""),
+    status: Joi.string().max(50).trim().optional().allow(""),
+    education: Joi.string().max(100).trim().optional().allow(""),
+    dateOfBirth: Joi.date().optional().allow(null),
+  }).optional(),
+
+  // Guardian Information
+  guardian: Joi.object({
+    nationality: Joi.string().max(100).trim().optional().allow(""),
+    nationalId: Joi.string().max(20).trim().optional().allow(""),
+    prefix: Joi.string().max(20).trim().optional().allow(""),
+    firstName: Joi.string().max(100).trim().optional().allow(""),
+    lastName: Joi.string().max(100).trim().optional().allow(""),
+    relationship: Joi.string().max(50).trim().optional().allow(""),
+    dateOfBirth: Joi.date().optional().allow(null),
+  }).optional(),
+
+  // Emergency Contact
+  emergencyContact: Joi.object({
+    prefix: Joi.string().max(20).trim().optional().allow(""),
+    firstName: Joi.string().max(100).trim().optional().allow(""),
+    lastName: Joi.string().max(100).trim().optional().allow(""),
+  }).optional(),
+
+  // Current Education
   education: Joi.object({
     faculty: Joi.string().max(200).trim().optional().allow(""),
     department: Joi.string().max(200).trim().optional().allow(""),
@@ -209,18 +277,7 @@ export const updateStudentProfileSchema = Joi.object({
       "number.min": "GPA cannot be negative",
     }),
   }).optional(),
-  emergencyContact: Joi.object({
-    name: Joi.string().max(100).trim().optional().allow(""),
-    relationship: Joi.string().max(50).trim().optional().allow(""),
-    phoneNumber: Joi.string()
-      .pattern(/^[0-9]{9,13}$/)
-      .optional()
-      .allow("")
-      .messages({
-        "string.pattern.base": "Phone number must be 9-13 digits",
-      }),
-  }).optional(),
-}).min(1);
+});
 
 export const validate = (schema, property = "body") => {
   return (req, res, next) => {

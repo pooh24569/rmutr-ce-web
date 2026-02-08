@@ -1,7 +1,6 @@
 import api from "@/lib/api";
 
 export const profileService = {
-
   getProfile: async () => {
     const { data } = await api.get("/api/profile");
     return data;

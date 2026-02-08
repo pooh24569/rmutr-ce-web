@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 export default function EventModal({ isOpen, onClose, onSave, event = null, eventTypes = [] }) {
     const [formData, setFormData] = useState({
@@ -132,7 +133,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                {}
+                { }
                 <div className="flex items-center justify-between p-6 border-b border-neutral-200">
                     <h2 className="text-xl font-semibold text-neutral-900">
                         {event ? "Edit Event" : "Create Event"}
@@ -146,9 +147,9 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                     </button>
                 </div>
 
-                {}
+                { }
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {}
+                    { }
                     <div>
                         <label htmlFor="title" className="block text-sm font-medium text-neutral-700 mb-1">
                             Title <span className="text-red-500">*</span>
@@ -166,7 +167,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-1">
                             Description
@@ -182,7 +183,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         />
                     </div>
 
-                    {}
+                    { }
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="type" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -229,7 +230,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -244,20 +245,20 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         </label>
                     </div>
 
-                    {}
+                    { }
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="startDate" className="block text-sm font-medium text-neutral-700 mb-1">
                                 Start Date <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="date"
-                                id="startDate"
-                                name="startDate"
+                            <DatePicker
                                 value={formData.startDate}
                                 onChange={handleChange}
-                                className={`w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 ${errors.startDate ? "border-red-500" : "border-neutral-300"
-                                    }`}
+                                name="startDate"
+                                label="Start Date"
+                                placeholder="เลือกวันเริ่มต้น"
+                                maxYear={new Date().getFullYear() + 5}
+                                minYear={2020}
                             />
                             {errors.startDate && <p className="text-xs text-red-500 mt-1">{errors.startDate}</p>}
                         </div>
@@ -279,20 +280,20 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         )}
                     </div>
 
-                    {}
+                    { }
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="endDate" className="block text-sm font-medium text-neutral-700 mb-1">
                                 End Date <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="date"
-                                id="endDate"
-                                name="endDate"
+                            <DatePicker
                                 value={formData.endDate}
                                 onChange={handleChange}
-                                className={`w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 ${errors.endDate ? "border-red-500" : "border-neutral-300"
-                                    }`}
+                                name="endDate"
+                                label="End Date"
+                                placeholder="เลือกวันสิ้นสุด"
+                                maxYear={new Date().getFullYear() + 5}
+                                minYear={2020}
                             />
                             {errors.endDate && <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>}
                         </div>
@@ -314,7 +315,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         )}
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-1">
                             Location
@@ -330,7 +331,7 @@ export default function EventModal({ isOpen, onClose, onSave, event = null, even
                         />
                     </div>
 
-                    {}
+                    { }
                     <div className="flex gap-3 pt-4">
                         <button
                             type="button"

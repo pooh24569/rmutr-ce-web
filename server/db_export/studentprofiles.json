@@ -28,5 +28,35 @@
     },
     "createdAt": "2025-12-03T23:48:15.942Z",
     "updatedAt": "2025-12-04T11:58:14.743Z"
+  },
+  {
+    "_id": "694e3a78099174d42b568177",
+    "userId": "693dc21cad9f02d90b72489c",
+    "studentId": "1651010541132",
+    "firstNameTH": "ภาณุพงศ์",
+    "lastNameTH": "หาญเสนา",
+    "dateOfBirth": "2003-09-26T00:00:00.000Z",
+    "gender": "male",
+    "cardIssueDate": null,
+    "cardExpiryDate": null,
+    "address": {
+      "street": "",
+      "district": "",
+      "province": "",
+      "postalCode": ""
+    },
+    "education": {
+      "faculty": "Engineering",
+      "department": "Computer Engineering",
+      "year": null,
+      "gpa": 3.5
+    },
+    "emergencyContact": {
+      "name": "",
+      "relationship": "",
+      "phoneNumber": ""
+    },
+    "createdAt": "2025-12-26T07:34:16.428Z",
+    "updatedAt": "2025-12-26T09:46:36.462Z"
   }
 ]

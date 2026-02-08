@@ -18,64 +18,64 @@ const router = express.Router();
 router.post(
   "/",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
-  createClass
+  authorizeRoles("admin", "superadmin"),
+  createClass,
 );
 
 router.get(
   "/my-classes",
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
-  getMyClasses
+  getMyClasses,
 );
 
 router.put(
   "/:classId",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
-  updateClass
+  authorizeRoles("admin", "superadmin"),
+  updateClass,
 );
 
 router.delete(
   "/:classId",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
-  deleteClass
+  authorizeRoles("admin", "superadmin"),
+  deleteClass,
 );
 
 router.post(
   "/:classId/students",
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
-  addStudentToClass
+  addStudentToClass,
 );
 
 router.delete(
   "/:classId/students/:studentId",
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
-  removeStudentFromClass
+  removeStudentFromClass,
 );
 
 router.get(
   "/students/all",
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
-  getAllStudents
+  getAllStudents,
 );
 
 router.post(
   "/:classId/import",
   verifyToken,
   authorizeRoles("teacher", "admin", "superadmin"),
-  importStudentsToClass
+  importStudentsToClass,
 );
 
 router.get(
   "/enrolled",
   verifyToken,
   authorizeRoles("student"),
-  getEnrolledClasses
+  getEnrolledClasses,
 );
 
 router.get("/:classId", verifyToken, getClassById);

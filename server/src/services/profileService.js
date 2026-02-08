@@ -4,7 +4,6 @@ import { logger } from "../utils/logger.js";
 
 export const getUserProfile = async (userId) => {
   try {
-
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
@@ -87,6 +86,16 @@ export const updateUserProfile = async (userId, data) => {
 
 export const updateStudentProfile = async (userId, data) => {
   try {
+    // ========== DEBUG LOGGING ==========
+    console.log("========================================");
+    console.log("📥 RECEIVED DATA FROM FRONTEND:");
+    console.log("All Keys:", Object.keys(data));
+    console.log("nationalId:", data.nationalId);
+    console.log("nationality:", data.nationality);
+    console.log("prefix:", data.prefix);
+    console.log("firstNameEN:", data.firstNameEN);
+    console.log("========================================");
+    // ====================================
 
     const user = await User.findById(userId);
 
@@ -102,19 +111,75 @@ export const updateStudentProfile = async (userId, data) => {
       throw error;
     }
 
+    // Helper function to check if parent info is complete
+    const isParentInfoComplete = (parent) => {
+      return (
+        parent &&
+        parent.nationalId &&
+        parent.nationalId.trim() !== "" &&
+        parent.firstName &&
+        parent.firstName.trim() !== "" &&
+        parent.lastName &&
+        parent.lastName.trim() !== "" &&
+        parent.dateOfBirth
+      );
+    };
+
+    // Check if at least one parent/guardian has complete info
+    const hasCompleteFather = isParentInfoComplete(data.father);
+    const hasCompleteMother = isParentInfoComplete(data.mother);
+    const hasCompleteGuardian = isParentInfoComplete(data.guardian);
+
+    if (!hasCompleteFather && !hasCompleteMother && !hasCompleteGuardian) {
+      const error = new Error(
+        "กรุณากรอกข้อมูลบิดา มารดา หรือผู้ปกครองอย่างน้อย 1 คนให้ครบถ้วน (เลขบัตรประชาชน, ชื่อ, นามสกุล, วันเกิด)",
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
     let studentProfile = await StudentProfile.findOne({ userId });
 
     if (studentProfile) {
+      logger.info("Updating student profile with data:", {
+        keys: Object.keys(data),
+      });
 
+      // List of nested object fields that need special handling
+      const nestedFields = [
+        "previousEducation",
+        "address",
+        "father",
+        "mother",
+        "guardian",
+        "emergencyContact",
+        "education",
+      ];
+
+      // Update each field
       Object.keys(data).forEach((key) => {
         if (data[key] !== undefined) {
-          studentProfile[key] = data[key];
+          if (
+            nestedFields.includes(key) &&
+            typeof data[key] === "object" &&
+            data[key] !== null
+          ) {
+            // For nested objects, merge with existing data and mark as modified
+            const existingData =
+              studentProfile[key]?.toObject?.() || studentProfile[key] || {};
+            studentProfile[key] = { ...existingData, ...data[key] };
+            studentProfile.markModified(key);
+          } else {
+            // For primitive fields, direct assignment
+            studentProfile[key] = data[key];
+          }
         }
       });
-      await studentProfile.save();
-      logger.info("Student profile updated", { userId });
-    } else {
 
+      await studentProfile.save();
+      logger.info("Student profile updated successfully", { userId });
+    } else {
+      // Create new profile
       studentProfile = await StudentProfile.create({
         userId,
         ...data,

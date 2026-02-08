@@ -12,7 +12,6 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPw, setShowPw] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     values,
@@ -130,21 +129,18 @@ export default function Login() {
         </div>
 
         <div className="flex items-center justify-between text-xs sm:text-sm text-neutral-600">
-          <label className="inline-flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              className="h-3.5 w-3.5 rounded border-neutral-300 text-rose-600 focus:ring-rose-400"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <span>Remember me</span>
-          </label>
+          <Link
+            to="/parent/login"
+            className="font-medium text-rose-600 hover:underline"
+          >
+            Parent Login
+          </Link>
 
           <Link
             to="/reset-email"
             className="font-medium text-rose-600 hover:underline"
           >
-            Forgot password?
+            Forgot password
           </Link>
         </div>
 

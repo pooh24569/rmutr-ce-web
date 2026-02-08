@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "69694b27a833ab4458a91922",
+    "class": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "title": "ทำดีๆ",
+    "description": "",
+    "maxScore": 50,
+    "dueDate": "2026-01-16T20:16:00.000Z",
+    "attachments": [],
+    "status": "published",
+    "createdAt": "2026-01-15T20:16:39.305Z",
+    "updatedAt": "2026-01-15T20:16:39.305Z"
+  }
+]

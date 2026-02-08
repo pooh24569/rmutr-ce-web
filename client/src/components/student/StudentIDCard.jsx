@@ -21,15 +21,30 @@ export const StudentIDCard = ({ profile, onEdit }) => {
     const lastName = profile.lastName || "";
     const firstNameTH = studentProfile.firstNameTH || (isThai(firstName) ? firstName : "");
     const lastNameTH = studentProfile.lastNameTH || (isThai(lastName) ? lastName : "");
-    const firstNameEN = !isThai(firstName) ? firstName : "";
-    const lastNameEN = !isThai(lastName) ? lastName : "";
+    // Use firstNameEN/lastNameEN from studentProfile, fallback to profile name if not Thai
+    const firstNameEN = studentProfile.firstNameEN || (!isThai(firstName) ? firstName : "");
+    const lastNameEN = studentProfile.lastNameEN || (!isThai(lastName) ? lastName : "");
+
+    // Get prefix from studentProfile
+    const prefixTH = studentProfile.prefix || "";
+    // Convert Thai prefix to English
+    const getPrefixEN = (thaiPrefix) => {
+        const prefixMap = {
+            "นาย": "Mr.",
+            "นาง": "Mrs.",
+            "นางสาว": "Miss"
+        };
+        return prefixMap[thaiPrefix] || "";
+    };
+    const prefixEN = getPrefixEN(prefixTH);
+
 
     const issueDate = formatDate(new Date());
     const expiryDate = formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 4)));
 
     return (
         <div className="w-full flex justify-center items-center p-4">
-            {}
+            { }
             <div
                 className="w-full"
                 style={{
@@ -37,12 +52,12 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                     aspectRatio: '1040 / 543'
                 }}
             >
-                {}
+                { }
                 <div
                     className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-white border border-gray-200"
                 >
 
-                    {}
+                    { }
                     {onEdit && (
                         <Button
                             onClick={onEdit}
@@ -53,7 +68,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                     )}
 
                     <div className="flex h-full">
-                        {}
+                        { }
                         <div className="w-45 flex-shrink-0 flex items-center justify-center">
                             <img
                                 src="/LOGO-RMUTR.png"
@@ -62,11 +77,11 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                             />
                         </div>
 
-                        {}
+                        { }
                         <div className="flex-1 flex pr-8 py-8 gap-6">
-                            {}
+                            { }
                             <div className="flex flex-col items-center justify-center gap-6 w-[40%] -ml-8">
-                                {}
+                                { }
                                 <div className="w-full max-w-[260px]" style={{ aspectRatio: '1/1' }}>
                                     {profile.profileImage ? (
                                         <img
@@ -81,7 +96,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                     )}
                                 </div>
 
-                                {}
+                                { }
                                 <div className="bg-white p-2 rounded-md ">
                                     <Barcode
                                         value={studentProfile.studentId || profile.username || "0000000000000"}
@@ -94,67 +109,76 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                 </div>
                             </div>
 
-                            {}
+                            { }
                             <div className="flex-1  flex-col justify-center py-20 ">
-                                {}
+                                { }
                                 <div className="space-y-4 ">
-                                    {}
+                                    {/* Row 1 - National ID, Issue Date, Expiry Date */}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
-                                            <p className="text-[12px] text-gray-400 mb-0.5">รหัสบัตรประจำตัวประชาชน</p>
-                                            <p className="text-base font-bold text-gray-800">
-                                                {studentProfile.studentId || profile.username || "-"}
+                                            <p className="text-[12px] text-gray-400 mb-0.5">รหัสบัตรประชาชน</p>
+                                            <p className="text-base font-semibold text-gray-700">
+                                                {studentProfile.nationalId || "-"}
                                             </p>
                                         </div>
-                                        <div>
-                                            <p className="text-[12px] text-gray-400 mb-0.5 ml-5">วันที่ออกบัตร</p>
-                                            <p className="text-base font-semibold text-gray-700 ml-5">{issueDate}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[12px] text-gray-400 mb-0.5">วันที่หมดอายุ</p>
-                                            <p className="text-base font-semibold text-gray-700">{expiryDate}</p>
+                                        { }
+                                        <div className="col-span-2">
+                                            <div className="flex gap-12 ml-5">
+                                                <div>
+                                                    <p className="text-[12px] text-gray-400 mb-0.5">วันที่ออกบัตร</p>
+                                                    <p className="text-base font-semibold text-gray-700">
+                                                        {formatDate(studentProfile.cardIssueDate)}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[12px] text-gray-400 mb-0.5">วันหมดอายุ</p>
+                                                    <p className="text-base font-semibold text-gray-700">
+                                                        {formatDate(studentProfile.cardExpiryDate)}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {}
+                                    { }
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5 ">ชื่อ</p>
                                             <p className="text-base font-semibold text-gray-800">
-                                                {firstNameTH ? `นาย${firstNameTH}` : "-"}
+                                                {firstNameTH ? `${prefixTH} ${firstNameTH}` : ""}
                                             </p>
                                         </div>
-                                        {}
+                                        { }
                                         <div className="col-span-2">
-                                            <div className="w-1/2"> {}
+                                            <div className="w-1/2"> { }
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">นามสกุล</p>
                                                 <p className="text-base font-semibold text-gray-800 ml-5">
-                                                    {lastNameTH || "-"}
+                                                    {lastNameTH || ""}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {}
+                                    { }
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5">ชื่อภาษาอังกฤษ</p>
                                             <p className="text-sm font-medium text-gray-700">
-                                                {firstNameEN ? `Mr. ${firstNameEN}` : "-"}
+                                                {firstNameEN ? `${prefixEN} ${firstNameEN}` : ""}
                                             </p>
                                         </div>
-                                        {}
+                                        { }
                                         <div className="col-span-2">
                                             <div className="w-1/2">
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">นามสกุลภาษาอังกฤษ</p>
                                                 <p className="text-sm font-medium text-gray-700 ml-5">
-                                                    {lastNameEN || "-"}
+                                                    {lastNameEN || ""}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {}
+                                    { }
                                     <div className="grid grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-[12px] text-gray-400 mb-0.5">วันเกิด</p>
@@ -162,7 +186,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                                 {formatDate(studentProfile.dateOfBirth)}
                                             </p>
                                         </div>
-                                        {}
+                                        { }
                                         <div className="col-span-2">
                                             <div className="w-1/2">
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">สัญชาติ</p>
