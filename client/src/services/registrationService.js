@@ -1,14 +1,12 @@
-
-
 import api from "@/lib/api";
 
 export const getEnrolledCourses = async () => {
-  const response = await api.get("/api/registration/enrolled");
+  const response = await api.get("/registration/enrolled");
   return response.data;
 };
 
 export const getAllCourses = async () => {
-  const response = await api.get("/api/registration/courses");
+  const response = await api.get("/registration/courses");
   return response.data;
 };
 
@@ -18,7 +16,7 @@ export const getCourseByCode = async (courseCode) => {
 };
 
 export const getTeachingCourses = async () => {
-  const response = await api.get("/api/registration/teaching");
+  const response = await api.get("/registration/teaching");
   return response.data;
 };
 

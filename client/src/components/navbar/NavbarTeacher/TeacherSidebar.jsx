@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import ConfirmDialog from "../ConfirmDialog";
 
-const teacherLinks = [
+const baseTeacherLinks = [
     {
         href: "/teacher/dashboard",
         label: "Dashboard",
@@ -48,6 +48,12 @@ const teacherLinks = [
     //     icon: BarChart3
     // },
 ];
+
+const advisorLink = {
+    href: "/teacher/advisory-students",
+    label: "นศ. ในที่ปรึกษา",
+    icon: Users
+};
 
 const TeacherSidebar = () => {
     const location = useLocation();
@@ -115,7 +121,7 @@ const TeacherSidebar = () => {
 
             { }
             <nav className="flex-1 px-3 space-y-1">
-                {teacherLinks.map((item) => {
+                {[...baseTeacherLinks, ...(user?.isClassAdvisor ? [advisorLink] : [])].map((item) => {
                     const active = location.pathname.startsWith(item.href);
                     const Icon = item.icon;
 

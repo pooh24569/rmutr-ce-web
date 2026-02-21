@@ -46,12 +46,21 @@ export const registerSchema = Joi.object({
   firstName: Joi.string().min(1).max(100).trim().optional().allow(""),
   lastName: Joi.string().min(1).max(100).trim().optional().allow(""),
   role: Joi.string()
-    .valid("student", "teacher", "parent", "admin", "superadmin")
+    .valid(
+      "superadmin",
+      "admin",
+      "central_registrar",
+      "faculty_registrar",
+      "dept_head",
+      "instructor",
+      "student",
+      "parent",
+    )
     .optional()
     .default("student")
     .messages({
       "any.only":
-        "Role must be one of: student, teacher, parent, admin, superadmin",
+        "Role must be one of: superadmin, admin, central_registrar, faculty_registrar, dept_head, instructor, student, parent",
     }),
 });
 
@@ -131,7 +140,16 @@ export const createUserSchema = Joi.object({
   email: emailSchema,
   password: passwordSchema,
   role: Joi.string()
-    .valid("student", "teacher", "parent", "admin", "superadmin")
+    .valid(
+      "superadmin",
+      "admin",
+      "central_registrar",
+      "faculty_registrar",
+      "dept_head",
+      "instructor",
+      "student",
+      "parent",
+    )
     .default("student"),
 });
 
@@ -139,7 +157,16 @@ export const updateUserSchema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).trim().optional(),
   email: Joi.string().email().lowercase().trim().optional(),
   role: Joi.string()
-    .valid("student", "teacher", "parent", "admin", "superadmin")
+    .valid(
+      "superadmin",
+      "admin",
+      "central_registrar",
+      "faculty_registrar",
+      "dept_head",
+      "instructor",
+      "student",
+      "parent",
+    )
     .optional(),
 }).min(1);
 

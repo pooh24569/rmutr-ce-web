@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadHomework } from "../middlewares/uploadMiddleware.js";
@@ -19,29 +17,29 @@ const router = express.Router();
 router.post(
   "/",
   verifyToken,
-  authorizeRoles("teacher", "admin"),
-  createHomework
+  authorizeRoles("instructor", "admin"),
+  createHomework,
 );
 
 router.get(
   "/:homeworkId/submissions",
   verifyToken,
-  authorizeRoles("teacher", "admin"),
-  getSubmissions
+  authorizeRoles("instructor", "admin"),
+  getSubmissions,
 );
 
 router.put(
   "/submissions/:submissionId/grade",
   verifyToken,
-  authorizeRoles("teacher", "admin"),
-  gradeSubmission
+  authorizeRoles("instructor", "admin"),
+  gradeSubmission,
 );
 
 router.delete(
   "/:homeworkId",
   verifyToken,
-  authorizeRoles("teacher", "admin"),
-  deleteHomework
+  authorizeRoles("instructor", "admin"),
+  deleteHomework,
 );
 
 router.get("/my", verifyToken, authorizeRoles("student"), getMyHomework);
@@ -51,7 +49,7 @@ router.post(
   verifyToken,
   authorizeRoles("student"),
   uploadHomework.array("attachments", 10),
-  submitHomework
+  submitHomework,
 );
 
 router.get("/class/:classId", verifyToken, getHomeworkByClass);

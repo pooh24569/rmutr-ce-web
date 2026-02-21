@@ -36,7 +36,7 @@ export const getTeacherDashboard = async (req, res) => {
 
       const totalAttendances = attendances.length;
       const presentCount = attendances.filter(
-        (a) => a.status === "PRESENT" || a.status === "LATE"
+        (a) => a.status === "PRESENT" || a.status === "LATE",
       ).length;
 
       attendanceRate =
@@ -112,7 +112,6 @@ export const getTeacherDashboard = async (req, res) => {
 
 export const getAdminDashboard = async (req, res) => {
   try {
-
     const userCounts = await User.aggregate([
       { $group: { _id: "$role", count: { $sum: 1 } } },
     ]);
@@ -127,7 +126,7 @@ export const getAdminDashboard = async (req, res) => {
     userCounts.forEach((item) => {
       stats.totalUsers += item.count;
       if (item._id === "student") stats.students = item.count;
-      if (item._id === "teacher") stats.teachers = item.count;
+      if (item._id === "instructor") stats.teachers = item.count;
       if (item._id === "admin" || item._id === "superadmin")
         stats.admins += item.count;
     });

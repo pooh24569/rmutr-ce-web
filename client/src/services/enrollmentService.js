@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const enrollmentApi = axios.create({
-  baseURL: "http://localhost:7001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:7001/api",
 });
 
 enrollmentApi.interceptors.request.use((config) => {
@@ -25,11 +25,10 @@ enrollmentApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const enrollmentService = {
-
   getAvailableClasses: async () => {
     const response = await enrollmentApi.get("/enrollments/available");
     return response.data;

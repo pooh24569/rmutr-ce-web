@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 import {
@@ -16,19 +14,19 @@ registrationRouter.use(verifyToken);
 registrationRouter.get(
   "/enrolled",
   authorizeRoles("student"),
-  getMyEnrolledCourses
+  getMyEnrolledCourses,
 );
 
 registrationRouter.get(
   "/teaching",
-  authorizeRoles("teacher"),
-  getMyTeachingCourses
+  authorizeRoles("instructor"),
+  getMyTeachingCourses,
 );
 
 registrationRouter.get(
   "/courses",
-  authorizeRoles("student", "teacher", "admin", "superadmin"),
-  listAllCourses
+  authorizeRoles("student", "instructor", "admin", "superadmin"),
+  listAllCourses,
 );
 
 registrationRouter.get("/courses/:courseCode", getCourse);

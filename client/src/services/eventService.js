@@ -1,10 +1,8 @@
-
 import api from "@/lib/api";
 
 export const eventService = {
-
   getEvents: async (params = {}) => {
-    const { data } = await api.get("/api/events", { params });
+    const { data } = await api.get("/events", { params });
     return data;
   },
 
@@ -14,7 +12,7 @@ export const eventService = {
   },
 
   createEvent: async (eventData) => {
-    const { data } = await api.post("/api/events", eventData);
+    const { data } = await api.post("/events", eventData);
     return data;
   },
 
@@ -29,7 +27,7 @@ export const eventService = {
   },
 
   getEventTypes: async () => {
-    const { data } = await api.get("/api/events/types");
+    const { data } = await api.get("/events/types");
     return data;
   },
 };

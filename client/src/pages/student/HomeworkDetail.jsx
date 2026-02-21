@@ -136,7 +136,7 @@ const HomeworkDetail = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {}
+            { }
             <StudentHeader
                 breadcrumbs={[
                     { label: "HOMEWORK LIST", link: "/student/homework" },
@@ -144,9 +144,9 @@ const HomeworkDetail = () => {
                 ]}
             />
 
-            {}
+            { }
             <div className="p-6">
-                {}
+                { }
                 <button
                     onClick={() => navigate("/student/homework")}
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6"
@@ -155,11 +155,11 @@ const HomeworkDetail = () => {
                     <span>Back</span>
                 </button>
 
-                {}
+                { }
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {}
+                    { }
                     <div>
-                        {}
+                        { }
                         <div className="mb-4">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-2xl font-bold text-gray-800">
@@ -171,7 +171,7 @@ const HomeworkDetail = () => {
                             </div>
                         </div>
 
-                        {}
+                        { }
                         <div className="flex items-center gap-1 text-sm text-gray-500 mb-6">
                             <Clock className="w-4 h-4" />
                             <span>On {formatDate(homework.createdAt)}</span>
@@ -179,7 +179,7 @@ const HomeworkDetail = () => {
                             <span>Closes {formatDate(homework.dueDate)}</span>
                         </div>
 
-                        {}
+                        { }
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-gray-700 mb-2">Instructions</h3>
                             <p className="text-gray-600">
@@ -188,14 +188,14 @@ const HomeworkDetail = () => {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        {}
+                        { }
                         <div className="flex justify-center mb-4">
                             <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
                         </div>
 
-                        {}
+                        { }
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-gray-700 font-medium">Your work</h3>
                             <span className={`text-sm font-medium ${submissionStatus === "Submitted" ? "text-green-600" : "text-red-500"
@@ -204,10 +204,10 @@ const HomeworkDetail = () => {
                             </span>
                         </div>
 
-                        {}
+                        { }
                         <p className="text-sm text-gray-500 mb-3">Attachments</p>
 
-                        {}
+                        { }
                         {homework.submission?.attachments?.length > 0 && (
                             <div className="mb-4">
                                 <p className="text-xs text-green-600 mb-2">ไฟล์ที่ส่งแล้ว:</p>
@@ -215,7 +215,7 @@ const HomeworkDetail = () => {
                                     {homework.submission.attachments.map((file, idx) => (
                                         <a
                                             key={`submitted-${idx}`}
-                                            href={`http://localhost:7001${file.fileUrl}`}
+                                            href={`${import.meta.env.VITE_SERVER_URL || "http://localhost:7001"}${file.fileUrl}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100"
@@ -232,7 +232,7 @@ const HomeworkDetail = () => {
                             </div>
                         )}
 
-                        {}
+                        { }
                         {homework.submission?.status === "graded" && (
                             <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                                 <div className="flex items-center justify-between mb-2">
@@ -250,7 +250,7 @@ const HomeworkDetail = () => {
                             </div>
                         )}
 
-                        {}
+                        { }
                         <div className="space-y-2 mb-4">
                             {attachments.map((attachment, index) => (
                                 <div
@@ -287,7 +287,7 @@ const HomeworkDetail = () => {
                             ))}
                         </div>
 
-                        {}
+                        { }
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
@@ -306,7 +306,7 @@ const HomeworkDetail = () => {
                             accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
                         />
 
-                        {}
+                        { }
                         <button
                             onClick={handleSubmit}
                             disabled={submitting || attachments.length === 0}

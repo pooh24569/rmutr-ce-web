@@ -52,6 +52,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("auth");
   };
 
+  const updateUser = (updates) => {
+    setAuth((prev) => {
+      const next = { ...prev, user: { ...prev.user, ...updates } };
+      localStorage.setItem("auth", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const hasPermission = (permission) =>
     auth.user?.permissions?.includes(permission) || false;
 
@@ -62,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       login,
       logout,
+      updateUser,
       hasPermission,
     }),
     [auth, loading]

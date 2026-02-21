@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:7001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:7001/api",
 });
 
 api.interceptors.request.use((config) => {
@@ -30,19 +30,18 @@ api.interceptors.response.use(
       (status === 404 && message.includes("user"));
 
     if (isAuthError || isUserDeleted) {
-
       localStorage.removeItem("auth");
 
       if (!window.location.pathname.includes("/login")) {
         console.log(
-          "🔐 Session expired or user deleted. Redirecting to login..."
+          "🔐 Session expired or user deleted. Redirecting to login...",
         );
         window.location.href = "/login";
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

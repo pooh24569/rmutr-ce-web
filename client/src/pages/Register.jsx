@@ -45,7 +45,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await api.post("/api/auth/register", {
+      await api.post("/auth/register", {
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         username: values.username.trim(),
@@ -71,7 +71,7 @@ export default function Register() {
           </div>
         )}
 
-        {}
+        { }
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="firstName" className="mb-1 block text-sm text-neutral-700">
@@ -105,7 +105,7 @@ export default function Register() {
           </div>
         </div>
 
-        {}
+        { }
         <div>
           <label htmlFor="username" className="mb-1 block text-sm text-neutral-700">
             ID
@@ -122,7 +122,7 @@ export default function Register() {
           />
         </div>
 
-        {}
+        { }
         <div>
           <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
             Email
@@ -139,7 +139,7 @@ export default function Register() {
           />
         </div>
 
-        {}
+        { }
         <div>
           <label htmlFor="password" className="mb-1 block text-sm text-neutral-700">
             Password
@@ -169,7 +169,7 @@ export default function Register() {
           </div>
         </div>
 
-        {}
+        { }
         <div>
           <label htmlFor="confirmPassword" className="mb-1 block text-sm text-neutral-700">
             Confirm Password
@@ -186,7 +186,7 @@ export default function Register() {
           />
         </div>
 
-        {}
+        { }
         <div>
           <label htmlFor="role" className="mb-1 block text-sm text-neutral-700">
             Role
@@ -199,12 +199,12 @@ export default function Register() {
             className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none focus:border-neutral-500 focus:bg-white"
           >
             <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
+            <option value="instructor">Instructor</option>
             <option value="parent">Parent</option>
           </select>
         </div>
 
-        {}
+        { }
         <button
           type="submit"
           disabled={loading || !values.username || !values.email || !values.password}

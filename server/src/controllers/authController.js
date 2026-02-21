@@ -7,7 +7,7 @@ export async function register(req, res) {
 
     const allowedRoles = [
       "student",
-      "teacher",
+      "instructor",
       "parent",
       "admin",
       "superadmin",
@@ -287,7 +287,6 @@ export async function requestResetPassword(req, res) {
 
 export async function confirmResetPassword(req, res) {
   try {
-
     return res.json({
       success: true,
       message: "Password has been reset successfully. You can now log in.",

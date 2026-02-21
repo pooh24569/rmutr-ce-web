@@ -19,36 +19,36 @@ const router = express.Router();
 router.post(
   "/sessions/start",
   verifyToken,
-  authorizeRoles("teacher"),
-  startSession
+  authorizeRoles("instructor"),
+  startSession,
 );
 
 router.patch(
   "/sessions/:sessionId/close",
   verifyToken,
-  authorizeRoles("teacher"),
-  closeSession
+  authorizeRoles("instructor"),
+  closeSession,
 );
 
 router.get(
   "/sessions/open",
   verifyToken,
-  authorizeRoles("teacher"),
-  getOpenSessions
+  authorizeRoles("instructor"),
+  getOpenSessions,
 );
 
 router.get(
   "/sessions/:sessionId",
   verifyToken,
-  authorizeRoles("teacher"),
-  getSessionDetail
+  authorizeRoles("instructor"),
+  getSessionDetail,
 );
 
 router.get(
   "/sessions/class/:classId",
   verifyToken,
-  authorizeRoles("teacher"),
-  getClassSessions
+  authorizeRoles("instructor"),
+  getClassSessions,
 );
 
 router.post("/attendance/check-in", checkInByFingerprint);
@@ -56,22 +56,22 @@ router.post("/attendance/check-in", checkInByFingerprint);
 router.post(
   "/attendance/manual",
   verifyToken,
-  authorizeRoles("teacher"),
-  manualCheckIn
+  authorizeRoles("instructor"),
+  manualCheckIn,
 );
 
 router.get(
   "/attendance/history/:classId",
   verifyToken,
   authorizeRoles("student"),
-  getStudentAttendanceHistory
+  getStudentAttendanceHistory,
 );
 
 router.get(
   "/attendance/summary/:classId",
   verifyToken,
-  authorizeRoles("teacher"),
-  getClassAttendanceSummary
+  authorizeRoles("instructor"),
+  getClassAttendanceSummary,
 );
 
 export default router;

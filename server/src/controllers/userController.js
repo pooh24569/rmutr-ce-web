@@ -47,6 +47,32 @@ export async function create(req, res) {
   }
 }
 
+export async function update(req, res) {
+  try {
+    const { username, email, role } = req.body;
+    const updateData = {};
+    if (username) updateData.username = username.trim();
+    if (email) updateData.email = email.trim().toLowerCase();
+    if (role) updateData.role = role;
+
+    const user = await userModel
+      .findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true,
+      })
+      .select("-password");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (e) {
+    if (e?.code === 11000)
+      return res
+        .status(409)
+        .json({ message: "Username or email already exists" });
+    return res.status(500).json({ message: "Update user failed" });
+  }
+}
+
 export async function remove(req, res) {
   try {
     const deleted = await userModel.findByIdAndDelete(req.params.id);

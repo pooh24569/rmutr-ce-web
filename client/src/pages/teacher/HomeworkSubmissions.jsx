@@ -92,7 +92,7 @@ const HomeworkSubmissions = () => {
 
     return (
         <div className="p-6 space-y-6">
-            {}
+            { }
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate("/teacher/homework")}
@@ -111,7 +111,7 @@ const HomeworkSubmissions = () => {
                 </button>
             </div>
 
-            {}
+            { }
             <div className="grid grid-cols-4 gap-4">
                 <div className="bg-white rounded-xl p-4 border border-gray-100 text-center">
                     <p className="text-2xl font-bold text-gray-800">{submissions.length}</p>
@@ -137,7 +137,7 @@ const HomeworkSubmissions = () => {
                 </div>
             </div>
 
-            {}
+            { }
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h2 className="font-semibold text-gray-800">รายชื่อที่ส่ง</h2>
@@ -196,7 +196,7 @@ const HomeworkSubmissions = () => {
                                     </div>
                                 </div>
 
-                                {}
+                                { }
                                 {sub.content && (
                                     <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
                                         {sub.content.substring(0, 200)}
@@ -204,7 +204,7 @@ const HomeworkSubmissions = () => {
                                     </div>
                                 )}
 
-                                {}
+                                { }
                                 {sub.attachments && sub.attachments.length > 0 && (
                                     <div className="mt-3">
                                         <p className="text-sm text-gray-500 mb-2">ไฟล์แนบ ({sub.attachments.length} ไฟล์)</p>
@@ -217,7 +217,7 @@ const HomeworkSubmissions = () => {
                                                 return (
                                                     <a
                                                         key={idx}
-                                                        href={`http://localhost:7001${fileUrl}`}
+                                                        href={`${import.meta.env.VITE_SERVER_URL || "http://localhost:7001"}${fileUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm"
@@ -236,7 +236,7 @@ const HomeworkSubmissions = () => {
                 )}
             </div>
 
-            {}
+            { }
             {selectedSubmission && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">

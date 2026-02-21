@@ -17,7 +17,6 @@ export const registerUser = async ({
   firstName,
   lastName,
 }) => {
-
   const exists = await userModel.findOne({
     $or: [{ username }, { email: email.toLowerCase().trim() }],
   });
@@ -63,7 +62,6 @@ export const registerUser = async ({
 };
 
 export const loginUser = async ({ username, password }) => {
-
   const user = await userModel.findOne({ username }).select("+password");
 
   if (!user) {
@@ -108,6 +106,8 @@ export const loginUser = async ({ username, password }) => {
       email: user.email,
       role: user.role,
       isAccountVerified: user.isAccountVerified,
+      profileImage: user.profileImage,
+      firstName: user.firstName,
     },
   };
 };

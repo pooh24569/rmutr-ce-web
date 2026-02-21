@@ -25,7 +25,7 @@ router.post(
 router.get(
   "/my-classes",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
+  authorizeRoles("instructor", "admin", "superadmin"),
   getMyClasses,
 );
 
@@ -46,28 +46,28 @@ router.delete(
 router.post(
   "/:classId/students",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
+  authorizeRoles("instructor", "admin", "superadmin"),
   addStudentToClass,
 );
 
 router.delete(
   "/:classId/students/:studentId",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
+  authorizeRoles("instructor", "admin", "superadmin"),
   removeStudentFromClass,
 );
 
 router.get(
   "/students/all",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
+  authorizeRoles("instructor", "admin", "superadmin"),
   getAllStudents,
 );
 
 router.post(
   "/:classId/import",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
+  authorizeRoles("instructor", "admin", "superadmin"),
   importStudentsToClass,
 );
 

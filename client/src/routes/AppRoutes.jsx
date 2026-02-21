@@ -18,9 +18,11 @@ import Unauthorized from "@/pages/Unauthorized";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 import AdminLayout from "@/layouts/AdminLayout";
+import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import Manage from "@/pages/admin/Manage";
-import Camping from "@/pages/admin/Camping";
+import UserManagement from "@/pages/admin/UserManagement";
+import AdminProfile from "@/pages/admin/AdminProfile";
 
 import StudentLayout from "@/layouts/StudentLayout";
 import HomeworkList from "@/pages/student/HomeworkList";
@@ -47,6 +49,14 @@ import ParentLogin from "@/pages/parent/ParentLogin";
 import ParentLayout from "@/layouts/ParentLayout";
 import ParentDashboard from "@/pages/parent/Dashboard";
 
+import RegistrarLogin from "@/pages/registrar/RegistrarLogin";
+import RegistrarLayout from "@/layouts/RegistrarLayout";
+import RegistrarDashboard from "@/pages/registrar/Dashboard";
+
+import DeptHeadLogin from "@/pages/depthead/DeptHeadLogin";
+import DeptHeadLayout from "@/layouts/DeptHeadLayout";
+import DeptHeadDashboard from "@/pages/depthead/Dashboard";
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -62,6 +72,9 @@ export default function AppRoutes() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/parent/login" element={<ParentLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/registrar/login" element={<RegistrarLogin />} />
+        <Route path="/depthead/login" element={<DeptHeadLogin />} />
 
         { }
         <Route element={<ProtectedRoute />}>
@@ -82,7 +95,7 @@ export default function AppRoutes() {
           </Route>
 
           { }
-          <Route element={<ProtectedRoute roles={["teacher"]} />}>
+          <Route element={<ProtectedRoute roles={["instructor"]} />}>
             <Route path="/teacher" element={<TeacherLayout />}>
               <Route index element={<Navigate to="/teacher/dashboard" replace />} />
               <Route path="dashboard" element={<TeacherDashboard />} />
@@ -102,8 +115,30 @@ export default function AppRoutes() {
           <Route element={<ProtectedRoute roles={["admin", "superadmin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="manage" element={<Manage />} />
-              <Route path="camping" element={<Camping />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="profile" element={<AdminProfile />} />
+            </Route>
+          </Route>
+        </Route>
+
+        {/* Registrar Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute roles={["central_registrar", "faculty_registrar"]} />}>
+            <Route path="/registrar" element={<RegistrarLayout />}>
+              <Route index element={<RegistrarDashboard />} />
+              <Route path="dashboard" element={<RegistrarDashboard />} />
+            </Route>
+          </Route>
+        </Route>
+
+        {/* Dept Head Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute roles={["dept_head"]} />}>
+            <Route path="/depthead" element={<DeptHeadLayout />}>
+              <Route index element={<DeptHeadDashboard />} />
+              <Route path="dashboard" element={<DeptHeadDashboard />} />
             </Route>
           </Route>
         </Route>

@@ -31,7 +31,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { data } = await api.post("/api/auth/login", {
+      const { data } = await api.post("/auth/login", {
         username: values.username.trim(),
         password: values.password,
       });
@@ -51,8 +51,10 @@ export default function Login() {
 
   const getDefaultPath = (role) => {
     if (role === "student") return "/student/homework";
-    if (role === "teacher") return "/teacher/dashboard";
+    if (role === "instructor") return "/teacher/dashboard";
     if (role === "parent") return "/parent/dashboard";
+    if (["central_registrar", "faculty_registrar"].includes(role)) return "/registrar";
+    if (role === "dept_head") return "/depthead";
     if (["admin", "superadmin"].includes(role)) return "/admin";
     return "/";
   };

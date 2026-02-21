@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const dashboardApi = axios.create({
-  baseURL: "http://localhost:7001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:7001/api",
 });
 
 dashboardApi.interceptors.request.use((config) => {
@@ -25,11 +25,10 @@ dashboardApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const dashboardService = {
-
   getTeacherDashboard: async () => {
     const response = await dashboardApi.get("/dashboard/teacher");
     return response.data;

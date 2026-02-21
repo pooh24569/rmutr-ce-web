@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const homeworkApi = axios.create({
-  baseURL: "http://localhost:7001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:7001/api",
 });
 
 homeworkApi.interceptors.request.use((config) => {
@@ -25,11 +25,10 @@ homeworkApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const homeworkService = {
-
   createHomework: async (data) => {
     const response = await homeworkApi.post("/homework", data);
     return response.data;
@@ -37,7 +36,7 @@ export const homeworkService = {
 
   getSubmissions: async (homeworkId) => {
     const response = await homeworkApi.get(
-      `/homework/${homeworkId}/submissions`
+      `/homework/${homeworkId}/submissions`,
     );
     return response.data;
   },
@@ -48,7 +47,7 @@ export const homeworkService = {
       {
         score,
         feedback,
-      }
+      },
     );
     return response.data;
   },
@@ -78,7 +77,7 @@ export const homeworkService = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
     return response.data;
   },

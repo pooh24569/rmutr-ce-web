@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 import {
@@ -12,15 +10,15 @@ const router = express.Router();
 router.get(
   "/teacher",
   verifyToken,
-  authorizeRoles("teacher", "admin", "superadmin"),
-  getTeacherDashboard
+  authorizeRoles("instructor", "admin", "superadmin"),
+  getTeacherDashboard,
 );
 
 router.get(
   "/admin",
   verifyToken,
   authorizeRoles("admin", "superadmin"),
-  getAdminDashboard
+  getAdminDashboard,
 );
 
 export default router;

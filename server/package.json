@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "seed": "node scripts/seedSuperAdmin.js",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint \"src/**/*.js\"",
