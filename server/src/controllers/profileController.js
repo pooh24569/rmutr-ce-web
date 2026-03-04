@@ -1,4 +1,5 @@
 import * as profileService from "../services/profileService.js";
+import { createParentAccountsForStudent } from "../services/parentAccountService.js";
 import { successResponse, errorResponse } from "../utils/responseFormatter.js";
 import { logger } from "../utils/logger.js";
 
@@ -47,8 +48,14 @@ export const updateStudentProfile = async (req, res) => {
       data
     );
 
+    // Auto-create parent accounts after profile save
+    const parentAccounts = await createParentAccountsForStudent(userId);
+
     return res.json(
-      successResponse(studentProfile, "Student profile updated successfully")
+      successResponse(
+        { studentProfile, parentAccounts },
+        "Student profile updated successfully"
+      )
     );
   } catch (error) {
     logger.error("Update student profile error", { error: error.message });

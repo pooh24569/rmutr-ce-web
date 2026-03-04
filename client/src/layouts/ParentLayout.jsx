@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import {
     Users,
     LayoutDashboard,
@@ -10,26 +11,11 @@ import {
 const ParentLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [parentData, setParentData] = useState(null);
-
-    useEffect(() => {
-        const token = localStorage.getItem("parentToken");
-        const data = localStorage.getItem("parentData");
-
-        if (!token) {
-            navigate("/parent/login");
-            return;
-        }
-
-        if (data) {
-            setParentData(JSON.parse(data));
-        }
-    }, [navigate]);
+    const { user, logout } = useAuth();
 
     const handleLogout = () => {
-        localStorage.removeItem("parentToken");
-        localStorage.removeItem("parentData");
-        navigate("/parent/login");
+        logout();
+        navigate("/login");
     };
 
     const menuItems = [
@@ -58,10 +44,10 @@ const ParentLayout = () => {
                         </div>
                         <div>
                             <p className="text-sm font-medium">
-                                {parentData?.studentName || "ผู้ปกครอง"}
+                                {user?.firstName || "ผู้ปกครอง"} {user?.lastName || ""}
                             </p>
                             <p className="text-xs text-gray-300">
-                                รหัส: {parentData?.studentId || "-"}
+                                {user?.parentType === "father" ? "บิดา" : user?.parentType === "mother" ? "มารดา" : "ผู้ปกครอง"}
                             </p>
                         </div>
                     </div>

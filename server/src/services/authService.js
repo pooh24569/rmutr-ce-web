@@ -1,4 +1,5 @@
 import userModel from "../models/userModel.js";
+import StudentProfile from "../models/studentProfileModel.js";
 import {
   hashPassword,
   comparePassword,
@@ -8,6 +9,56 @@ import { generateOtp, hashOtp, verifyOtp, isOtpExpired } from "./otpService.js";
 
 import { sendVerificationOtp, sendPasswordResetOtp } from "./emailService.js";
 import { logger } from "../utils/logger.js";
+
+// ─── Parent Login (by guardian name + student ID) ─────────────────────────────
+
+export const loginParent = async ({ firstName, lastName, studentId }) => {
+  const studentProfile = await StudentProfile.findOne({ studentId });
+
+  if (!studentProfile) {
+    const error = new Error("ไม่พบข้อมูลนักศึกษา กรุณาตรวจสอบเลขนักศึกษา");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const guardian = studentProfile.guardian;
+  if (!guardian?.firstName || !guardian?.lastName) {
+    const error = new Error("ยังไม่มีข้อมูลผู้ปกครองในระบบ กรุณาให้นักศึกษากรอกข้อมูลผู้ปกครองก่อน");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const nameMatch =
+    guardian.firstName.trim().toLowerCase() === firstName.trim().toLowerCase() &&
+    guardian.lastName.trim().toLowerCase() === lastName.trim().toLowerCase();
+
+  if (!nameMatch) {
+    const error = new Error("ชื่อ-นามสกุลผู้ปกครองไม่ตรงกับข้อมูลในระบบ");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // Generate token with studentUserId so parent routes can find linked student
+  const token = generateToken(studentProfile.userId, "parent");
+
+  logger.info("Parent logged in", {
+    studentId,
+    guardianName: `${guardian.firstName} ${guardian.lastName}`,
+    studentUserId: studentProfile.userId,
+  });
+
+  return {
+    token,
+    user: {
+      id: studentProfile.userId,
+      role: "parent",
+      firstName: guardian.firstName,
+      lastName: guardian.lastName,
+      parentType: guardian.relationship || "guardian",
+      linkedStudentId: studentProfile.userId,
+    },
+  };
+};
 
 export const registerUser = async ({
   username,
@@ -108,6 +159,8 @@ export const loginUser = async ({ username, password }) => {
       isAccountVerified: user.isAccountVerified,
       profileImage: user.profileImage,
       firstName: user.firstName,
+      lastName: user.lastName,
+      parentType: user.parentType || "",
     },
   };
 };

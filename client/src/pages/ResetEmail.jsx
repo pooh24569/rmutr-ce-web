@@ -21,7 +21,7 @@ export default function ResetEmail() {
 
     setLoading(true);
     try {
-      const { data } = await api.post(`/api/auth/send-reset-otp`, {
+      const { data } = await api.post(`/auth/send-reset-otp`, {
         email: email.trim(),
       });
 

@@ -5,6 +5,7 @@ import StudentHeader from "@/components/student/StudentHeader";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -21,7 +22,6 @@ const ProfileEdit = () => {
     const handleSave = async (basicProfile, studentProfile, imageFile) => {
         setSaving(true);
         try {
-
             if (imageFile) {
                 await uploadImage(imageFile);
             }
@@ -29,11 +29,20 @@ const ProfileEdit = () => {
             await updateProfile(basicProfile);
 
             if (profile?.role === "student") {
-                await updateStudentProfile(studentProfile);
+                const result = await updateStudentProfile(studentProfile);
+
+                // Notify about parent login availability
+                if (result?.parentAccounts?.length > 0) {
+                    const ready = result.parentAccounts.filter(a => a.loginReady);
+                    if (ready.length > 0) {
+                        toast.success(
+                            `ผู้ปกครอง "${ready[0].name}" สามารถเข้าสู่ระบบได้แล้ว โดยใช้ชื่อ-นามสกุล + เลขนักศึกษา`
+                        );
+                    }
+                }
             }
 
             await fetchProfile();
-
             navigate('/student/profile');
         } catch (error) {
             console.error("Error saving profile:", error);
@@ -75,8 +84,6 @@ const ProfileEdit = () => {
             />
 
             <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
-
-                { }
                 <ProfileEditForm
                     profile={profile}
                     onSave={handleSave}

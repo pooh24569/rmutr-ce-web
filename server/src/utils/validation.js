@@ -73,6 +73,19 @@ export const loginSchema = Joi.object({
   }),
 });
 
+export const parentLoginSchema = Joi.object({
+  firstName: Joi.string().trim().required().messages({
+    "any.required": "กรุณากรอกชื่อผู้ปกครอง",
+  }),
+  lastName: Joi.string().trim().required().messages({
+    "any.required": "กรุณากรอกนามสกุลผู้ปกครอง",
+  }),
+  studentId: Joi.string().pattern(/^[0-9]{13}$/).required().messages({
+    "string.pattern.base": "เลขนักศึกษาต้องเป็นตัวเลข 13 หลัก",
+    "any.required": "กรุณากรอกเลขนักศึกษา",
+  }),
+});
+
 export const requestResetSchema = Joi.object({
   email: emailSchema,
 });
@@ -169,6 +182,10 @@ export const updateUserSchema = Joi.object({
     )
     .optional(),
 }).min(1);
+
+export const adminResetPasswordSchema = Joi.object({
+  newPassword: passwordSchema,
+});
 
 export const userIdSchema = Joi.object({
   id: Joi.string()
@@ -334,6 +351,7 @@ export const validate = (schema, property = "body") => {
 export default {
   registerSchema,
   loginSchema,
+  parentLoginSchema,
   requestResetSchema,
   confirmResetSchema,
   sendOtpSchema,
@@ -344,6 +362,7 @@ export default {
   createUserSchema,
   updateUserSchema,
   userIdSchema,
+  adminResetPasswordSchema,
   updateProfileSchema,
   updateStudentProfileSchema,
   validate,

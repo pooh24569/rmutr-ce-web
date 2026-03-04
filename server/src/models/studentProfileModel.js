@@ -77,6 +77,8 @@ const studentProfileSchema = new mongoose.Schema(
       status: { type: String, trim: true, default: "" },
       education: { type: String, trim: true, default: "" },
       dateOfBirth: { type: Date, default: null },
+      email: { type: String, trim: true, default: "" },
+      phone: { type: String, trim: true, default: "" },
     },
 
     // ===== 5. ข้อมูลมารดา (Mother Information) =====
@@ -89,6 +91,8 @@ const studentProfileSchema = new mongoose.Schema(
       status: { type: String, trim: true, default: "" },
       education: { type: String, trim: true, default: "" },
       dateOfBirth: { type: Date, default: null },
+      email: { type: String, trim: true, default: "" },
+      phone: { type: String, trim: true, default: "" },
     },
 
     // ===== 6. ข้อมูลผู้ปกครอง (Guardian Information) =====
@@ -100,6 +104,8 @@ const studentProfileSchema = new mongoose.Schema(
       lastName: { type: String, trim: true, default: "" },
       relationship: { type: String, trim: true, default: "" },
       dateOfBirth: { type: Date, default: null },
+      email: { type: String, trim: true, default: "" },
+      phone: { type: String, trim: true, default: "" },
     },
 
     // ===== 7. ข้อมูลติดต่อฉุกเฉิน (Emergency Contact) =====

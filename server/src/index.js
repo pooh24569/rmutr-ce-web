@@ -224,7 +224,12 @@ const server = app.listen(PORT, () => {
   logger.info(`API Base: http://localhost:${PORT}`);
 });
 
+let isShuttingDown = false;
+
 const gracefulShutdown = (signal) => {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
   logger.info(`${signal} received, shutting down gracefully...`);
 
   server.close(() => {
@@ -257,7 +262,6 @@ process.on("uncaughtException", (error) => {
 
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection", { reason, promise });
-  gracefulShutdown("unhandledRejection");
 });
 
 export default app;

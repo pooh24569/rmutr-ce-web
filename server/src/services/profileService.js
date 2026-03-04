@@ -1,6 +1,37 @@
+/**
+ * profileService.js
+ *
+ * Handles user profile retrieval and updates.
+ * Parent account creation is delegated to parentAccountService.
+ */
+
 import StudentProfile from "../models/studentProfileModel.js";
 import User from "../models/userModel.js";
 import { logger } from "../utils/logger.js";
+import { createParentAccountsForStudent } from "./parentAccountService.js";
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const NESTED_PROFILE_FIELDS = [
+  "previousEducation",
+  "address",
+  "father",
+  "mother",
+  "guardian",
+  "emergencyContact",
+  "education",
+];
+
+
+const computeCardDates = (referenceDate) => {
+  const cardIssueDate = new Date(referenceDate);
+  const cardExpiryDate = new Date(referenceDate);
+  cardExpiryDate.setFullYear(cardExpiryDate.getFullYear() + 4);
+  cardExpiryDate.setMonth(cardExpiryDate.getMonth() + 6);
+  return { cardIssueDate, cardExpiryDate };
+};
+
+// ─── Service functions ────────────────────────────────────────────────────────
 
 export const getUserProfile = async (userId) => {
   try {
@@ -25,16 +56,12 @@ export const getUserProfile = async (userId) => {
     };
 
     if (user.role === "student") {
-      const studentProfile = await StudentProfile.findOne({ userId });
-      profileData.studentProfile = studentProfile || null;
+      profileData.studentProfile = (await StudentProfile.findOne({ userId })) || null;
     }
 
     return profileData;
   } catch (error) {
-    logger.error("Error getting user profile", {
-      userId,
-      error: error.message,
-    });
+    logger.error("Error getting user profile", { userId, error: error.message });
     throw error;
   }
 };
@@ -49,21 +76,11 @@ export const updateUserProfile = async (userId, data) => {
       throw error;
     }
 
-    const allowedFields = [
-      "firstName",
-      "lastName",
-      "phoneNumber",
-      "profileImage",
-    ];
-
-    allowedFields.forEach((field) => {
-      if (data[field] !== undefined) {
-        user[field] = data[field];
-      }
-    });
+    for (const field of ["firstName", "lastName", "phoneNumber", "profileImage"]) {
+      if (data[field] !== undefined) user[field] = data[field];
+    }
 
     await user.save();
-
     logger.info("User profile updated", { userId });
 
     return {
@@ -76,26 +93,16 @@ export const updateUserProfile = async (userId, data) => {
       profileImage: user.profileImage,
     };
   } catch (error) {
-    logger.error("Error updating user profile", {
-      userId,
-      error: error.message,
-    });
+    logger.error("Error updating user profile", { userId, error: error.message });
     throw error;
   }
 };
 
 export const updateStudentProfile = async (userId, data) => {
   try {
-    // ========== DEBUG LOGGING ==========
-    console.log("========================================");
-    console.log("📥 RECEIVED DATA FROM FRONTEND:");
-    console.log("All Keys:", Object.keys(data));
-    console.log("nationalId:", data.nationalId);
-    console.log("nationality:", data.nationality);
-    console.log("prefix:", data.prefix);
-    console.log("firstNameEN:", data.firstNameEN);
-    console.log("========================================");
-    // ====================================
+    // Prevent frontend from overriding auto-set card dates
+    delete data.cardIssueDate;
+    delete data.cardExpiryDate;
 
     const user = await User.findById(userId);
 
@@ -111,88 +118,51 @@ export const updateStudentProfile = async (userId, data) => {
       throw error;
     }
 
-    // Helper function to check if parent info is complete
-    const isParentInfoComplete = (parent) => {
-      return (
-        parent &&
-        parent.nationalId &&
-        parent.nationalId.trim() !== "" &&
-        parent.firstName &&
-        parent.firstName.trim() !== "" &&
-        parent.lastName &&
-        parent.lastName.trim() !== "" &&
-        parent.dateOfBirth
-      );
-    };
-
-    // Check if at least one parent/guardian has complete info
-    const hasCompleteFather = isParentInfoComplete(data.father);
-    const hasCompleteMother = isParentInfoComplete(data.mother);
-    const hasCompleteGuardian = isParentInfoComplete(data.guardian);
-
-    if (!hasCompleteFather && !hasCompleteMother && !hasCompleteGuardian) {
-      const error = new Error(
-        "กรุณากรอกข้อมูลบิดา มารดา หรือผู้ปกครองอย่างน้อย 1 คนให้ครบถ้วน (เลขบัตรประชาชน, ชื่อ, นามสกุล, วันเกิด)",
-      );
-      error.statusCode = 400;
-      throw error;
-    }
-
     let studentProfile = await StudentProfile.findOne({ userId });
 
     if (studentProfile) {
-      logger.info("Updating student profile with data:", {
-        keys: Object.keys(data),
-      });
-
-      // List of nested object fields that need special handling
-      const nestedFields = [
-        "previousEducation",
-        "address",
-        "father",
-        "mother",
-        "guardian",
-        "emergencyContact",
-        "education",
-      ];
-
-      // Update each field
-      Object.keys(data).forEach((key) => {
-        if (data[key] !== undefined) {
-          if (
-            nestedFields.includes(key) &&
-            typeof data[key] === "object" &&
-            data[key] !== null
-          ) {
-            // For nested objects, merge with existing data and mark as modified
-            const existingData =
-              studentProfile[key]?.toObject?.() || studentProfile[key] || {};
-            studentProfile[key] = { ...existingData, ...data[key] };
-            studentProfile.markModified(key);
-          } else {
-            // For primitive fields, direct assignment
-            studentProfile[key] = data[key];
-          }
+      // Merge fields
+      for (const [key, value] of Object.entries(data)) {
+        if (value === undefined) continue;
+        if (NESTED_PROFILE_FIELDS.includes(key) && typeof value === "object" && value !== null) {
+          const existing = studentProfile[key]?.toObject?.() ?? studentProfile[key] ?? {};
+          studentProfile[key] = { ...existing, ...value };
+          studentProfile.markModified(key);
+        } else {
+          studentProfile[key] = value;
         }
-      });
+      }
+
+      // Auto-fill card dates if missing
+      if (!studentProfile.cardIssueDate || !studentProfile.cardExpiryDate) {
+        const { cardIssueDate, cardExpiryDate } = computeCardDates(user.createdAt || new Date());
+        studentProfile.cardIssueDate = cardIssueDate;
+        studentProfile.cardExpiryDate = cardExpiryDate;
+        logger.info("Auto-set card dates for existing profile", { userId });
+      }
 
       await studentProfile.save();
-      logger.info("Student profile updated successfully", { userId });
+      logger.info("Student profile updated", { userId });
     } else {
-      // Create new profile
-      studentProfile = await StudentProfile.create({
-        userId,
-        ...data,
-      });
+      const { cardIssueDate, cardExpiryDate } = computeCardDates(user.createdAt || new Date());
+      studentProfile = await StudentProfile.create({ userId, ...data, cardIssueDate, cardExpiryDate });
       logger.info("Student profile created", { userId });
     }
 
     return studentProfile;
   } catch (error) {
-    logger.error("Error updating student profile", {
-      userId,
-      error: error.message,
-    });
+    // MongoDB duplicate key → แปลง error ให้อ่านเข้าใจได้
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0] || "ข้อมูล";
+      const friendlyField = field === "studentId" ? "รหัสนักศึกษา" : field;
+      const friendly = new Error(
+        `${friendlyField} นี้ถูกใช้งานโดยบัญชีอื่นในระบบแล้ว กรุณาตรวจสอบข้อมูล`
+      );
+      friendly.statusCode = 409;
+      logger.error("Error updating student profile", { userId, error: error.message });
+      throw friendly;
+    }
+    logger.error("Error updating student profile", { userId, error: error.message });
     throw error;
   }
 };
@@ -217,15 +187,9 @@ export const uploadProfileImage = async (userId, imageData) => {
     await user.save();
 
     logger.info("Profile image uploaded", { userId });
-
-    return {
-      profileImage: user.profileImage,
-    };
+    return { profileImage: user.profileImage };
   } catch (error) {
-    logger.error("Error uploading profile image", {
-      userId,
-      error: error.message,
-    });
+    logger.error("Error uploading profile image", { userId, error: error.message });
     throw error;
   }
 };
@@ -234,5 +198,6 @@ export default {
   getUserProfile,
   updateUserProfile,
   updateStudentProfile,
+  createParentAccountsForStudent,
   uploadProfileImage,
 };

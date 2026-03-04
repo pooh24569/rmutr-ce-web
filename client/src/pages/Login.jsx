@@ -36,6 +36,20 @@ export default function Login() {
         password: values.password,
       });
 
+      // Block roles that have dedicated login pages
+      if (["admin", "superadmin"].includes(data.user.role)) {
+        setError("Invalid username or password");
+        return;
+      }
+      if (["central_registrar", "faculty_registrar"].includes(data.user.role)) {
+        setError("Invalid username or password");
+        return;
+      }
+      if (data.user.role === "parent") {
+        setError("Invalid username or password");
+        return;
+      }
+
       login({ user: data.user, token: data.token });
 
       const from = location.state?.from || getDefaultPath(data.user.role);
@@ -135,9 +149,8 @@ export default function Login() {
             to="/parent/login"
             className="font-medium text-rose-600 hover:underline"
           >
-            Parent Login
+            Parent
           </Link>
-
           <Link
             to="/reset-email"
             className="font-medium text-rose-600 hover:underline"

@@ -6,6 +6,7 @@ import {
   validate,
   createUserSchema,
   updateUserSchema,
+  adminResetPasswordSchema,
 } from "../utils/validation.js";
 
 const router = express.Router();
@@ -33,6 +34,14 @@ router.put(
   validate(updateUserSchema),
   canAssignRole,
   UserCtrl.update,
+);
+
+router.patch(
+  "/:id/reset-password",
+  verifyToken,
+  authorizeRoles("superadmin"),
+  validate(adminResetPasswordSchema),
+  UserCtrl.resetPassword,
 );
 
 router.delete(

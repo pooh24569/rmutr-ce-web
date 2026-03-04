@@ -7,6 +7,7 @@ import {
     XMarkIcon,
     MagnifyingGlassIcon,
     UserGroupIcon,
+    KeyIcon,
 } from "@heroicons/react/24/outline";
 
 const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:7001/api"}/user-admin`;
@@ -43,6 +44,13 @@ export default function UserManagement() {
 
     // Delete confirm
     const [deleteTarget, setDeleteTarget] = useState(null);
+
+    // Reset password modal
+    const [resetTarget, setResetTarget] = useState(null);
+    const [resetData, setResetData] = useState({ newPassword: "", confirmPassword: "" });
+    const [resetError, setResetError] = useState("");
+    const [resetSuccess, setResetSuccess] = useState("");
+    const [resetting, setResetting] = useState(false);
 
     const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
@@ -108,7 +116,14 @@ export default function UserManagement() {
 
             const res = await fetch(url, { method, headers, body: JSON.stringify(body) });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Save failed");
+            if (!res.ok) {
+                // Show detailed validation errors if available
+                if (data.errors && Array.isArray(data.errors)) {
+                    const details = data.errors.map(e => `${e.field}: ${e.message}`).join("\n");
+                    throw new Error(details);
+                }
+                throw new Error(data.message || "Save failed");
+            }
 
             setShowModal(false);
             fetchUsers();
@@ -133,6 +148,46 @@ export default function UserManagement() {
         } catch (err) {
             alert(err.message);
             setDeleteTarget(null);
+        }
+    };
+
+    // Reset Password
+    const openResetPassword = (u) => {
+        setResetTarget(u);
+        setResetData({ newPassword: "", confirmPassword: "" });
+        setResetError("");
+        setResetSuccess("");
+    };
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setResetError("");
+        setResetSuccess("");
+
+        if (resetData.newPassword !== resetData.confirmPassword) {
+            setResetError("รหัสผ่านไม่ตรงกัน");
+            return;
+        }
+        if (resetData.newPassword.length < 6) {
+            setResetError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+            return;
+        }
+
+        setResetting(true);
+        try {
+            const res = await fetch(`${API_BASE}/${resetTarget._id}/reset-password`, {
+                method: "PATCH",
+                headers,
+                body: JSON.stringify({ newPassword: resetData.newPassword }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Reset failed");
+            setResetSuccess("รีเซ็ตรหัสผ่านเรียบร้อยแล้ว");
+            setTimeout(() => setResetTarget(null), 1500);
+        } catch (err) {
+            setResetError(err.message);
+        } finally {
+            setResetting(false);
         }
     };
 
@@ -278,6 +333,15 @@ export default function UserManagement() {
                                                             <PencilSquareIcon className="w-4.5 h-4.5" />
                                                         </button>
                                                     )}
+                                                    {currentUser?.role === "superadmin" && !isSelf && !isSuperadminTarget && (
+                                                        <button
+                                                            onClick={() => openResetPassword(u)}
+                                                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                                            title="Reset Password"
+                                                        >
+                                                            <KeyIcon className="w-4.5 h-4.5" />
+                                                        </button>
+                                                    )}
                                                     {canManage && !isSelf && (
                                                         <button
                                                             onClick={() => setDeleteTarget(u)}
@@ -363,8 +427,8 @@ export default function UserManagement() {
                                     className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                                 >
                                     {ROLES.filter((r) => {
-                                        // Only superadmin can assign superadmin
-                                        if (r.value === "superadmin" && currentUser?.role !== "superadmin") return false;
+                                        // Never allow assigning superadmin from UI
+                                        if (r.value === "superadmin") return false;
                                         return true;
                                     }).map((r) => (
                                         <option key={r.value} value={r.value}>{r.label}</option>
@@ -416,6 +480,82 @@ export default function UserManagement() {
                                 Delete
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Password Modal */}
+            {resetTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setResetTarget(null)} />
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in fade-in">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <KeyIcon className="w-5 h-5 text-amber-500" />
+                                Reset Password
+                            </h3>
+                            <button onClick={() => setResetTarget(null)} className="p-1 hover:bg-gray-100 rounded-lg">
+                                <XMarkIcon className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-4">
+                            ตั้งรหัสผ่านใหม่ให้ <strong>{resetTarget.username}</strong> ({getRoleBadge(resetTarget.role).label})
+                        </p>
+
+                        {resetError && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg mb-4 text-sm">
+                                {resetError}
+                            </div>
+                        )}
+                        {resetSuccess && (
+                            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-2.5 rounded-lg mb-4 text-sm">
+                                {resetSuccess}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleResetPassword} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านใหม่</label>
+                                <input
+                                    type="password"
+                                    value={resetData.newPassword}
+                                    onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
+                                    required
+                                    minLength={6}
+                                    placeholder="อย่างน้อย 6 ตัวอักษร"
+                                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">ยืนยันรหัสผ่าน</label>
+                                <input
+                                    type="password"
+                                    value={resetData.confirmPassword}
+                                    onChange={(e) => setResetData({ ...resetData, confirmPassword: e.target.value })}
+                                    required
+                                    minLength={6}
+                                    placeholder="กรอกรหัสผ่านอีกครั้ง"
+                                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setResetTarget(null)}
+                                    className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors text-sm"
+                                >
+                                    ยกเลิก
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={resetting || !resetData.newPassword || !resetData.confirmPassword}
+                                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg transition-all disabled:opacity-50 text-sm"
+                                >
+                                    {resetting ? "กำลังรีเซ็ต..." : "รีเซ็ตรหัสผ่าน"}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

@@ -83,6 +83,29 @@ export async function remove(req, res) {
   }
 }
 
+export async function resetPassword(req, res) {
+  try {
+    const { newPassword } = req.body;
+    const targetUser = await userModel.findById(req.params.id).select("role");
+
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent resetting superadmin password through this endpoint
+    if (targetUser.role === "superadmin") {
+      return res.status(403).json({ message: "Cannot reset superadmin password from here" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await userModel.findByIdAndUpdate(req.params.id, { password: hashed });
+
+    return res.json({ success: true, message: "Password reset successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: "Reset password failed" });
+  }
+}
+
 export const getUserData = async (req, res) => {
   try {
     const { userId } = req.body;

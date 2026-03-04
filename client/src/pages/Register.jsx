@@ -186,23 +186,7 @@ export default function Register() {
           />
         </div>
 
-        { }
-        <div>
-          <label htmlFor="role" className="mb-1 block text-sm text-neutral-700">
-            Role
-          </label>
-          <select
-            id="role"
-            name="role"
-            value={values.role}
-            onChange={onChange}
-            className="w-full rounded-xl border border-neutral-300/80 bg-white/80 px-3 py-2 text-sm outline-none focus:border-neutral-500 focus:bg-white"
-          >
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
-            <option value="parent">Parent</option>
-          </select>
-        </div>
+        <input type="hidden" name="role" value="student" />
 
         { }
         <button

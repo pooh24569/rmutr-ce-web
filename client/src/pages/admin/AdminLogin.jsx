@@ -196,15 +196,6 @@ export default function AdminLogin() {
                             </div>
                         </div>
 
-                        {/* Forgot Password Link */}
-                        <div className="text-right">
-                            <a
-                                href="#"
-                                className="text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
-                            >
-                                Forgot password?
-                            </a>
-                        </div>
 
                         {/* Login Button */}
                         <button

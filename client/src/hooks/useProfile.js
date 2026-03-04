@@ -54,12 +54,14 @@ export const useProfile = () => {
     try {
       const response = await profileService.updateStudentProfile(data);
       if (response.success) {
+        // Response data now contains { studentProfile, parentAccounts }
+        const { studentProfile, parentAccounts } = response.data || {};
         setProfile((prev) => ({
           ...prev,
-          studentProfile: response.data,
+          studentProfile: studentProfile || response.data,
         }));
         toast.success("Student profile updated successfully");
-        return response;
+        return { ...response, parentAccounts };
       } else {
         throw new Error(response.message || "Failed to update student profile");
       }

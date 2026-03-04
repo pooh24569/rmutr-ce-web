@@ -5,38 +5,25 @@ const parentApi = axios.create({
 });
 
 const parentService = {
-  login: async (data) => {
-    const response = await parentApi.post("/parent/login", data);
-    return response.data;
-  },
-
-  getStudentInfo: async () => {
-    const token = localStorage.getItem("parentToken");
+  getStudentInfo: async (token) => {
     const response = await parentApi.get("/parent/student-info", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  getAttendance: async () => {
-    const token = localStorage.getItem("parentToken");
+  getAttendance: async (token) => {
     const response = await parentApi.get("/parent/attendance", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  getSchedule: async () => {
-    const token = localStorage.getItem("parentToken");
+  getSchedule: async (token) => {
     const response = await parentApi.get("/parent/schedule", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
-  },
-
-  logout: () => {
-    localStorage.removeItem("parentToken");
-    localStorage.removeItem("parentData");
   },
 };
 

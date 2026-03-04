@@ -20,14 +20,12 @@ const mapProfileToFormValues = (profile) => {
         phoneNumber: profile?.phoneNumber || "",
 
         // Personal Info
-        studentId: sp.studentId || "",
+        studentId: sp.studentId || profile?.username || "",
         nationality: sp.nationality || "",
         nationalId: sp.nationalId || "",
-        cardIssueDate: formatDate(sp.cardIssueDate),
-        cardExpiryDate: formatDate(sp.cardExpiryDate),
         prefix: sp.prefix || "",
-        firstNameTH: sp.firstNameTH || "",
-        lastNameTH: sp.lastNameTH || "",
+        firstNameTH: sp.firstNameTH || profile?.firstName || "",
+        lastNameTH: sp.lastNameTH || profile?.lastName || "",
         firstNameEN: sp.firstNameEN || "",
         lastNameEN: sp.lastNameEN || "",
         dateOfBirth: formatDate(sp.dateOfBirth),
@@ -61,7 +59,7 @@ const mapProfileToFormValues = (profile) => {
         postalCode: sp.address?.postalCode || "",
         homePhone: sp.address?.homePhone || "",
         mobilePhone: sp.address?.mobilePhone || "",
-        addressEmail: sp.address?.email || "",
+        addressEmail: sp.address?.email || profile?.email || "",
 
         // Father
         fatherNationality: sp.father?.nationality || "",
@@ -72,6 +70,7 @@ const mapProfileToFormValues = (profile) => {
         fatherStatus: sp.father?.status || "",
         fatherEducation: sp.father?.education || "",
         fatherDob: formatDate(sp.father?.dateOfBirth),
+        fatherPhone: sp.father?.phone || "",
 
         // Mother
         motherNationality: sp.mother?.nationality || "",
@@ -82,6 +81,7 @@ const mapProfileToFormValues = (profile) => {
         motherStatus: sp.mother?.status || "",
         motherEducation: sp.mother?.education || "",
         motherDob: formatDate(sp.mother?.dateOfBirth),
+        motherPhone: sp.mother?.phone || "",
 
         // Guardian
         guardianNationality: sp.guardian?.nationality || "",
@@ -91,6 +91,13 @@ const mapProfileToFormValues = (profile) => {
         guardianLastName: sp.guardian?.lastName || "",
         guardianRelationship: sp.guardian?.relationship || "",
         guardianDob: formatDate(sp.guardian?.dateOfBirth),
+        guardianPhone: sp.guardian?.phone || "",
+        // UI-only: infer from relationship if possible
+        guardianParentType: sp.guardian?.relationship === "บิดา"
+            ? "father"
+            : sp.guardian?.relationship === "มารดา"
+            ? "mother"
+            : sp.guardian?.firstName ? "other" : "",
 
         // Emergency Contact
         emergencyPrefix: sp.emergencyContact?.prefix || "",
@@ -113,12 +120,59 @@ export const ProfileEditForm = ({
 }) => {
     const [selectedImage, setSelectedImage] = useState(null);
 
+    const GUARDIAN_FIELD_MAP = {
+        father: {
+            guardianNationality: "fatherNationality",
+            guardianNationalId:  "fatherNationalId",
+            guardianPrefix:      "fatherPrefix",
+            guardianFirstName:   "fatherFirstName",
+            guardianLastName:    "fatherLastName",
+            guardianDob:         "fatherDob",
+            guardianPhone:       "fatherPhone",
+            guardianRelationship: "",  // will be set to 'บิดา'
+        },
+        mother: {
+            guardianNationality: "motherNationality",
+            guardianNationalId:  "motherNationalId",
+            guardianPrefix:      "motherPrefix",
+            guardianFirstName:   "motherFirstName",
+            guardianLastName:    "motherLastName",
+            guardianDob:         "motherDob",
+            guardianPhone:       "motherPhone",
+            guardianRelationship: "",  // will be set to 'มารดา'
+        },
+    };
+
+    const handleGuardianTypeChange = (type) => {
+        setValue("guardianParentType", type);
+        if (type === "father" || type === "mother") {
+            const map = GUARDIAN_FIELD_MAP[type];
+            for (const [guardianField, sourceField] of Object.entries(map)) {
+                if (guardianField === "guardianRelationship") {
+                    setValue(guardianField, type === "father" ? "บิดา" : "มารดา");
+                } else {
+                    setValue(guardianField, sourceField ? getValues(sourceField) : "");
+                }
+            }
+        } else {
+            // Clear all guardian fields
+            for (const field of [
+                "guardianNationality", "guardianNationalId", "guardianPrefix",
+                "guardianFirstName", "guardianLastName", "guardianRelationship",
+                "guardianDob", "guardianPhone",
+            ]) {
+                setValue(field, "");
+            }
+        }
+    };
+
     const {
         register,
         handleSubmit,
         reset,
         watch,
         setValue,
+        getValues,
         formState: { errors, isDirty },
     } = useForm({
         defaultValues: mapProfileToFormValues(profile),
@@ -126,21 +180,12 @@ export const ProfileEditForm = ({
 
     useEffect(() => {
         if (profile) {
-            console.log("🔥 RESETTING FORM WITH PROFILE 🔥", profile);
             reset(mapProfileToFormValues(profile));
         }
     }, [profile, reset]);
 
 
     const onSubmit = async (data) => {
-        // ========== VERSION CHECK ==========
-        console.log("🚀🚀🚀 FORM VERSION 3.0 - ALL FIELDS INCLUDED 🚀🚀🚀");
-        console.log("📤 Form data onSubmit:", data);
-        console.log("📤 nationalId value:", data.nationalId);
-        console.log("📤 nationality value:", data.nationality);
-        console.log("📤 prefix value:", data.prefix);
-        console.log("📤 firstNameEN value:", data.firstNameEN);
-        // ====================================
 
         const basicProfile = {
             firstName: data.firstName,
@@ -148,13 +193,25 @@ export const ProfileEditForm = ({
             phoneNumber: data.phoneNumber,
         };
 
+        // Re-sync guardian fields from father/mother at submit time
+        // to capture any changes made AFTER selecting guardian type
+        const guardianType = data.guardianParentType;
+        if (guardianType === "father" || guardianType === "mother") {
+            const map = GUARDIAN_FIELD_MAP[guardianType];
+            for (const [guardianField, sourceField] of Object.entries(map)) {
+                if (guardianField === "guardianRelationship") {
+                    data[guardianField] = guardianType === "father" ? "บิดา" : "มารดา";
+                } else if (sourceField) {
+                    data[guardianField] = data[sourceField];
+                }
+            }
+        }
+
         const studentProfile = {
             // Use nullish coalescing (??) to ensure we send empty string instead of undefined
             studentId: data.studentId ?? "",
             nationality: data.nationality ?? "",
             nationalId: data.nationalId ?? "",
-            cardIssueDate: data.cardIssueDate || null,
-            cardExpiryDate: data.cardExpiryDate || null,
             prefix: data.prefix ?? "",
             firstNameTH: data.firstNameTH ?? "",
             lastNameTH: data.lastNameTH ?? "",
@@ -204,6 +261,7 @@ export const ProfileEditForm = ({
                 status: data.fatherStatus ?? "",
                 education: data.fatherEducation ?? "",
                 dateOfBirth: data.fatherDob || null,
+                phone: data.fatherPhone ?? "",
             },
 
             mother: {
@@ -215,6 +273,7 @@ export const ProfileEditForm = ({
                 status: data.motherStatus ?? "",
                 education: data.motherEducation ?? "",
                 dateOfBirth: data.motherDob || null,
+                phone: data.motherPhone ?? "",
             },
 
             guardian: {
@@ -225,6 +284,7 @@ export const ProfileEditForm = ({
                 lastName: data.guardianLastName ?? "",
                 relationship: data.guardianRelationship ?? "",
                 dateOfBirth: data.guardianDob || null,
+                phone: data.guardianPhone ?? "",
             },
 
             emergencyContact: {
@@ -241,7 +301,6 @@ export const ProfileEditForm = ({
             },
         };
 
-        console.log("📤 Sending studentProfile:", studentProfile);
         await onSave(basicProfile, studentProfile, selectedImage);
     };
 
@@ -290,8 +349,22 @@ export const ProfileEditForm = ({
                     <FormField label="รหัสนักศึกษา" id="studentId" />
                     <FormField label="สัญชาติ" id="nationality" />
                     <FormField label="เลขประจำตัวประชาชน/Passport" id="nationalId" />
-                    <DateFormField label="วันที่ออกบัตร" id="cardIssueDate" />
-                    <DateFormField label="วันหมดอายุ" id="cardExpiryDate" />
+                    <div>
+                        <Label className="text-sm text-gray-600">วันที่ออกบัตร</Label>
+                        <p className="mt-1 px-3 py-2 text-sm bg-gray-100 rounded-md text-gray-600">
+                            {profile?.studentProfile?.cardIssueDate
+                                ? new Date(profile.studentProfile.cardIssueDate).toLocaleDateString("th-TH", { year: "numeric", month: "2-digit", day: "2-digit" })
+                                : "(ระบบตั้งค่าอัตโนมัติเมื่อบันทึก)"}
+                        </p>
+                    </div>
+                    <div>
+                        <Label className="text-sm text-gray-600">วันหมดอายุ</Label>
+                        <p className="mt-1 px-3 py-2 text-sm bg-gray-100 rounded-md text-gray-600">
+                            {profile?.studentProfile?.cardExpiryDate
+                                ? new Date(profile.studentProfile.cardExpiryDate).toLocaleDateString("th-TH", { year: "numeric", month: "2-digit", day: "2-digit" })
+                                : "(ระบบตั้งค่าอัตโนมัติเมื่อบันทึก)"}
+                        </p>
+                    </div>
                     <div>
                         <Label htmlFor="prefix" className="text-sm text-gray-600">คำนำหน้า</Label>
                         <select
@@ -385,9 +458,21 @@ export const ProfileEditForm = ({
                     </div>
                     <FormField label="ชื่อ" id="fatherFirstName" />
                     <FormField label="นามสกุล" id="fatherLastName" />
-                    <FormField label="สถานะภาพ" id="fatherStatus" />
+                    <div>
+                        <Label htmlFor="fatherStatus" className="text-sm text-gray-600">สถานะภาพ</Label>
+                        <select
+                            id="fatherStatus"
+                            {...register("fatherStatus")}
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">เลือก</option>
+                            <option value="มีชีวิตอยู่">มีชีวิตอยู่</option>
+                            <option value="ถึงแก่กรรม">ถึงแก่กรรม</option>
+                        </select>
+                    </div>
                     <FormField label="วุฒิการศึกษาสูงสุด" id="fatherEducation" />
                     <DateFormField label="วันเดือนปีเกิด" id="fatherDob" />
+                    <FormField label="เบอร์โทร" id="fatherPhone" />
                 </div>
             </div>
 
@@ -411,15 +496,51 @@ export const ProfileEditForm = ({
                     </div>
                     <FormField label="ชื่อ" id="motherFirstName" />
                     <FormField label="นามสกุล" id="motherLastName" />
-                    <FormField label="สถานะภาพ" id="motherStatus" />
+                    <div>
+                        <Label htmlFor="motherStatus" className="text-sm text-gray-600">สถานะภาพ</Label>
+                        <select
+                            id="motherStatus"
+                            {...register("motherStatus")}
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">เลือก</option>
+                            <option value="มีชีวิตอยู่">มีชีวิตอยู่</option>
+                            <option value="ถึงแก่กรรม">ถึงแก่กรรม</option>
+                        </select>
+                    </div>
                     <FormField label="วุฒิการศึกษาสูงสุด" id="motherEducation" />
                     <DateFormField label="วันเดือนปีเกิด" id="motherDob" />
+                    <FormField label="เบอร์โทร" id="motherPhone" />
                 </div>
             </div>
 
             {/* 6. Guardian Information */}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <SectionTitle>6. ข้อมูลผู้ปกครอง</SectionTitle>
+
+                {/* Guardian type selector */}
+                <div className="mb-4 flex gap-2">
+                    {[
+                        { value: "father", label: "บิดา" },
+                        { value: "mother", label: "มารดา" },
+                        { value: "other",  label: "บุคคลอื่น" },
+                    ].map(({ value, label }) => (
+                        <button
+                            key={value}
+                            type="button"
+                            onClick={() => handleGuardianTypeChange(value)}
+                            className={[
+                                "px-5 py-1.5 rounded-full text-sm font-medium border transition-all duration-150",
+                                watch("guardianParentType") === value
+                                    ? "bg-gray-900 text-white border-gray-900 shadow-sm"
+                                    : "bg-white text-gray-500 border-gray-300 hover:border-gray-500 hover:text-gray-700",
+                            ].join(" ")}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <FormField label="สัญชาติ" id="guardianNationality" />
                     <FormField label="เลขประจำตัวประชาชน" id="guardianNationalId" />
@@ -440,6 +561,7 @@ export const ProfileEditForm = ({
                     <FormField label="นามสกุล" id="guardianLastName" />
                     <FormField label="ความสัมพันธ์" id="guardianRelationship" />
                     <DateFormField label="วันเดือนปีเกิด" id="guardianDob" />
+                    <FormField label="เบอร์โทร" id="guardianPhone" />
                 </div>
             </div>
 

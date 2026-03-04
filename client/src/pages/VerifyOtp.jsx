@@ -54,7 +54,7 @@ export default function VerifyOtp() {
     setLoading(true);
     try {
 
-      const { data } = await api.post(`/api/auth/verify-reset-otp`, {
+      const { data } = await api.post(`/auth/verify-reset-otp`, {
         email,
         otp: code,
       });

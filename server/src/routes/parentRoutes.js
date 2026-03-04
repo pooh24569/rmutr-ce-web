@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  parentLogin,
   getStudentInfo,
   getStudentAttendance,
   getStudentSchedule,
@@ -9,7 +8,8 @@ import { authenticate, authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/login", parentLogin);
+// Parent login is now handled by /auth/login (standard auth)
+// All routes require parent role
 
 router.get(
   "/student-info",

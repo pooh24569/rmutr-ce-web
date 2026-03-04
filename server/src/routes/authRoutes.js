@@ -3,6 +3,7 @@ import verifyToken from "../middlewares/authMiddleware.js";
 import {
   register,
   login,
+  parentLogin,
   logout,
   requestResetPassword,
   confirmResetPassword,
@@ -18,6 +19,7 @@ import {
   validate,
   registerSchema,
   loginSchema,
+  parentLoginSchema,
   requestResetSchema,
   confirmResetSchema,
   sendOtpSchema,
@@ -31,6 +33,7 @@ const authRouter = express.Router();
 
 authRouter.post("/register", validate(registerSchema), register);
 authRouter.post("/login", validate(loginSchema), login);
+authRouter.post("/parent-login", validate(parentLoginSchema), parentLogin);
 authRouter.post("/logout", logout);
 
 authRouter.post(

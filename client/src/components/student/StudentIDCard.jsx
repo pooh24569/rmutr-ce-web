@@ -39,8 +39,6 @@ export const StudentIDCard = ({ profile, onEdit }) => {
     const prefixEN = getPrefixEN(prefixTH);
 
 
-    const issueDate = formatDate(new Date());
-    const expiryDate = formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 4)));
 
     return (
         <div className="w-full flex justify-center items-center p-4">
@@ -191,7 +189,7 @@ export const StudentIDCard = ({ profile, onEdit }) => {
                                             <div className="w-1/2">
                                                 <p className="text-[12px] text-gray-400 mb-0.5 ml-5">สัญชาติ</p>
                                                 <p className="text-sm font-medium text-gray-700 ml-5">
-                                                    {studentProfile.nationality || "ไทย"}
+                                                    {studentProfile.nationality || "-"}
                                                 </p>
                                             </div>
                                         </div>

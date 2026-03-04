@@ -302,3 +302,37 @@ export async function confirmResetPassword(req, res) {
     });
   }
 }
+
+export async function parentLogin(req, res) {
+  try {
+    const { firstName, lastName, studentId } = req.body;
+
+    const result = await authService.loginParent({ firstName, lastName, studentId });
+
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      success: true,
+      message: "เข้าสู่ระบบสำเร็จ",
+      token: result.token,
+      user: result.user,
+    });
+  } catch (error) {
+    logger.error("Parent login error", {
+      error: error.message,
+      stack: error.stack,
+    });
+
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || "เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่",
+    });
+  }
+}

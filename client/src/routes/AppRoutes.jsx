@@ -16,6 +16,7 @@ import Notfound from "@/pages/Notfound";
 import Unauthorized from "@/pages/Unauthorized";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
+import GuestRoute from "@/components/GuestRoute";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminLogin from "@/pages/admin/AdminLogin";
@@ -45,8 +46,8 @@ import HomeworkManage from "@/pages/teacher/HomeworkManage";
 import HomeworkSubmissions from "@/pages/teacher/HomeworkSubmissions";
 import TeacherCalendar from "@/pages/teacher/Calendar";
 
-import ParentLogin from "@/pages/parent/ParentLogin";
 import ParentLayout from "@/layouts/ParentLayout";
+import ParentLogin from "@/pages/parent/ParentLogin";
 import ParentDashboard from "@/pages/parent/Dashboard";
 
 import RegistrarLogin from "@/pages/registrar/RegistrarLogin";
@@ -64,17 +65,20 @@ export default function AppRoutes() {
         { }
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        { }
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/reset-email" element={<ResetEmail />} />
-        <Route path="/verify-otp" element={<VerifyOtp />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Guest routes - redirect to dashboard if already logged in */}
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/reset-email" element={<ResetEmail />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/registrar/login" element={<RegistrarLogin />} />
+          <Route path="/depthead/login" element={<DeptHeadLogin />} />
+          <Route path="/parent/login" element={<ParentLogin />} />
+        </Route>
+
         <Route path="/unauthorized" element={<Unauthorized />} />
-        <Route path="/parent/login" element={<ParentLogin />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/registrar/login" element={<RegistrarLogin />} />
-        <Route path="/depthead/login" element={<DeptHeadLogin />} />
 
         { }
         <Route element={<ProtectedRoute />}>
@@ -143,9 +147,14 @@ export default function AppRoutes() {
           </Route>
         </Route>
 
-        {/* Parent Routes - uses separate auth (parentToken) */}
-        <Route path="/parent" element={<ParentLayout />}>
-          <Route index element={<ParentDashboard />} />
+        {/* Parent Routes - now uses standard auth */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute roles={["parent"]} />}>
+            <Route path="/parent" element={<ParentLayout />}>
+              <Route index element={<ParentDashboard />} />
+              <Route path="dashboard" element={<ParentDashboard />} />
+            </Route>
+          </Route>
         </Route>
 
         { }

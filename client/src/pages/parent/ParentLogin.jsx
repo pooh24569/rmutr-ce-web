@@ -1,40 +1,45 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Users, ArrowLeft, CreditCard, User } from "lucide-react";
+import { Users, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import parentService from "@/services/parentService";
-import DatePicker from "@/components/ui/DatePicker";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 const ParentLogin = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        studentId: "",
-        nationalId: "",
+    const { login } = useAuth();
+    const [values, setValues] = useState({
         firstName: "",
         lastName: "",
-        dateOfBirth: "",
+        studentId: "",
     });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    const onChange = (e) =>
+        setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-    const handleSubmit = async (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
+        if (loading) return;
+        setError("");
         setLoading(true);
 
         try {
-            const response = await parentService.login(formData);
-            if (response.success) {
-                localStorage.setItem("parentToken", response.token);
-                localStorage.setItem("parentData", JSON.stringify(response.data));
-                toast.success("เข้าสู่ระบบสำเร็จ");
-                navigate("/parent");
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || "เกิดข้อผิดพลาด");
+            const { data } = await api.post("/auth/parent-login", {
+                firstName: values.firstName.trim(),
+                lastName: values.lastName.trim(),
+                studentId: values.studentId.trim(),
+            });
+
+            login({ user: data.user, token: data.token });
+            toast.success("เข้าสู่ระบบสำเร็จ");
+            navigate("/parent/dashboard", { replace: true });
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบข้อมูล"
+            );
         } finally {
             setLoading(false);
         }
@@ -64,101 +69,70 @@ const ParentLogin = () => {
                         <h1 className="text-2xl font-bold text-gray-800">
                             ระบบผู้ปกครอง
                         </h1>
-                        <p className="text-gray-500 mt-2">
-                            กรอกข้อมูลผู้ปกครองเพื่อเข้าสู่ระบบ
+                        <p className="text-gray-500 mt-2 text-sm">
+                            กรอกชื่อ-นามสกุลผู้ปกครอง และเลขนักศึกษา
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={onSubmit} className="space-y-4">
+                        {error && (
+                            <div className="text-red-700 text-sm border border-red-200 bg-red-50 p-3 rounded-xl">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* First Name */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                ชื่อผู้ปกครอง
+                            </label>
+                            <input
+                                type="text"
+                                name="firstName"
+                                value={values.firstName}
+                                onChange={onChange}
+                                placeholder="ชื่อผู้ปกครอง"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                            />
+                        </div>
+
+                        {/* Last Name */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                นามสกุลผู้ปกครอง
+                            </label>
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={values.lastName}
+                                onChange={onChange}
+                                placeholder="นามสกุลผู้ปกครอง"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                            />
+                        </div>
+
                         {/* Student ID */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                รหัสนักศึกษา (บุตร/หลาน)
+                                เลขนักศึกษา
                             </label>
                             <input
                                 type="text"
                                 name="studentId"
-                                value={formData.studentId}
-                                onChange={handleChange}
-                                placeholder="เช่น 6512345678901"
+                                value={values.studentId}
+                                onChange={onChange}
+                                placeholder="เลขนักศึกษา 13 หลัก"
                                 required
                                 maxLength={13}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
                             />
                         </div>
 
-                        {/* Parent National ID */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                เลขบัตรประชาชนผู้ปกครอง
-                            </label>
-                            <div className="relative">
-                                <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type="text"
-                                    name="nationalId"
-                                    value={formData.nationalId}
-                                    onChange={handleChange}
-                                    placeholder="เลขบัตรประชาชน 13 หลัก"
-                                    required
-                                    maxLength={13}
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Parent Name */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    ชื่อผู้ปกครอง
-                                </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        placeholder="ชื่อ"
-                                        required
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    นามสกุลผู้ปกครอง
-                                </label>
-                                <input
-                                    type="text"
-                                    name="lastName"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                    placeholder="นามสกุล"
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Parent Date of Birth */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                วันเดือนปีเกิดผู้ปกครอง
-                            </label>
-                            <DatePicker
-                                value={formData.dateOfBirth}
-                                onChange={handleChange}
-                                name="dateOfBirth"
-                                placeholder="เลือกวันเกิด"
-                                theme="green"
-                            />
-                        </div>
-
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || !values.firstName || !values.lastName || !values.studentId}
                             className="w-full py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
@@ -174,8 +148,8 @@ const ParentLogin = () => {
 
                     <div className="mt-6 p-4 bg-green-50 rounded-xl">
                         <p className="text-sm text-green-700 text-center">
-                            <strong>หมายเหตุ:</strong> กรุณากรอกข้อมูลให้ตรงกับข้อมูล
-                            ที่นักศึกษาลงทะเบียนไว้ในระบบ
+                            <strong>หมายเหตุ:</strong> ใช้ชื่อ-นามสกุลผู้ปกครองที่นักศึกษากรอกไว้
+                            ในหน้าแก้ไขข้อมูลส่วนตัว พร้อมเลขนักศึกษา
                         </p>
                     </div>
                 </div>
@@ -185,4 +159,3 @@ const ParentLogin = () => {
 };
 
 export default ParentLogin;
-

@@ -54,6 +54,27 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // ===== Parent Linking =====
+    // เชื่อม parent กับ student (รองรับลูกหลายคน)
+    linkedStudents: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+
+    // ประเภทผู้ปกครอง
+    parentType: {
+      type: String,
+      enum: ["father", "mother", "guardian", ""],
+      default: "",
+    },
+
+    // เลขบัตรประชาชนผู้ปกครอง (ใช้ match กรณีลูกคนที่ 2 ลงทะเบียน)
+    nationalId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     // ===== Advisor Flags =====
     // เป็นอาจารย์ประจำห้อง (Class Advisor)
     isClassAdvisor: {
