@@ -9,9 +9,11 @@ import {
     CalendarDaysIcon,
     ArrowRightOnRectangleIcon,
     ShieldCheckIcon,
+    RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 
-const navItems = [
+
+const centralNav = [
     {
         to: "/registrar",
         icon: HomeIcon,
@@ -24,19 +26,38 @@ const navItems = [
         label: "จัดการรายวิชา",
     },
     {
-        to: "/registrar/registrations",
-        icon: DocumentTextIcon,
-        label: "ลงทะเบียน",
+        to: "/registrar/offerings",
+        icon: RectangleStackIcon,
+        label: "กลุ่มเรียน",
+    },
+];
+
+const facultyNav = [
+    {
+        to: "/registrar",
+        icon: HomeIcon,
+        label: "Dashboard",
+        end: true,
     },
     {
-        to: "/registrar/students",
+        to: "/registrar/courses",
+        icon: AcademicCapIcon,
+        label: "รายวิชา",
+    },
+    {
+        to: "/registrar/offerings",
+        icon: RectangleStackIcon,
+        label: "กลุ่มเรียน",
+    },
+    {
+        to: "/registrar/enrollments",
         icon: UserGroupIcon,
-        label: "นักศึกษา",
+        label: "ลงทะเบียนนักศึกษา",
     },
     {
-        to: "/registrar/academic",
+        to: "/registrar/schedule",
         icon: CalendarDaysIcon,
-        label: "ปีการศึกษา",
+        label: "จัดตารางเรียน",
     },
 ];
 
@@ -55,6 +76,8 @@ const RegistrarLayout = () => {
     };
 
     const roleLabel = ROLE_LABELS[user?.role] || user?.role;
+    const navItems =
+        user?.role === "central_registrar" ? centralNav : facultyNav;
 
     return (
         <div className="min-h-screen flex bg-slate-50">
@@ -63,7 +86,7 @@ const RegistrarLayout = () => {
                 {/* Logo */}
                 <div className="p-5 border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                             <ShieldCheckIcon className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -86,7 +109,7 @@ const RegistrarLayout = () => {
                             end={item.end}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                                    ? "bg-blue-50 text-blue-700"
+                                    ? "bg-blue-50 text-blue-700 shadow-sm"
                                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                 }`
                             }

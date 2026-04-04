@@ -4,11 +4,7 @@ import CourseOffering from "../models/courseOfferingModel.js";
 import Enrollment from "../models/enrollmentModel.js";
 import StudentProfile from "../models/studentProfileModel.js";
 
-/**
- * Permission checking utilities for role-based access control
- */
 
-// ===== Role Hierarchy =====
 const ROLE_HIERARCHY = {
   superadmin: 100,
   admin: 90,
@@ -20,9 +16,7 @@ const ROLE_HIERARCHY = {
   student: 30,
 };
 
-/**
- * Check if user has minimum role level
- */
+
 export const hasMinRole = (userRole, requiredRole) => {
   return (ROLE_HIERARCHY[userRole] || 0) >= (ROLE_HIERARCHY[requiredRole] || 0);
 };

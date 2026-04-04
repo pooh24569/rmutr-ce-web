@@ -6,9 +6,14 @@ import {
   updateCourse,
   deleteCourse,
   getCourseOfferings,
+  getCourseOfferingById,
   createCourseOffering,
   updateCourseOffering,
   toggleRegistration,
+  getInstructors,
+  enrollStudentsToOffering,
+  removeStudentFromOffering,
+  updateOfferingSchedule,
 } from "../controllers/courseController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
 import { requireRole } from "../middlewares/permissionMiddleware.js";
@@ -25,6 +30,11 @@ const REGISTRAR_ROLES = [
   "admin",
   "superadmin",
 ];
+
+// ===== Instructor List =====
+
+// Get all instructors (for dropdown)
+router.get("/instructors", requireRole(...REGISTRAR_ROLES), getInstructors);
 
 // ===== Course Catalog Routes =====
 
@@ -48,10 +58,13 @@ router.delete("/:id", requireRole(...REGISTRAR_ROLES), deleteCourse);
 // Get offerings
 router.get("/offerings/list", getCourseOfferings);
 
-// Create offering
+// Get single offering with full details
+router.get("/offerings/:id", requireRole(...REGISTRAR_ROLES), getCourseOfferingById);
+
+// Create offering (Central Registrar + Admin)
 router.post(
   "/offerings",
-  requireRole(...REGISTRAR_ROLES),
+  requireRole("central_registrar", "admin", "superadmin"),
   createCourseOffering,
 );
 
@@ -67,6 +80,27 @@ router.patch(
   "/offerings/:id/toggle-registration",
   requireRole(...REGISTRAR_ROLES),
   toggleRegistration,
+);
+
+// Update offering schedule (Faculty Registrar + Admin)
+router.put(
+  "/offerings/:id/schedule",
+  requireRole(...REGISTRAR_ROLES),
+  updateOfferingSchedule,
+);
+
+// Enroll students to offering (Faculty Registrar + Admin)
+router.post(
+  "/offerings/:id/enroll",
+  requireRole(...REGISTRAR_ROLES),
+  enrollStudentsToOffering,
+);
+
+// Remove student from offering
+router.delete(
+  "/offerings/:id/students/:studentId",
+  requireRole(...REGISTRAR_ROLES),
+  removeStudentFromOffering,
 );
 
 export default router;

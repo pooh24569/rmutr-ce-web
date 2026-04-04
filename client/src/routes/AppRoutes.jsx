@@ -53,6 +53,10 @@ import ParentDashboard from "@/pages/parent/Dashboard";
 import RegistrarLogin from "@/pages/registrar/RegistrarLogin";
 import RegistrarLayout from "@/layouts/RegistrarLayout";
 import RegistrarDashboard from "@/pages/registrar/Dashboard";
+import CourseManage from "@/pages/registrar/CourseManage";
+import CourseOfferingManage from "@/pages/registrar/CourseOfferingManage";
+import EnrollmentManage from "@/pages/registrar/EnrollmentManage";
+import ScheduleManage from "@/pages/registrar/ScheduleManage";
 
 import DeptHeadLogin from "@/pages/depthead/DeptHeadLogin";
 import DeptHeadLayout from "@/layouts/DeptHeadLayout";
@@ -133,6 +137,10 @@ export default function AppRoutes() {
             <Route path="/registrar" element={<RegistrarLayout />}>
               <Route index element={<RegistrarDashboard />} />
               <Route path="dashboard" element={<RegistrarDashboard />} />
+              <Route path="courses" element={<CourseManage />} />
+              <Route path="offerings" element={<CourseOfferingManage />} />
+              <Route path="enrollments" element={<EnrollmentManage />} />
+              <Route path="schedule" element={<ScheduleManage />} />
             </Route>
           </Route>
         </Route>

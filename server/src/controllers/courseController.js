@@ -424,3 +424,258 @@ export const toggleRegistration = async (req, res) => {
     });
   }
 };
+
+// ===== Instructor List (for dropdown) =====
+
+/**
+ * Get all instructors (for assigning to course offerings)
+ */
+export const getInstructors = async (req, res) => {
+  try {
+    const { faculty, search } = req.query;
+    const query = { role: "instructor" };
+
+    if (faculty) {
+      query.faculty = faculty;
+    }
+
+    if (search) {
+      query.$or = [
+        { firstName: new RegExp(search, "i") },
+        { lastName: new RegExp(search, "i") },
+        { email: new RegExp(search, "i") },
+        { username: new RegExp(search, "i") },
+      ];
+    }
+
+    const instructors = await User.find(query)
+      .select("_id username email firstName lastName faculty department")
+      .populate("faculty", "code nameTH")
+      .populate("department", "code nameTH")
+      .sort({ firstName: 1 });
+
+    res.json({
+      success: true,
+      data: instructors,
+    });
+  } catch (error) {
+    console.error("Get instructors error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการดึงข้อมูลอาจารย์",
+    });
+  }
+};
+
+// ===== Enrollment Management =====
+
+/**
+ * Enroll students to a course offering
+ */
+export const enrollStudentsToOffering = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { studentIds } = req.body;
+
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณาระบุรายชื่อนักศึกษา",
+      });
+    }
+
+    const offering = await CourseOffering.findById(id);
+    if (!offering) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบกลุ่มเรียน",
+      });
+    }
+
+    // Find students by username or ObjectId
+    const students = await User.find({
+      role: "student",
+      $or: [
+        { _id: { $in: studentIds.filter((id) => id.match(/^[0-9a-fA-F]{24}$/)) } },
+        { username: { $in: studentIds } },
+      ],
+    });
+
+    const results = { added: [], alreadyExists: [], notFound: [] };
+
+    const foundUsernames = students.map((s) => s.username);
+    const foundIds = students.map((s) => s._id.toString());
+
+    results.notFound = studentIds.filter(
+      (id) => !foundUsernames.includes(id) && !foundIds.includes(id),
+    );
+
+    for (const student of students) {
+      const alreadyEnrolled = offering.students.some(
+        (s) => s.toString() === student._id.toString(),
+      );
+
+      if (alreadyEnrolled) {
+        results.alreadyExists.push({
+          username: student.username,
+          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        });
+      } else {
+        offering.students.push(student._id);
+        results.added.push({
+          username: student.username,
+          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        });
+      }
+    }
+
+    // Check capacity
+    if (offering.students.length > offering.maxStudents) {
+      return res.status(400).json({
+        success: false,
+        message: `จำนวนนักศึกษาเกินจำนวนที่นั่ง (สูงสุด ${offering.maxStudents} คน)`,
+      });
+    }
+
+    await offering.save();
+
+    res.json({
+      success: true,
+      message: `เพิ่มนักศึกษาสำเร็จ ${results.added.length} คน`,
+      data: {
+        added: results.added,
+        alreadyExists: results.alreadyExists,
+        notFound: results.notFound,
+        summary: {
+          total: studentIds.length,
+          added: results.added.length,
+          alreadyExists: results.alreadyExists.length,
+          notFound: results.notFound.length,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Enroll students error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการลงทะเบียนนักศึกษา",
+    });
+  }
+};
+
+/**
+ * Remove student from course offering
+ */
+export const removeStudentFromOffering = async (req, res) => {
+  try {
+    const { id, studentId } = req.params;
+
+    const offering = await CourseOffering.findById(id);
+    if (!offering) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบกลุ่มเรียน",
+      });
+    }
+
+    offering.students = offering.students.filter(
+      (s) => s.toString() !== studentId,
+    );
+    await offering.save();
+
+    res.json({
+      success: true,
+      message: "ลบนักศึกษาออกจากกลุ่มเรียนสำเร็จ",
+    });
+  } catch (error) {
+    console.error("Remove student error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาด",
+    });
+  }
+};
+
+/**
+ * Update course offering schedule
+ */
+export const updateOfferingSchedule = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { schedule } = req.body;
+
+    if (!schedule || !Array.isArray(schedule)) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณาระบุตารางเรียน",
+      });
+    }
+
+    const offering = await CourseOffering.findById(id);
+    if (!offering) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบกลุ่มเรียน",
+      });
+    }
+
+    offering.schedule = schedule;
+    await offering.save();
+
+    await offering.populate([
+      { path: "course", select: "courseCode courseNameTH credits" },
+      { path: "instructor", select: "firstName lastName email" },
+    ]);
+
+    res.json({
+      success: true,
+      message: "อัปเดตตารางเรียนสำเร็จ",
+      data: offering,
+    });
+  } catch (error) {
+    console.error("Update schedule error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการอัปเดตตารางเรียน",
+    });
+  }
+};
+
+/**
+ * Get single course offering with full details
+ */
+export const getCourseOfferingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const offering = await CourseOffering.findById(id)
+      .populate({
+        path: "course",
+        select: "courseCode courseNameTH courseNameEN credits courseType",
+        populate: [
+          { path: "faculty", select: "code nameTH" },
+          { path: "department", select: "code nameTH" },
+        ],
+      })
+      .populate("instructor", "firstName lastName email username")
+      .populate("students", "username email firstName lastName");
+
+    if (!offering) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบกลุ่มเรียน",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: offering,
+    });
+  } catch (error) {
+    console.error("Get offering error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการดึงข้อมูลกลุ่มเรียน",
+    });
+  }
+};

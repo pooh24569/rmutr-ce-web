@@ -36,17 +36,15 @@ export default function Login() {
         password: values.password,
       });
 
-      // Block roles that have dedicated login pages
+      // Block admin/superadmin from student login page
       if (["admin", "superadmin"].includes(data.user.role)) {
-        setError("Invalid username or password");
+        setError("กรุณาเข้าสู่ระบบผ่านหน้า Admin Login");
         return;
       }
+
+      // Block registrar from student login page
       if (["central_registrar", "faculty_registrar"].includes(data.user.role)) {
-        setError("Invalid username or password");
-        return;
-      }
-      if (data.user.role === "parent") {
-        setError("Invalid username or password");
+        setError("กรุณาเข้าสู่ระบบผ่านหน้า Registrar Login");
         return;
       }
 

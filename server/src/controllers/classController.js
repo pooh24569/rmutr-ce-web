@@ -1,6 +1,9 @@
 import Class from "../models/classModel.js";
 import User from "../models/userModel.js";
 
+// Roles that can manage all classes
+const REGISTRAR_ROLES = ["central_registrar", "admin", "superadmin"];
+
 export const createClass = async (req, res) => {
   try {
     const {
@@ -11,7 +14,29 @@ export const createClass = async (req, res) => {
       schedule,
       academicYear,
       semester,
+      teacher, // registrar ส่ง teacher ID มาจาก dropdown
     } = req.body;
+
+    // Registrar ต้องระบุ teacher, instructor ใช้ตัวเอง
+    const teacherId = REGISTRAR_ROLES.includes(req.user.role)
+      ? teacher
+      : req.user.id;
+
+    if (!teacherId) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณาเลือกอาจารย์ผู้สอน",
+      });
+    }
+
+    // Validate teacher exists and is an instructor
+    const instructorUser = await User.findById(teacherId);
+    if (!instructorUser || instructorUser.role !== "instructor") {
+      return res.status(400).json({
+        success: false,
+        message: "ไม่พบอาจารย์ หรือผู้ใช้ไม่ใช่อาจารย์",
+      });
+    }
 
     const existingClass = await Class.findOne({
       classCode,
@@ -35,11 +60,14 @@ export const createClass = async (req, res) => {
       schedule,
       academicYear,
       semester,
-      teacher: req.user.id,
+      teacher: teacherId,
       students: [],
     });
 
     await newClass.save();
+
+    // Populate teacher info before returning
+    await newClass.populate("teacher", "username email firstName lastName");
 
     return res.status(201).json({
       success: true,
@@ -51,6 +79,39 @@ export const createClass = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "เกิดข้อผิดพลาดในการสร้างรายวิชา",
+    });
+  }
+};
+
+// Get all classes (for registrar management view)
+export const getAllClasses = async (req, res) => {
+  try {
+    const { academicYear, semester, search } = req.query;
+    const query = {};
+
+    if (academicYear) query.academicYear = academicYear;
+    if (semester) query.semester = semester;
+    if (search) {
+      query.$or = [
+        { classCode: new RegExp(search, "i") },
+        { className: new RegExp(search, "i") },
+      ];
+    }
+
+    const classes = await Class.find(query)
+      .populate("teacher", "username email firstName lastName")
+      .populate("students", "username email firstName lastName")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: classes,
+    });
+  } catch (error) {
+    console.error("Error fetching all classes:", error);
+    return res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการดึงข้อมูล",
     });
   }
 };
@@ -135,20 +196,26 @@ export const updateClass = async (req, res) => {
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    // Registrar สามารถแก้ไขได้ทุก class
+    const isRegistrar = REGISTRAR_ROLES.includes(req.user.role);
+    if (!isRegistrar && classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์แก้ไขรายวิชานี้",
       });
     }
 
-    Object.keys(updates).forEach((key) => {
-      if (key !== "teacher" && key !== "students") {
-        classData[key] = updates[key];
-      }
+    // Registrar สามารถเปลี่ยน teacher ได้
+    const allowedKeys = isRegistrar
+      ? Object.keys(updates).filter((key) => key !== "students")
+      : Object.keys(updates).filter((key) => key !== "teacher" && key !== "students");
+
+    allowedKeys.forEach((key) => {
+      classData[key] = updates[key];
     });
 
     await classData.save();
+    await classData.populate("teacher", "username email firstName lastName");
 
     return res.status(200).json({
       success: true,
@@ -177,7 +244,9 @@ export const deleteClass = async (req, res) => {
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    // Registrar สามารถลบได้ทุก class
+    const isRegistrar = REGISTRAR_ROLES.includes(req.user.role);
+    if (!isRegistrar && classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์ลบรายวิชานี้",
@@ -213,7 +282,8 @@ export const addStudentToClass = async (req, res) => {
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    const isRegistrar = REGISTRAR_ROLES.includes(req.user.role);
+    if (!isRegistrar && classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์จัดการรายวิชานี้",
@@ -265,7 +335,8 @@ export const removeStudentFromClass = async (req, res) => {
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    const isRegistrar = REGISTRAR_ROLES.includes(req.user.role);
+    if (!isRegistrar && classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์จัดการรายวิชานี้",
@@ -331,7 +402,8 @@ export const importStudentsToClass = async (req, res) => {
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    const isRegistrar = REGISTRAR_ROLES.includes(req.user.role);
+    if (!isRegistrar && classData.teacher.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์จัดการรายวิชานี้",
