@@ -57,9 +57,9 @@ export const sessionService = {
     }
   },
 
-  getClassSessions: async (classId, params = {}) => {
+  getOfferingSessions: async (offeringId, params = {}) => {
     try {
-      const response = await api.get(`/sessions/class/${classId}`, { params });
+      const response = await api.get(`/sessions/offering/${offeringId}`, { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -75,9 +75,9 @@ export const sessionService = {
     }
   },
 
-  getClassAttendanceSummary: async (classId) => {
+  getAttendanceSummary: async (offeringId) => {
     try {
-      const response = await api.get(`/attendance/summary/${classId}`);
+      const response = await api.get(`/attendance/summary/${offeringId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

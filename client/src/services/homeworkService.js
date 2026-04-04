@@ -82,8 +82,8 @@ export const homeworkService = {
     return response.data;
   },
 
-  getHomeworkByClass: async (classId) => {
-    const response = await homeworkApi.get(`/homework/class/${classId}`);
+  getHomeworkByOffering: async (offeringId) => {
+    const response = await homeworkApi.get(`/homework/offering/${offeringId}`);
     return response.data;
   },
 

@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 const sessionSchema = new mongoose.Schema(
   {
 
-    classId: {
+    courseOffering: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
+      ref: "CourseOffering",
       required: true,
     },
 
@@ -81,7 +81,7 @@ const sessionSchema = new mongoose.Schema(
   }
 );
 
-sessionSchema.index({ classId: 1, date: 1 });
+sessionSchema.index({ courseOffering: 1, date: 1 });
 
 sessionSchema.index({ status: 1 });
 

@@ -1,11 +1,11 @@
 import Session from "../models/sessionModel.js";
 import Attendance from "../models/attendanceModel.js";
-import Class from "../models/classModel.js";
+import CourseOffering from "../models/courseOfferingModel.js";
 
 export const startSession = async (req, res) => {
   try {
     const {
-      classId,
+      offeringId,
       date,
       startTime,
       lateAfterMinutes,
@@ -15,15 +15,18 @@ export const startSession = async (req, res) => {
       deviceId,
     } = req.body;
 
-    const classData = await Class.findById(classId);
-    if (!classData) {
+    const offering = await CourseOffering.findById(offeringId).populate(
+      "students",
+      "_id"
+    );
+    if (!offering) {
       return res.status(404).json({
         success: false,
-        message: "ไม่พบรายวิชา",
+        message: "ไม่พบกลุ่มเรียน",
       });
     }
 
-    if (classData.teacher.toString() !== req.user.id.toString()) {
+    if (offering.instructor.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "คุณไม่มีสิทธิ์เปิดเรียนวิชานี้",
@@ -34,7 +37,7 @@ export const startSession = async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     const existingSession = await Session.findOne({
-      classId,
+      courseOffering: offeringId,
       date: today,
       status: "OPEN",
     });
@@ -63,7 +66,7 @@ export const startSession = async (req, res) => {
     const endTime = `${String(closeDate.getHours()).padStart(2, "0")}:${String(closeDate.getMinutes()).padStart(2, "0")}`;
 
     const session = new Session({
-      classId,
+      courseOffering: offeringId,
       teacher: req.user.id,
       date: today,
       startTime,
@@ -74,19 +77,19 @@ export const startSession = async (req, res) => {
       deviceId: deviceId || "",
       status: "OPEN",
       summary: {
-        totalStudents: classData.students.length,
+        totalStudents: offering.students.length,
         present: 0,
         late: 0,
-        absent: classData.students.length,
+        absent: offering.students.length,
       },
     });
 
     await session.save();
 
-    const attendanceRecords = classData.students.map((studentId) => ({
+    const attendanceRecords = offering.students.map((student) => ({
       sessionId: session._id,
-      classId,
-      student: studentId,
+      courseOffering: offeringId,
+      student: student._id || student,
       date: today,
       status: "ABSENT",
       checkInTime: null,
@@ -97,7 +100,14 @@ export const startSession = async (req, res) => {
     }
 
     const populatedSession = await Session.findById(session._id)
-      .populate("classId", "classCode className section")
+      .populate({
+        path: "courseOffering",
+        select: "section academicYear semester",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .populate("teacher", "firstName lastName");
 
     return res.status(201).json({
@@ -188,7 +198,14 @@ export const getOpenSessions = async (req, res) => {
       teacher: req.user.id,
       status: "OPEN",
     })
-      .populate("classId", "classCode className section")
+      .populate({
+        path: "courseOffering",
+        select: "section academicYear semester",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -209,7 +226,14 @@ export const getSessionDetail = async (req, res) => {
     const { sessionId } = req.params;
 
     const session = await Session.findById(sessionId)
-      .populate("classId", "classCode className section")
+      .populate({
+        path: "courseOffering",
+        select: "section academicYear semester",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .populate("teacher", "firstName lastName");
 
     if (!session) {
@@ -239,17 +263,17 @@ export const getSessionDetail = async (req, res) => {
   }
 };
 
-export const getClassSessions = async (req, res) => {
+export const getOfferingSessions = async (req, res) => {
   try {
-    const { classId } = req.params;
+    const { offeringId } = req.params;
     const { limit = 20, page = 1 } = req.query;
 
-    const sessions = await Session.find({ classId })
+    const sessions = await Session.find({ courseOffering: offeringId })
       .sort({ date: -1 })
       .limit(parseInt(limit))
       .skip((parseInt(page) - 1) * parseInt(limit));
 
-    const total = await Session.countDocuments({ classId });
+    const total = await Session.countDocuments({ courseOffering: offeringId });
 
     return res.status(200).json({
       success: true,
@@ -262,7 +286,7 @@ export const getClassSessions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching class sessions:", error);
+    console.error("Error fetching offering sessions:", error);
     return res.status(500).json({
       success: false,
       message: "เกิดข้อผิดพลาด",

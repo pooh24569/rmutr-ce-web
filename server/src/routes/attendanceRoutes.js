@@ -4,7 +4,7 @@ import {
   closeSession,
   getOpenSessions,
   getSessionDetail,
-  getClassSessions,
+  getOfferingSessions,
 } from "../controllers/sessionController.js";
 import {
   checkInByFingerprint,
@@ -45,10 +45,10 @@ router.get(
 );
 
 router.get(
-  "/sessions/class/:classId",
+  "/sessions/offering/:offeringId",
   verifyToken,
   authorizeRoles("instructor"),
-  getClassSessions,
+  getOfferingSessions,
 );
 
 router.post("/attendance/check-in", checkInByFingerprint);
@@ -61,14 +61,14 @@ router.post(
 );
 
 router.get(
-  "/attendance/history/:classId",
+  "/attendance/history/:offeringId",
   verifyToken,
   authorizeRoles("student"),
   getStudentAttendanceHistory,
 );
 
 router.get(
-  "/attendance/summary/:classId",
+  "/attendance/summary/:offeringId",
   verifyToken,
   authorizeRoles("instructor"),
   getClassAttendanceSummary,

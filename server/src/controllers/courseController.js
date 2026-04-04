@@ -679,3 +679,37 @@ export const getCourseOfferingById = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get offerings where current user is the instructor
+ */
+export const getMyTeachingOfferings = async (req, res) => {
+  try {
+    const offerings = await CourseOffering.find({
+      instructor: req.user._id,
+      status: "active",
+    })
+      .populate({
+        path: "course",
+        select: "courseCode courseNameTH courseNameEN credits courseType",
+        populate: [
+          { path: "faculty", select: "code nameTH" },
+          { path: "department", select: "code nameTH" },
+        ],
+      })
+      .populate("students", "username firstName lastName email")
+      .sort({ academicYear: -1, semester: 1 });
+
+    res.json({
+      success: true,
+      data: offerings,
+      message: `พบ ${offerings.length} รายวิชาที่สอน`,
+    });
+  } catch (error) {
+    console.error("Get my teaching offerings error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการดึงข้อมูลรายวิชาที่สอน",
+    });
+  }
+};

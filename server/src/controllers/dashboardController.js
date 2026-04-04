@@ -1,7 +1,12 @@
-import Class from "../models/classModel.js";
+import CourseOffering from "../models/courseOfferingModel.js";
 import Session from "../models/sessionModel.js";
 import Attendance from "../models/attendanceModel.js";
 import User from "../models/userModel.js";
+
+// Day mapping: CourseOffering uses short format (mon, tue, ...)
+const DAY_INDEX_TO_SHORT = [
+  "sun", "mon", "tue", "wed", "thu", "fri", "sat",
+];
 
 export const getTeacherDashboard = async (req, res) => {
   try {
@@ -9,21 +14,22 @@ export const getTeacherDashboard = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const classes = await Class.find({ teacher: teacherId })
+    const offerings = await CourseOffering.find({ instructor: teacherId })
+      .populate("course", "courseCode courseNameTH")
       .populate("students", "_id")
       .lean();
 
-    const totalClasses = classes.length;
+    const totalClasses = offerings.length;
 
     const studentIds = new Set();
-    classes.forEach((cls) => {
-      cls.students?.forEach((s) => studentIds.add(s._id.toString()));
+    offerings.forEach((off) => {
+      off.students?.forEach((s) => studentIds.add((s._id || s).toString()));
     });
     const totalStudents = studentIds.size;
 
-    const classIds = classes.map((c) => c._id);
+    const offeringIds = offerings.map((o) => o._id);
     const todaySessions = await Session.find({
-      classId: { $in: classIds },
+      courseOffering: { $in: offeringIds },
       date: { $gte: today },
     }).lean();
 
@@ -45,40 +51,39 @@ export const getTeacherDashboard = async (req, res) => {
           : 0;
     }
 
-    const dayOfWeek = [
-      "sunday",
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-    ][today.getDay()];
+    const dayOfWeek = DAY_INDEX_TO_SHORT[today.getDay()];
 
-    const todayClasses = classes
-      .filter((cls) => cls.schedule?.some((s) => s.day === dayOfWeek))
-      .map((cls) => {
-        const todaySchedule = cls.schedule.find((s) => s.day === dayOfWeek);
+    const todayClasses = offerings
+      .filter((off) => off.schedule?.some((s) => s.day === dayOfWeek))
+      .map((off) => {
+        const todaySchedule = off.schedule.find((s) => s.day === dayOfWeek);
         return {
-          _id: cls._id,
-          classCode: cls.classCode,
-          className: cls.className,
-          section: cls.section,
+          _id: off._id,
+          classCode: off.course?.courseCode || "",
+          className: off.course?.courseNameTH || "",
+          section: off.section,
           time: todaySchedule
             ? `${todaySchedule.startTime} - ${todaySchedule.endTime}`
             : "",
           room: todaySchedule?.room || "-",
-          students: cls.students?.length || 0,
+          students: off.students?.length || 0,
         };
       })
       .sort((a, b) => a.time.localeCompare(b.time));
 
     const recentSessions = await Session.find({
-      classId: { $in: classIds },
+      courseOffering: { $in: offeringIds },
     })
       .sort({ date: -1 })
       .limit(5)
-      .populate("classId", "classCode className")
+      .populate({
+        path: "courseOffering",
+        select: "section",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .lean();
 
     return res.status(200).json({
@@ -93,8 +98,8 @@ export const getTeacherDashboard = async (req, res) => {
         todayClasses,
         recentSessions: recentSessions.map((s) => ({
           _id: s._id,
-          classCode: s.classId?.classCode,
-          className: s.classId?.className,
+          classCode: s.courseOffering?.course?.courseCode,
+          className: s.courseOffering?.course?.courseNameTH,
           date: s.date,
           status: s.status,
           summary: s.summary,
@@ -131,7 +136,7 @@ export const getAdminDashboard = async (req, res) => {
         stats.admins += item.count;
     });
 
-    stats.totalClasses = await Class.countDocuments();
+    stats.totalClasses = await CourseOffering.countDocuments();
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

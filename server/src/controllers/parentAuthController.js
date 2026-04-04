@@ -80,7 +80,17 @@ export const getStudentAttendance = async (req, res) => {
         const [user, attendances] = await Promise.all([
           User.findById(studentUserId).select("firstName lastName"),
           Attendance.find({ student: studentUserId })
-            .populate({ path: "sessionId", populate: { path: "classId", select: "classCode className" } })
+            .populate({
+              path: "sessionId",
+              populate: {
+                path: "courseOffering",
+                select: "section",
+                populate: {
+                  path: "course",
+                  select: "courseCode courseNameTH",
+                },
+              },
+            })
             .sort({ createdAt: -1 })
             .limit(50),
         ]);
@@ -112,22 +122,28 @@ export const getStudentSchedule = async (req, res) => {
     const studentIds = await getLinkedStudents(req.user.id);
     if (!studentIds.length) return notFound(res);
 
-    const Enrollment = (await import("../models/enrollmentModel.js")).default;
+    const CourseOffering = (await import("../models/courseOfferingModel.js")).default;
 
     const allSchedules = await Promise.all(
       studentIds.map(async (studentUserId) => {
-        const [user, enrollments] = await Promise.all([
+        const [user, offerings] = await Promise.all([
           User.findById(studentUserId).select("firstName lastName"),
-          Enrollment.find({ student: studentUserId, status: "enrolled" }).populate({
-            path: "class",
-            populate: { path: "teacher", select: "firstName lastName" },
-          }),
+          CourseOffering.find({ students: studentUserId })
+            .populate("course", "courseCode courseNameTH credits")
+            .populate("instructor", "firstName lastName"),
         ]);
 
         return {
           studentId: studentUserId,
           studentName: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim(),
-          classes: enrollments.map((e) => e.class).filter(Boolean),
+          classes: offerings.map((off) => ({
+            _id: off._id,
+            classCode: off.course?.courseCode || "",
+            className: off.course?.courseNameTH || "",
+            section: off.section,
+            schedule: off.schedule,
+            teacher: off.instructor,
+          })),
         };
       })
     );

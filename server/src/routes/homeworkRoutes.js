@@ -3,7 +3,7 @@ import verifyToken, { authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadHomework } from "../middlewares/uploadMiddleware.js";
 import {
   createHomework,
-  getHomeworkByClass,
+  getHomeworkByOffering,
   getMyHomework,
   getHomeworkById,
   submitHomework,
@@ -52,7 +52,7 @@ router.post(
   submitHomework,
 );
 
-router.get("/class/:classId", verifyToken, getHomeworkByClass);
+router.get("/offering/:offeringId", verifyToken, getHomeworkByOffering);
 
 router.get("/:homeworkId", verifyToken, getHomeworkById);
 

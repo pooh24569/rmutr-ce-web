@@ -168,11 +168,11 @@ export const manualCheckIn = async (req, res) => {
 
 export const getStudentAttendanceHistory = async (req, res) => {
   try {
-    const { classId } = req.params;
+    const { offeringId } = req.params;
     const studentId = req.user.id;
 
     const attendances = await Attendance.find({
-      classId,
+      courseOffering: offeringId,
       student: studentId,
     })
       .populate({
@@ -212,17 +212,17 @@ export const getStudentAttendanceHistory = async (req, res) => {
 
 export const getClassAttendanceSummary = async (req, res) => {
   try {
-    const { classId } = req.params;
+    const { offeringId } = req.params;
 
     const totalSessions = await Session.countDocuments({
-      classId,
+      courseOffering: offeringId,
       status: "CLOSED",
     });
 
     const studentSummary = await Attendance.aggregate([
       {
         $match: {
-          classId: new (await import("mongoose")).Types.ObjectId(classId),
+          courseOffering: new (await import("mongoose")).Types.ObjectId(offeringId),
         },
       },
       {

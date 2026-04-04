@@ -1,25 +1,25 @@
 import Homework from "../models/homeworkModel.js";
 import Submission from "../models/submissionModel.js";
-import Class from "../models/classModel.js";
+import CourseOffering from "../models/courseOfferingModel.js";
 
 export const createHomework = async (req, res) => {
   try {
     const teacherId = req.user.id;
-    const { classId, title, description, maxScore, dueDate, attachments } =
+    const { offeringId, title, description, maxScore, dueDate, attachments } =
       req.body;
 
-    const classData = await Class.findById(classId);
-    if (!classData) {
-      return res.status(404).json({ success: false, message: "ไม่พบวิชานี้" });
+    const offering = await CourseOffering.findById(offeringId);
+    if (!offering) {
+      return res.status(404).json({ success: false, message: "ไม่พบกลุ่มเรียนนี้" });
     }
-    if (classData.teacher.toString() !== teacherId) {
+    if (offering.instructor.toString() !== teacherId) {
       return res
         .status(403)
         .json({ success: false, message: "คุณไม่ได้สอนวิชานี้" });
     }
 
     const homework = await Homework.create({
-      class: classId,
+      courseOffering: offeringId,
       teacher: teacherId,
       title,
       description,
@@ -39,12 +39,12 @@ export const createHomework = async (req, res) => {
   }
 };
 
-export const getHomeworkByClass = async (req, res) => {
+export const getHomeworkByOffering = async (req, res) => {
   try {
-    const { classId } = req.params;
+    const { offeringId } = req.params;
 
     const homework = await Homework.find({
-      class: classId,
+      courseOffering: offeringId,
       status: { $ne: "draft" },
     })
       .populate("teacher", "firstName lastName")
@@ -64,16 +64,24 @@ export const getMyHomework = async (req, res) => {
   try {
     const studentId = req.user.id;
 
-    const enrolledClasses = await Class.find({ students: studentId }).select(
-      "_id"
-    );
-    const classIds = enrolledClasses.map((c) => c._id);
+    // Find offerings where student is enrolled
+    const enrolledOfferings = await CourseOffering.find({
+      students: studentId,
+    }).select("_id");
+    const offeringIds = enrolledOfferings.map((o) => o._id);
 
     const homework = await Homework.find({
-      class: { $in: classIds },
+      courseOffering: { $in: offeringIds },
       status: "published",
     })
-      .populate("class", "classCode className")
+      .populate({
+        path: "courseOffering",
+        select: "section academicYear semester",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .populate("teacher", "firstName lastName")
       .sort({ dueDate: 1 });
 
@@ -116,7 +124,14 @@ export const getHomeworkById = async (req, res) => {
     const userId = req.user?.id;
 
     const homework = await Homework.findById(homeworkId)
-      .populate("class", "classCode className")
+      .populate({
+        path: "courseOffering",
+        select: "section academicYear semester",
+        populate: {
+          path: "course",
+          select: "courseCode courseNameTH",
+        },
+      })
       .populate("teacher", "firstName lastName");
 
     if (!homework) {
@@ -169,8 +184,8 @@ export const submitHomework = async (req, res) => {
       return res.status(404).json({ success: false, message: "ไม่พบการบ้าน" });
     }
 
-    const classData = await Class.findById(homework.class);
-    if (!classData.students.includes(studentId)) {
+    const offering = await CourseOffering.findById(homework.courseOffering);
+    if (!offering || !offering.students.includes(studentId)) {
       return res
         .status(403)
         .json({ success: false, message: "คุณไม่ได้ลงทะเบียนวิชานี้" });

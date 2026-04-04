@@ -1,30 +1,23 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Users, Clock, MapPin, MoreVertical, Edit, Trash2, Eye, BookOpen, Download } from "lucide-react";
-import CreateClassModal from "./components/CreateClassModal";
-import { classService } from "@/services/classService";
-import registrationService from "@/services/registrationService";
-import { toast } from "sonner";
+import { Search, Users, Clock, MapPin, Eye, BookOpen } from "lucide-react";
+import api from "@/lib/api";
 
 const Classes = () => {
     const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
-    const [registrationCourses, setRegistrationCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [selectedClass, setSelectedClass] = useState(null);
 
     useEffect(() => {
         fetchClasses();
-        fetchRegistrationCourses();
     }, []);
 
     const fetchClasses = async () => {
         try {
             setLoading(true);
-            const response = await classService.getMyClasses();
+            const { data: response } = await api.get("/courses/offerings/my-teaching");
             if (response.success) {
                 setClasses(response.data);
             }
@@ -35,86 +28,26 @@ const Classes = () => {
         }
     };
 
-    const fetchRegistrationCourses = async () => {
-        try {
-            const response = await registrationService.getTeachingCourses();
-            if (response.success) {
-                const regCourses = response.data;
-                setRegistrationCourses(regCourses);
-                const regCourseCodes = regCourses.map(c => c.courseCode);
-
-                for (const course of regCourses) {
-                    const existingClass = classes.find(c => c.classCode === course.courseCode);
-                    if (!existingClass) {
-                        try {
-                            const classData = {
-                                classCode: course.courseCode,
-                                className: course.courseName,
-                                section: course.section,
-                                schedule: course.schedule || [],
-                                academicYear: "2567",
-                                semester: "1",
-                                isFromRegistration: true,
-                            };
-                            await classService.createClass(classData);
-                        } catch (err) {
-                            console.log(`Class ${course.courseCode} อาจมีอยู่แล้ว`);
-                        }
-                    }
-                }
-
-                const classesResponse = await classService.getMyClasses();
-                if (classesResponse.success) {
-
-                    const filteredByReg = classesResponse.data.filter(c => {
-                        if (c.isFromRegistration) {
-
-                            return regCourseCodes.includes(c.classCode);
-                        }
-
-                        return true;
-                    });
-                    setClasses(filteredByReg);
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching registration courses:", error);
-        }
-    };
-
-    const handleCreateClass = async (classData) => {
-        try {
-            const response = await classService.createClass(classData);
-            if (response.success) {
-                setClasses([response.data, ...classes]);
-                setShowCreateModal(false);
-            }
-        } catch (error) {
-            console.error("Error creating class:", error);
-        }
-    };
-
-    const handleDeleteClass = async (classId) => {
-        if (!window.confirm("Are you sure you want to delete this class?")) return;
-
-        try {
-            const response = await classService.deleteClass(classId);
-            if (response.success) {
-                setClasses(classes.filter((c) => c._id !== classId));
-            }
-        } catch (error) {
-            console.error("Error deleting class:", error);
-        }
-    };
-
-    const filteredClasses = classes.filter(
-        (c) =>
-            c.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.classCode.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredClasses = classes.filter((c) => {
+        const code = c.course?.courseCode || "";
+        const name = c.course?.courseNameTH || c.course?.courseNameEN || "";
+        return (
+            name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            code.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    });
 
     const getDayLabel = (day) => {
         const days = {
+            // CourseOffering format
+            mon: "จันทร์",
+            tue: "อังคาร",
+            wed: "พุธ",
+            thu: "พฤหัส",
+            fri: "ศุกร์",
+            sat: "เสาร์",
+            sun: "อาทิตย์",
+            // Class format (backward compat)
             monday: "จันทร์",
             tuesday: "อังคาร",
             wednesday: "พุธ",
@@ -157,7 +90,7 @@ const Classes = () => {
                 <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                     <BookOpenIcon className="w-16 h-16 mb-4 text-gray-300" />
                     <p className="text-lg font-medium">No classes found</p>
-                    <p className="text-sm">Create your first class to get started</p>
+                    <p className="text-sm">You have no assigned classes yet</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -169,9 +102,18 @@ const Classes = () => {
                             { }
                             <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600 p-4 relative">
                                 <div className="text-white">
-                                    <p className="text-sm font-medium opacity-80">{classItem.classCode}</p>
-                                    <h3 className="text-lg font-bold truncate">{classItem.className}</h3>
+                                    <p className="text-sm font-medium opacity-80">
+                                        {classItem.course?.courseCode}
+                                    </p>
+                                    <h3 className="text-lg font-bold truncate">
+                                        {classItem.course?.courseNameTH || classItem.course?.courseNameEN}
+                                    </h3>
                                 </div>
+                                {classItem.course?.credits && (
+                                    <span className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-2 py-1 rounded-lg">
+                                        {classItem.course.credits} หน่วยกิต
+                                    </span>
+                                )}
                             </div>
 
                             { }
@@ -192,8 +134,12 @@ const Classes = () => {
                                                 <span>
                                                     {getDayLabel(sch.day)} {sch.startTime} - {sch.endTime}
                                                 </span>
-                                                <MapPin className="w-4 h-4 ml-2" />
-                                                <span>{sch.room}</span>
+                                                {sch.room && (
+                                                    <>
+                                                        <MapPin className="w-4 h-4 ml-2" />
+                                                        <span>{sch.room}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -213,20 +159,6 @@ const Classes = () => {
                         </div>
                     ))}
                 </div>
-            )}
-
-            { }
-            {showCreateModal && (
-                <CreateClassModal
-                    isOpen={showCreateModal}
-                    onClose={() => {
-                        setShowCreateModal(false);
-                        setSelectedClass(null);
-                    }}
-                    onSubmit={handleCreateClass}
-                    editData={selectedClass}
-                    onRefresh={fetchClasses}
-                />
             )}
         </div>
     );

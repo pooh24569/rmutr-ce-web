@@ -1,7 +1,6 @@
 import User from "../models/userModel.js";
 import StudentClass from "../models/studentClassModel.js";
 import CourseOffering from "../models/courseOfferingModel.js";
-import Enrollment from "../models/enrollmentModel.js";
 import StudentProfile from "../models/studentProfileModel.js";
 
 
@@ -54,18 +53,14 @@ export const canAccessStudentData = async (userId, targetStudentId) => {
     return false;
   }
 
-  // Instructor can access students in their classes
+  // Instructor can access students in their course offerings
   if (user.role === "instructor") {
-    // Check course offerings (subject teaching)
-    const offerings = await CourseOffering.find({ instructor: userId });
-    if (offerings.length > 0) {
-      const enrollments = await Enrollment.find({
-        class: { $in: offerings.map((o) => o._id) },
-        student: targetStudentId,
-        status: "enrolled",
-      });
-      if (enrollments.length > 0) return true;
-    }
+    // Check if instructor teaches a CourseOffering that includes this student
+    const offering = await CourseOffering.findOne({
+      instructor: userId,
+      students: targetStudentId,
+    });
+    if (offering) return true;
 
     // Check if class advisor
     if (user.isClassAdvisor) {

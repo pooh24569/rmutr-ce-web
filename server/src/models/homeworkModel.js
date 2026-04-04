@@ -5,9 +5,9 @@ import mongoose from "mongoose";
 const homeworkSchema = new mongoose.Schema(
   {
 
-    class: {
+    courseOffering: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
+      ref: "CourseOffering",
       required: true,
     },
 
@@ -58,7 +58,7 @@ const homeworkSchema = new mongoose.Schema(
   }
 );
 
-homeworkSchema.index({ class: 1, dueDate: 1 });
+homeworkSchema.index({ courseOffering: 1, dueDate: 1 });
 homeworkSchema.index({ teacher: 1 });
 
 const Homework =

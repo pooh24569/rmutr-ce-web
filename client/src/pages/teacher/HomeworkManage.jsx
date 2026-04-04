@@ -11,7 +11,7 @@ import {
     Trash2,
 } from "lucide-react";
 import { homeworkService } from "@/services/homeworkService";
-import { classService } from "@/services/classService";
+import api from "@/lib/api";
 import { toast } from "sonner";
 
 const HomeworkManage = () => {
@@ -41,7 +41,7 @@ const HomeworkManage = () => {
 
     const fetchClasses = async () => {
         try {
-            const response = await classService.getMyClasses();
+            const { data: response } = await api.get("/courses/offerings/my-teaching");
             if (response.success) {
                 setClasses(response.data);
                 if (response.data.length > 0) {
@@ -57,7 +57,7 @@ const HomeworkManage = () => {
 
     const fetchHomework = async () => {
         try {
-            const response = await homeworkService.getHomeworkByClass(selectedClass);
+            const { data: response } = await api.get(`/homework/offering/${selectedClass}`);
             if (response.success) {
                 setHomework(response.data);
             }
@@ -74,8 +74,8 @@ const HomeworkManage = () => {
         }
 
         try {
-            const response = await homeworkService.createHomework({
-                classId: selectedClass,
+            const { data: response } = await api.post("/homework", {
+                offeringId: selectedClass,
                 ...formData,
             });
             if (response.success) {
@@ -94,7 +94,7 @@ const HomeworkManage = () => {
         if (!window.confirm("ต้องการลบการบ้านนี้?")) return;
 
         try {
-            const response = await homeworkService.deleteHomework(homeworkId);
+            const { data: response } = await api.delete(`/homework/${homeworkId}`);
             if (response.success) {
                 toast.success("ลบสำเร็จ");
                 fetchHomework();
@@ -150,7 +150,7 @@ const HomeworkManage = () => {
                 >
                     {classes.map((cls) => (
                         <option key={cls._id} value={cls._id}>
-                            {cls.classCode} - {cls.className}
+                            {cls.course?.courseCode} - {cls.course?.courseNameTH || cls.course?.courseNameEN}
                         </option>
                     ))}
                 </select>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { enrollmentService } from "@/services/enrollmentService";
+import api from "@/lib/api";
 import { toast } from "sonner";
 import { BookOpen, Plus, Minus, Clock, MapPin, User, Search, RefreshCw } from "lucide-react";
 
@@ -19,7 +19,7 @@ const Registration = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await enrollmentService.getAvailableClasses();
+            const { data: response } = await api.get("/student-registration/available");
             if (response.success) {
                 setClasses(response.data);
             }
@@ -32,16 +32,16 @@ const Registration = () => {
         }
     };
 
-    const handleEnroll = async (classId) => {
+    const handleEnroll = async (offeringId) => {
         try {
-            setEnrollingId(classId);
-            const response = await enrollmentService.enrollClass(classId);
+            setEnrollingId(offeringId);
+            const { data: response } = await api.post("/student-registration/enroll", { offeringId });
             if (response.success) {
                 toast.success("ลงทะเบียนสำเร็จ!");
 
                 setClasses(
                     classes.map((c) =>
-                        c._id === classId ? { ...c, isEnrolled: true } : c
+                        c._id === offeringId ? { ...c, isEnrolled: true } : c
                     )
                 );
             }
@@ -52,18 +52,18 @@ const Registration = () => {
         }
     };
 
-    const handleDrop = async (classId) => {
+    const handleDrop = async (offeringId) => {
         if (!window.confirm("คุณแน่ใจหรือไม่ที่จะยกเลิกลงทะเบียนวิชานี้?")) return;
 
         try {
-            setEnrollingId(classId);
-            const response = await enrollmentService.dropClass(classId);
+            setEnrollingId(offeringId);
+            const { data: response } = await api.delete(`/student-registration/drop/${offeringId}`);
             if (response.success) {
                 toast.success("ยกเลิกลงทะเบียนสำเร็จ");
 
                 setClasses(
                     classes.map((c) =>
-                        c._id === classId ? { ...c, isEnrolled: false } : c
+                        c._id === offeringId ? { ...c, isEnrolled: false } : c
                     )
                 );
             }
@@ -76,22 +76,24 @@ const Registration = () => {
 
     const getDayLabel = (day) => {
         const days = {
-            monday: "จันทร์",
-            tuesday: "อังคาร",
-            wednesday: "พุธ",
-            thursday: "พฤหัส",
-            friday: "ศุกร์",
-            saturday: "เสาร์",
-            sunday: "อาทิตย์",
+            mon: "จันทร์", tue: "อังคาร", wed: "พุธ",
+            thu: "พฤหัส", fri: "ศุกร์", sat: "เสาร์", sun: "อาทิตย์",
+            monday: "จันทร์", tuesday: "อังคาร", wednesday: "พุธ",
+            thursday: "พฤหัส", friday: "ศุกร์", saturday: "เสาร์", sunday: "อาทิตย์",
         };
         return days[day] || day;
     };
 
-    const filteredClasses = classes.filter(
-        (c) =>
-            c.className?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.classCode?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredClasses = classes.filter((c) => {
+        const code = c.course?.courseCode || "";
+        const nameTH = c.course?.courseNameTH || "";
+        const nameEN = c.course?.courseNameEN || "";
+        return (
+            code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            nameTH.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            nameEN.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    });
 
     const enrolledCount = classes.filter((c) => c.isEnrolled).length;
 
@@ -165,7 +167,9 @@ const Registration = () => {
                                 key={classItem._id}
                                 className={`bg-white rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg ${classItem.isEnrolled
                                         ? "border-green-500 bg-green-50"
-                                        : "border-gray-200 hover:border-red-300"
+                                        : classItem.isFull
+                                            ? "border-gray-300 opacity-70"
+                                            : "border-gray-200 hover:border-red-300"
                                     }`}
                             >
                                 {}
@@ -178,15 +182,25 @@ const Registration = () => {
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <span className="text-xs font-medium bg-white/20 text-white px-2 py-1 rounded">
-                                                {classItem.classCode}
+                                                {classItem.course?.courseCode}
                                             </span>
                                             <h3 className="text-white font-bold mt-2 text-lg">
-                                                {classItem.className}
+                                                {classItem.course?.courseNameTH || classItem.course?.courseNameEN}
                                             </h3>
+                                            {classItem.course?.credits && (
+                                                <span className="text-xs text-white/80 mt-1">
+                                                    {classItem.course.credits} หน่วยกิต
+                                                </span>
+                                            )}
                                         </div>
                                         {classItem.isEnrolled && (
                                             <span className="text-xs bg-white text-green-600 px-2 py-1 rounded font-medium">
                                                 ลงทะเบียนแล้ว
+                                            </span>
+                                        )}
+                                        {classItem.isFull && !classItem.isEnrolled && (
+                                            <span className="text-xs bg-white text-red-600 px-2 py-1 rounded font-medium">
+                                                เต็มแล้ว
                                             </span>
                                         )}
                                     </div>
@@ -197,14 +211,16 @@ const Registration = () => {
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <User className="w-4 h-4" />
                                         <span>Section {classItem.section}</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span>{classItem.students?.length || 0}/{classItem.maxStudents} คน</span>
                                     </div>
 
-                                    {classItem.teacher && (
+                                    {classItem.instructor && (
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <User className="w-4 h-4 text-blue-500" />
                                             <span>
-                                                อ.{classItem.teacher.firstName}{" "}
-                                                {classItem.teacher.lastName}
+                                                อ.{classItem.instructor.firstName}{" "}
+                                                {classItem.instructor.lastName}
                                             </span>
                                         </div>
                                     )}
@@ -248,7 +264,7 @@ const Registration = () => {
                                         ) : (
                                             <button
                                                 onClick={() => handleEnroll(classItem._id)}
-                                                disabled={enrollingId === classItem._id}
+                                                disabled={enrollingId === classItem._id || classItem.isFull}
                                                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 transition disabled:opacity-50"
                                             >
                                                 {enrollingId === classItem._id ? (
@@ -256,7 +272,7 @@ const Registration = () => {
                                                 ) : (
                                                     <Plus className="w-4 h-4" />
                                                 )}
-                                                ลงทะเบียน
+                                                {classItem.isFull ? "เต็มแล้ว" : "ลงทะเบียน"}
                                             </button>
                                         )}
                                     </div>

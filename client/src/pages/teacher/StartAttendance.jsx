@@ -13,11 +13,11 @@ import {
     AlertCircle,
     RefreshCw,
 } from "lucide-react";
-import { classService } from "@/services/classService";
+import api from "@/lib/api";
 import { sessionService } from "@/services/sessionService";
 
 const StartAttendance = () => {
-    const { classId } = useParams();
+    const { classId: offeringId } = useParams();
     const navigate = useNavigate();
 
     const [classData, setClassData] = useState(null);
@@ -36,13 +36,13 @@ const StartAttendance = () => {
     });
 
     useEffect(() => {
-        fetchClassDetail();
+        fetchOfferingDetail();
         checkActiveSession();
-    }, [classId]);
+    }, [offeringId]);
 
-    const fetchClassDetail = async () => {
+    const fetchOfferingDetail = async () => {
         try {
-            const response = await classService.getClassById(classId);
+            const { data: response } = await api.get(`/courses/offerings/${offeringId}`);
             if (response.success) {
                 setClassData(response.data);
 
@@ -69,7 +69,7 @@ const StartAttendance = () => {
             if (response.success && response.data.length > 0) {
 
                 const session = response.data.find(
-                    (s) => s.classId._id === classId || s.classId === classId
+                    (s) => (s.courseOffering?._id || s.courseOffering) === offeringId
                 );
                 if (session) {
                     setActiveSession(session);
@@ -97,7 +97,7 @@ const StartAttendance = () => {
         try {
             setStarting(true);
             const response = await sessionService.startSession({
-                classId,
+                offeringId,
                 startTime: formData.startTime,
                 lateAfterMinutes: parseInt(formData.lateAfterMinutes),
                 closeAfterMinutes: parseInt(formData.closeAfterMinutes),
@@ -125,7 +125,7 @@ const StartAttendance = () => {
             const response = await sessionService.closeSession(activeSession._id);
             if (response.success) {
                 alert("ปิดการเช็คชื่อสำเร็จ!");
-                navigate(`/teacher/classes/${classId}`);
+                navigate(`/teacher/classes/${offeringId}`);
             }
         } catch (error) {
             console.error("Error:", error);
@@ -179,7 +179,7 @@ const StartAttendance = () => {
             {}
             <div className="flex items-center gap-4">
                 <button
-                    onClick={() => navigate(`/teacher/classes/${classId}`)}
+                    onClick={() => navigate(`/teacher/classes/${offeringId}`)}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
@@ -187,7 +187,7 @@ const StartAttendance = () => {
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold text-gray-800">เช็คชื่อ</h1>
                     <p className="text-gray-500">
-                        {classData?.classCode} - {classData?.className}
+                        {classData?.course?.courseCode} - {classData?.course?.courseNameTH || classData?.course?.courseNameEN}
                     </p>
                 </div>
             </div>

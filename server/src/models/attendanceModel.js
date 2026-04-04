@@ -9,9 +9,9 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
     },
 
-    classId: {
+    courseOffering: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
+      ref: "CourseOffering",
       required: true,
     },
 
@@ -75,7 +75,7 @@ attendanceSchema.index({ sessionId: 1, student: 1 }, { unique: true });
 
 attendanceSchema.index({ student: 1, date: -1 });
 
-attendanceSchema.index({ classId: 1, date: -1 });
+attendanceSchema.index({ courseOffering: 1, date: -1 });
 
 attendanceSchema.index({ sessionId: 1, status: 1 });
 

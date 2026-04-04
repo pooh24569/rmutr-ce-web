@@ -14,6 +14,7 @@ import {
   enrollStudentsToOffering,
   removeStudentFromOffering,
   updateOfferingSchedule,
+  getMyTeachingOfferings,
 } from "../controllers/courseController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
 import { requireRole } from "../middlewares/permissionMiddleware.js";
@@ -31,7 +32,10 @@ const REGISTRAR_ROLES = [
   "superadmin",
 ];
 
-// ===== Instructor List =====
+// ===== Instructor Routes =====
+
+// Get my teaching offerings (for instructor dashboard)
+router.get("/offerings/my-teaching", requireRole("instructor", ...REGISTRAR_ROLES), getMyTeachingOfferings);
 
 // Get all instructors (for dropdown)
 router.get("/instructors", requireRole(...REGISTRAR_ROLES), getInstructors);

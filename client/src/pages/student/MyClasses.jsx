@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RefreshCw, BookOpen, User, MapPin, Clock, Users, ChevronRight } from "lucide-react";
-import { enrollmentService } from "@/services/enrollmentService";
+import api from "@/lib/api";
 import StudentHeader from "@/components/student/StudentHeader";
 
 const MyClasses = () => {
@@ -19,13 +19,13 @@ const MyClasses = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await enrollmentService.getMyEnrollments();
+            const { data: response } = await api.get("/student-registration/my-courses");
             if (response.success) {
-                setClasses(response.data);
+                setClasses(response.data.courses || []);
             }
         } catch (err) {
             console.error("Error fetching classes:", err);
-            setError(err.message || "ไม่สามารถโหลดข้อมูลได้");
+            setError(err.response?.data?.message || err.message || "ไม่สามารถโหลดข้อมูลได้");
         } finally {
             setLoading(false);
         }
@@ -33,6 +33,15 @@ const MyClasses = () => {
 
     const getDayLabel = (day) => {
         const days = {
+            // CourseOffering format
+            mon: "จันทร์",
+            tue: "อังคาร",
+            wed: "พุธ",
+            thu: "พฤหัส",
+            fri: "ศุกร์",
+            sat: "เสาร์",
+            sun: "อาทิตย์",
+            // Class format (backward compat)
             monday: "จันทร์",
             tuesday: "อังคาร",
             wednesday: "พุธ",
@@ -124,9 +133,11 @@ const MyClasses = () => {
                                             <BookOpen className="w-6 h-6 text-white" />
                                         </div>
                                         <div className="text-white">
-                                            <h3 className="font-extrabold text-lg">{cls.classCode}</h3>
+                                            <h3 className="font-extrabold text-lg">
+                                                {cls.course?.courseCode || cls.classCode}
+                                            </h3>
                                             <p className="text-white/100 text-sm truncate max-w-[200px]">
-                                                {cls.className}
+                                                {cls.course?.courseNameTH || cls.className}
                                             </p>
                                         </div>
                                     </div>
@@ -138,7 +149,8 @@ const MyClasses = () => {
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <User className="w-4 h-4 text-gray-400" />
                                         <span className="text-sm">
-                                            {cls.teacher?.firstName || ""} {cls.teacher?.lastName || "ไม่ระบุ"}
+                                            {cls.instructor?.firstName || cls.teacher?.firstName || ""}{" "}
+                                            {cls.instructor?.lastName || cls.teacher?.lastName || "ไม่ระบุ"}
                                         </span>
                                     </div>
 

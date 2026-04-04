@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { RefreshCw, User, BookOpen, MapPin, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { enrollmentService } from "@/services/enrollmentService";
+import api from "@/lib/api";
 
 const TIME_SLOTS = [
   { start: "8:00", end: "9:00" },
@@ -20,6 +20,14 @@ const TIME_SLOTS = [
   { start: "20:00", end: "21:00" },
   { start: "21:00", end: "22:00" },
 ];
+
+// Support both CourseOffering format (mon/tue) and Class format (monday/tuesday)
+const DAY_NORMALIZE = {
+  mon: "monday", tue: "tuesday", wed: "wednesday",
+  thu: "thursday", fri: "friday", sat: "saturday", sun: "sunday",
+  monday: "monday", tuesday: "tuesday", wednesday: "wednesday",
+  thursday: "thursday", friday: "friday", saturday: "saturday", sunday: "sunday",
+};
 
 const DAYS = [
   { key: "monday", label: "จันทร์" },
@@ -55,9 +63,9 @@ const Schedule = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await enrollmentService.getMyEnrollments();
+      const { data: response } = await api.get("/student-registration/my-courses");
       if (response.success) {
-        setClasses(response.data);
+        setClasses(response.data.courses || []);
       }
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -77,20 +85,25 @@ const Schedule = () => {
         const startHour = parseInt(sch.startTime?.split(":")[0] || "8");
         const endHour = parseInt(sch.endTime?.split(":")[0] || "9");
 
+        // Normalize day key: mon → monday, etc.
+        const normalizedDay = DAY_NORMALIZE[sch.day] || sch.day;
+
         entries.push({
           id: `${cls._id}-${sch.day}`,
           classId: cls._id,
-          day: sch.day,
+          day: normalizedDay,
           startHour,
           endHour,
           duration: endHour - startHour,
-          classCode: cls.classCode,
-          className: cls.className,
+          classCode: cls.course?.courseCode || cls.classCode,
+          className: cls.course?.courseNameTH || cls.className,
           section: cls.section,
           room: sch.room || "-",
-          teacher: cls.teacher
-            ? `${cls.teacher.firstName || ""} ${cls.teacher.lastName || ""}`
-            : "-",
+          teacher: cls.instructor
+            ? `${cls.instructor.firstName || ""} ${cls.instructor.lastName || ""}`
+            : cls.teacher
+              ? `${cls.teacher.firstName || ""} ${cls.teacher.lastName || ""}`
+              : "-",
           color: COLORS[classIndex % COLORS.length],
         });
       });
@@ -114,13 +127,10 @@ const Schedule = () => {
 
   const getDayLabel = (day) => {
     const days = {
-      monday: "จันทร์",
-      tuesday: "อังคาร",
-      wednesday: "พุธ",
-      thursday: "พฤหัส",
-      friday: "ศุกร์",
-      saturday: "เสาร์",
-      sunday: "อาทิตย์",
+      mon: "จันทร์", tue: "อังคาร", wed: "พุธ",
+      thu: "พฤหัส", fri: "ศุกร์", sat: "เสาร์", sun: "อาทิตย์",
+      monday: "จันทร์", tuesday: "อังคาร", wednesday: "พุธ",
+      thursday: "พฤหัส", friday: "ศุกร์", saturday: "เสาร์", sunday: "อาทิตย์",
     };
     return days[day] || day;
   };
@@ -167,7 +177,7 @@ const Schedule = () => {
             {classes.length === 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-400">
-                  (ยังไม่มีวิชาลงทะเบียน -{" "}
+                  (ยังไม่มีวิชาลงทะเบียน —{" "}
                   <button
                     onClick={() => navigate("/student/registration")}
                     className="text-red-500 hover:underline"
@@ -293,19 +303,20 @@ const Schedule = () => {
                     {classes.map((cls) => (
                       <tr key={cls._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-medium text-gray-800">
-                          {cls.classCode}
+                          {cls.course?.courseCode || cls.classCode}
                         </td>
                         <td className="px-4 py-3 text-center text-gray-600">
                           {cls.section || 1}
                         </td>
                         <td className="px-4 py-3 text-gray-800">
-                          {cls.className}
+                          {cls.course?.courseNameTH || cls.className}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-gray-400" />
                             <span className="text-gray-700">
-                              {cls.teacher?.firstName} {cls.teacher?.lastName}
+                              {cls.instructor?.firstName || cls.teacher?.firstName}{" "}
+                              {cls.instructor?.lastName || cls.teacher?.lastName}
                             </span>
                           </div>
                         </td>

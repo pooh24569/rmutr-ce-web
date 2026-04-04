@@ -40,16 +40,6 @@ const facultyNav = [
         end: true,
     },
     {
-        to: "/registrar/courses",
-        icon: AcademicCapIcon,
-        label: "รายวิชา",
-    },
-    {
-        to: "/registrar/offerings",
-        icon: RectangleStackIcon,
-        label: "กลุ่มเรียน",
-    },
-    {
         to: "/registrar/enrollments",
         icon: UserGroupIcon,
         label: "ลงทะเบียนนักศึกษา",
