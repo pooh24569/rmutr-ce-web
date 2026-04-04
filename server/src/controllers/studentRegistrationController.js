@@ -49,7 +49,7 @@ export const getAvailableCourses = async (req, res) => {
       .sort({ "course.courseCode": 1 });
 
     // Filter out full classes and add enrollment status
-    const studentId = req.user._id;
+    const studentId = req.user.id;
     const result = offerings.map((offering) => {
       const isEnrolled = offering.students.some(
         (s) => s.toString() === studentId.toString(),
@@ -79,7 +79,7 @@ export const getAvailableCourses = async (req, res) => {
  */
 export const getMyRegisteredCourses = async (req, res) => {
   try {
-    const studentId = req.user._id;
+    const studentId = req.user.id;
     const { academicYear, semester } = req.query;
 
     const query = {
@@ -130,7 +130,7 @@ export const getMyRegisteredCourses = async (req, res) => {
 export const enrollCourse = async (req, res) => {
   try {
     const { offeringId } = req.body;
-    const studentId = req.user._id;
+    const studentId = req.user.id;
 
     const offering = await CourseOffering.findById(offeringId);
     if (!offering) {
@@ -222,7 +222,7 @@ export const enrollCourse = async (req, res) => {
 export const dropCourse = async (req, res) => {
   try {
     const { offeringId } = req.params;
-    const studentId = req.user._id;
+    const studentId = req.user.id;
 
     const offering = await CourseOffering.findById(offeringId);
     if (!offering) {
@@ -274,7 +274,7 @@ export const dropCourse = async (req, res) => {
  */
 export const getAcademicRecords = async (req, res) => {
   try {
-    const studentId = req.params.studentId || req.user._id;
+    const studentId = req.params.studentId || req.user.id;
 
     const records = await StudentAcademicRecord.getStudentHistory(studentId);
     const canAddNew = await StudentAcademicRecord.canAddNewYear(studentId);
@@ -308,7 +308,7 @@ export const addAcademicRecord = async (req, res) => {
     const { student, academicYear, yearLevel, faculty, department, status } =
       req.body;
 
-    const studentId = student || req.user._id;
+    const studentId = student || req.user.id;
 
     // Check 8-year limit
     const canAdd = await StudentAcademicRecord.canAddNewYear(studentId);

@@ -184,7 +184,7 @@ export const assignClassAdvisor = async (req, res) => {
       instructor: advisorId,
       studentClass: classId,
       previousAdvisor: previousAdvisor || null,
-      changedBy: req.user._id,
+      changedBy: req.user.id,
       reason: reason || "",
       academicYear: studentClass.academicYear,
     });
@@ -245,7 +245,7 @@ export const removeClassAdvisor = async (req, res) => {
       action: "removed",
       instructor: removedAdvisorId,
       studentClass: classId,
-      changedBy: req.user._id,
+      changedBy: req.user.id,
       reason: reason || "",
       academicYear: studentClass.academicYear,
     });

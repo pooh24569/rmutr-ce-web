@@ -124,7 +124,7 @@ export const createCourse = async (req, res) => {
       description,
       prerequisites: prerequisites || [],
       courseType: courseType || "required",
-      createdBy: req.user._id,
+      createdBy: req.user.id,
     });
 
     await course.populate([
@@ -321,7 +321,7 @@ export const createCourseOffering = async (req, res) => {
       maxStudents: maxStudents || 40,
       schedule: schedule || [],
       registrationOpen: registrationOpen || false,
-      createdBy: req.user._id,
+      createdBy: req.user.id,
     });
 
     await offering.populate([
@@ -686,7 +686,7 @@ export const getCourseOfferingById = async (req, res) => {
 export const getMyTeachingOfferings = async (req, res) => {
   try {
     const offerings = await CourseOffering.find({
-      instructor: req.user._id,
+      instructor: req.user.id,
       status: "active",
     })
       .populate({

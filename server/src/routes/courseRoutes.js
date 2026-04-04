@@ -62,8 +62,8 @@ router.delete("/:id", requireRole(...REGISTRAR_ROLES), deleteCourse);
 // Get offerings
 router.get("/offerings/list", getCourseOfferings);
 
-// Get single offering with full details
-router.get("/offerings/:id", requireRole(...REGISTRAR_ROLES), getCourseOfferingById);
+// Get single offering with full details (any authenticated user)
+router.get("/offerings/:id", getCourseOfferingById);
 
 // Create offering (Central Registrar + Admin)
 router.post(
