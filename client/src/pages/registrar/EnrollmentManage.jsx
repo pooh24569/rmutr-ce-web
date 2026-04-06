@@ -9,6 +9,7 @@ import {
   ArrowUpTrayIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 import * as registrarService from "@/services/registrarService";
 
@@ -30,6 +31,9 @@ export default function EnrollmentManage() {
   const [enrollInput, setEnrollInput] = useState("");
   const [enrolling, setEnrolling] = useState(false);
   const [enrollResult, setEnrollResult] = useState(null);
+
+  // Tab: eligible / enrolled
+  const [activeTab, setActiveTab] = useState("eligible");
 
   // ===== Fetch Offerings =====
   const fetchOfferings = useCallback(async () => {
@@ -78,7 +82,7 @@ export default function EnrollmentManage() {
     );
   });
 
-  // ===== Enroll Students =====
+  // ===== Enroll (Pre-assign) Students =====
   const handleEnroll = async () => {
     if (enrolling || !enrollInput.trim()) return;
     setEnrolling(true);
@@ -131,6 +135,12 @@ export default function EnrollmentManage() {
     }
   };
 
+  // Derived: lists
+  const eligibleList = offeringDetail?.eligibleStudents || [];
+  const enrolledList = offeringDetail?.students || [];
+  const currentList = activeTab === "eligible" ? eligibleList : enrolledList;
+  const totalOccupied = eligibleList.length + enrolledList.length;
+
   // ===== Render =====
   return (
     <div className="p-6 h-full">
@@ -139,10 +149,10 @@ export default function EnrollmentManage() {
         <div className="w-full lg:w-96 flex-shrink-0 space-y-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
-              ลงทะเบียนนักศึกษา
+              จัดนักศึกษาเข้ากลุ่มเรียน
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              เลือกกลุ่มเรียน แล้วจัดการนักศึกษา
+              Pre-assign นักศึกษา → รอยืนยันผ่าน Shopping Cart
             </p>
           </div>
 
@@ -217,15 +227,22 @@ export default function EnrollmentManage() {
                           : "—"}
                       </p>
                     </div>
-                    <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        (o.students?.length || 0) >= o.maxStudents
-                          ? "bg-red-50 text-red-600"
-                          : "bg-emerald-50 text-emerald-600"
-                      }`}
-                    >
-                      {o.students?.length || 0}/{o.maxStudents}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span
+                        className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                          (o.students?.length || 0) + (o.eligibleStudents?.length || 0) >= o.maxStudents
+                            ? "bg-red-50 text-red-600"
+                            : "bg-emerald-50 text-emerald-600"
+                        }`}
+                      >
+                        {(o.students?.length || 0) + (o.eligibleStudents?.length || 0)}/{o.maxStudents}
+                      </span>
+                      {(o.eligibleStudents?.length || 0) > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600">
+                          รอ {o.eligibleStudents.length}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </button>
               ))
@@ -273,21 +290,63 @@ export default function EnrollmentManage() {
                       setShowEnrollModal(true);
                       setEnrollResult(null);
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all"
                   >
                     <UserPlusIcon className="w-4 h-4" />
-                    เพิ่มนักศึกษา
+                    จัดนักศึกษา (Pre-assign)
                   </button>
                 </div>
               </div>
 
+              {/* Tabs: Eligible / Enrolled */}
+              <div className="px-6 py-3 border-b border-slate-100 flex items-center gap-1 bg-slate-50/50">
+                <button
+                  onClick={() => setActiveTab("eligible")}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === "eligible"
+                      ? "bg-amber-100 text-amber-800 shadow-sm"
+                      : "text-slate-500 hover:bg-white hover:text-slate-700"
+                  }`}
+                >
+                  <ClockIcon className="w-4 h-4" />
+                  รอยืนยัน
+                  <span className={`ml-1 text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                    activeTab === "eligible" ? "bg-amber-200 text-amber-900" : "bg-slate-200 text-slate-600"
+                  }`}>
+                    {eligibleList.length}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("enrolled")}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === "enrolled"
+                      ? "bg-emerald-100 text-emerald-800 shadow-sm"
+                      : "text-slate-500 hover:bg-white hover:text-slate-700"
+                  }`}
+                >
+                  <CheckCircleIcon className="w-4 h-4" />
+                  ลงทะเบียนแล้ว
+                  <span className={`ml-1 text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                    activeTab === "enrolled" ? "bg-emerald-200 text-emerald-900" : "bg-slate-200 text-slate-600"
+                  }`}>
+                    {enrolledList.length}
+                  </span>
+                </button>
+              </div>
+
               {/* Student List */}
               <div className="flex-1 overflow-y-auto">
-                {offeringDetail.students?.length === 0 ? (
+                {currentList.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-slate-400 py-16">
                     <UserGroupIcon className="w-12 h-12 mb-2" />
-                    <p className="font-medium">ยังไม่มีนักศึกษา</p>
-                    <p className="text-sm">กดปุ่ม "เพิ่มนักศึกษา" เพื่อลงทะเบียน</p>
+                    <p className="font-medium">
+                      {activeTab === "eligible"
+                        ? "ยังไม่มีนักศึกษาที่จัดไว้"
+                        : "ยังไม่มีนักศึกษาที่ยืนยันแล้ว"}
+                    </p>
+                    {activeTab === "eligible" && (
+                      <p className="text-sm">กดปุ่ม "จัดนักศึกษา" เพื่อ Pre-assign</p>
+                    )}
                   </div>
                 ) : (
                   <table className="w-full text-sm">
@@ -303,7 +362,7 @@ export default function EnrollmentManage() {
                           ชื่อ-นามสกุล
                         </th>
                         <th className="text-left px-6 py-3 font-semibold text-slate-600">
-                          Email
+                          สถานะ
                         </th>
                         <th className="text-center px-6 py-3 font-semibold text-slate-600 w-20">
                           ลบ
@@ -311,7 +370,7 @@ export default function EnrollmentManage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                      {offeringDetail.students.map((student, idx) => (
+                      {currentList.map((student, idx) => (
                         <tr
                           key={student._id}
                           className="hover:bg-slate-50/50 transition-colors"
@@ -327,8 +386,18 @@ export default function EnrollmentManage() {
                           <td className="px-6 py-3 font-medium text-slate-800">
                             {student.firstName} {student.lastName}
                           </td>
-                          <td className="px-6 py-3 text-slate-500">
-                            {student.email}
+                          <td className="px-6 py-3">
+                            {activeTab === "eligible" ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
+                                <ClockIcon className="w-3 h-3" />
+                                รอยืนยัน
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                                <CheckCircleIcon className="w-3 h-3" />
+                                ยืนยันแล้ว
+                              </span>
+                            )}
                           </td>
                           <td className="px-6 py-3 text-center">
                             <button
@@ -348,14 +417,19 @@ export default function EnrollmentManage() {
 
               {/* Footer Stats */}
               <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 text-sm text-slate-500 flex items-center justify-between">
-                <span>
-                  รวม {offeringDetail.students?.length || 0} /{" "}
-                  {offeringDetail.maxStudents} คน
-                </span>
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    รอยืนยัน {eligibleList.length} คน
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    ยืนยันแล้ว {enrolledList.length} คน
+                  </span>
+                </div>
                 <span
                   className={`font-medium ${
-                    (offeringDetail.students?.length || 0) >=
-                    offeringDetail.maxStudents
+                    totalOccupied >= offeringDetail.maxStudents
                       ? "text-red-600"
                       : "text-emerald-600"
                   }`}
@@ -363,8 +437,7 @@ export default function EnrollmentManage() {
                   ว่าง{" "}
                   {Math.max(
                     0,
-                    offeringDetail.maxStudents -
-                      (offeringDetail.students?.length || 0),
+                    offeringDetail.maxStudents - totalOccupied,
                   )}{" "}
                   ที่นั่ง
                 </span>
@@ -374,7 +447,7 @@ export default function EnrollmentManage() {
         </div>
       </div>
 
-      {/* ===== Enroll Modal ===== */}
+      {/* ===== Enroll (Pre-assign) Modal ===== */}
       {showEnrollModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
@@ -383,9 +456,14 @@ export default function EnrollmentManage() {
           />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-800">
-                เพิ่มนักศึกษา
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">
+                  จัดนักศึกษา (Pre-assign)
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  นักศึกษาจะต้องยืนยันผ่าน Shopping Cart เอง
+                </p>
+              </div>
               <button
                 onClick={() => setShowEnrollModal(false)}
                 className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
@@ -421,13 +499,19 @@ export default function EnrollmentManage() {
                       {enrollResult.summary?.added > 0 && (
                         <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 rounded-xl text-sm text-emerald-700">
                           <CheckCircleIcon className="w-4 h-4" />
-                          เพิ่มสำเร็จ {enrollResult.summary.added} คน
+                          จัดสำเร็จ {enrollResult.summary.added} คน
                         </div>
                       )}
-                      {enrollResult.summary?.alreadyExists > 0 && (
+                      {enrollResult.summary?.alreadyEligible > 0 && (
                         <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 rounded-xl text-sm text-amber-700">
                           <ExclamationTriangleIcon className="w-4 h-4" />
-                          มีอยู่แล้ว {enrollResult.summary.alreadyExists} คน
+                          จัดไว้แล้ว {enrollResult.summary.alreadyEligible} คน
+                        </div>
+                      )}
+                      {enrollResult.summary?.alreadyEnrolled > 0 && (
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 rounded-xl text-sm text-blue-700">
+                          <CheckCircleIcon className="w-4 h-4" />
+                          ลงทะเบียนแล้ว {enrollResult.summary.alreadyEnrolled} คน
                         </div>
                       )}
                       {enrollResult.summary?.notFound > 0 && (
@@ -457,10 +541,10 @@ export default function EnrollmentManage() {
                 <button
                   onClick={handleEnroll}
                   disabled={enrolling || !enrollInput.trim()}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 rounded-xl shadow-lg shadow-emerald-500/20 disabled:opacity-50 transition-all"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all"
                 >
                   <ArrowUpTrayIcon className="w-4 h-4" />
-                  {enrolling ? "กำลังเพิ่ม..." : "เพิ่มนักศึกษา"}
+                  {enrolling ? "กำลังจัด..." : "จัดนักศึกษา"}
                 </button>
               </div>
             </div>

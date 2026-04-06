@@ -67,8 +67,16 @@ const courseOfferingSchema = new mongoose.Schema(
       },
     ],
 
-    // รายชื่อนักศึกษาที่ลงทะเบียน
+    // รายชื่อนักศึกษาที่ลงทะเบียนยืนยันแล้ว
     students: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    // รายชื่อนักศึกษาที่ทะเบียนจัดให้ (รอยืนยัน — Shopping Cart)
+    eligibleStudents: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -110,21 +118,34 @@ courseOfferingSchema.index(
 courseOfferingSchema.index({ instructor: 1 });
 courseOfferingSchema.index({ academicYear: 1, semester: 1 });
 courseOfferingSchema.index({ students: 1 });
+courseOfferingSchema.index({ eligibleStudents: 1 });
 courseOfferingSchema.index({ registrationOpen: 1 });
 
-// Virtual: จำนวนนักศึกษาปัจจุบัน
+// Virtual: จำนวนนักศึกษาปัจจุบัน (enrolled + eligible)
 courseOfferingSchema.virtual("studentCount").get(function () {
+  return (this.students?.length || 0) + (this.eligibleStudents?.length || 0);
+});
+
+// Virtual: จำนวนที่ enrolled จริง
+courseOfferingSchema.virtual("enrolledCount").get(function () {
   return this.students?.length || 0;
 });
 
-// Virtual: ที่นั่งว่าง
+// Virtual: จำนวนที่ eligible (รอยืนยัน)
+courseOfferingSchema.virtual("eligibleCount").get(function () {
+  return this.eligibleStudents?.length || 0;
+});
+
+// Virtual: ที่นั่งว่าง (คิดจากทั้ง enrolled + eligible)
 courseOfferingSchema.virtual("availableSeats").get(function () {
-  return Math.max(0, this.maxStudents - (this.students?.length || 0));
+  const total = (this.students?.length || 0) + (this.eligibleStudents?.length || 0);
+  return Math.max(0, this.maxStudents - total);
 });
 
 // Virtual: เต็มหรือยัง
 courseOfferingSchema.virtual("isFull").get(function () {
-  return this.students?.length >= this.maxStudents;
+  const total = (this.students?.length || 0) + (this.eligibleStudents?.length || 0);
+  return total >= this.maxStudents;
 });
 
 // Ensure virtuals are included

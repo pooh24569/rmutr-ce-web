@@ -1,19 +1,34 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { RefreshCw, BookOpen, User, MapPin, Clock, Users, ChevronRight } from "lucide-react";
 import api from "@/lib/api";
 import StudentHeader from "@/components/student/StudentHeader";
+import RegistrationSuccess from "@/components/student/RegistrationSuccess";
 
 const MyClasses = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [classes, setClasses] = useState([]);
+    const [totalCredits, setTotalCredits] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         fetchMyClasses();
+
+        // Show full-screen success page if redirected from Registration
+        if (searchParams.get("registered") === "true") {
+            setShowSuccess(true);
+            // Clean URL immediately so refresh doesn't re-trigger
+            setSearchParams({}, { replace: true });
+        }
     }, []);
+
+    const handleDismissSuccess = () => {
+        setShowSuccess(false);
+    };
 
     const fetchMyClasses = async () => {
         try {
@@ -22,6 +37,7 @@ const MyClasses = () => {
             const { data: response } = await api.get("/student-registration/my-courses");
             if (response.success) {
                 setClasses(response.data.courses || []);
+                setTotalCredits(response.data.totalCredits || 0);
             }
         } catch (err) {
             console.error("Error fetching classes:", err);
@@ -33,22 +49,10 @@ const MyClasses = () => {
 
     const getDayLabel = (day) => {
         const days = {
-            // CourseOffering format
-            mon: "จันทร์",
-            tue: "อังคาร",
-            wed: "พุธ",
-            thu: "พฤหัส",
-            fri: "ศุกร์",
-            sat: "เสาร์",
-            sun: "อาทิตย์",
-            // Class format (backward compat)
-            monday: "จันทร์",
-            tuesday: "อังคาร",
-            wednesday: "พุธ",
-            thursday: "พฤหัส",
-            friday: "ศุกร์",
-            saturday: "เสาร์",
-            sunday: "อาทิตย์",
+            mon: "จันทร์", tue: "อังคาร", wed: "พุธ",
+            thu: "พฤหัส", fri: "ศุกร์", sat: "เสาร์", sun: "อาทิตย์",
+            monday: "จันทร์", tuesday: "อังคาร", wednesday: "พุธ",
+            thursday: "พฤหัส", friday: "ศุกร์", saturday: "เสาร์", sunday: "อาทิตย์",
         };
         return days[day] || day;
     };
@@ -62,6 +66,7 @@ const MyClasses = () => {
         "from-teal-500 to-teal-600",
     ];
 
+    // ─── Loading State ───────────────────────────────────────────────────
     if (loading) {
         return (
             <div className="flex flex-col h-full">
@@ -76,17 +81,28 @@ const MyClasses = () => {
         );
     }
 
+    // ─── Full-screen Registration Success Page ───────────────────────────
+    if (showSuccess && classes.length > 0) {
+        return (
+            <RegistrationSuccess
+                classes={classes}
+                totalCredits={totalCredits}
+                onDismiss={handleDismissSuccess}
+            />
+        );
+    }
+
+    // ─── Normal Class List View ──────────────────────────────────────────
     return (
         <div className="flex flex-col h-full">
             <StudentHeader title="MY CLASSES" />
 
             <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
-                {}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-800">รายวิชา</h2>
+                        <h2 className="text-xl font-bold text-gray-800">รายวิชาที่ลงทะเบียน</h2>
                         <p className="text-sm text-gray-500">
-                            ลงทะเบียนแล้ว {classes.length} วิชา
+                            ลงทะเบียนแล้ว {classes.length} วิชา • {totalCredits} หน่วยกิต
                         </p>
                     </div>
                     <button
@@ -126,7 +142,6 @@ const MyClasses = () => {
                                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-100 group"
                                 onClick={() => navigate(`/student/homework/class/${cls._id}`)}
                             >
-                                {}
                                 <div className={`bg-gradient-to-r ${COLORS[index % COLORS.length]} p-5 relative`}>
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
@@ -144,7 +159,6 @@ const MyClasses = () => {
                                     <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
                                 </div>
 
-                                {}
                                 <div className="p-4 space-y-3">
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <User className="w-4 h-4 text-gray-400" />
@@ -190,3 +204,4 @@ const MyClasses = () => {
 };
 
 export default MyClasses;
+

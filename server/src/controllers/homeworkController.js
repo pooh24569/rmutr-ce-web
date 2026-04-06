@@ -67,6 +67,7 @@ export const getMyHomework = async (req, res) => {
     // Find offerings where student is enrolled
     const enrolledOfferings = await CourseOffering.find({
       students: studentId,
+      status: { $ne: "cancelled" },
     }).select("_id");
     const offeringIds = enrolledOfferings.map((o) => o._id);
 

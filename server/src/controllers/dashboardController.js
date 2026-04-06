@@ -14,7 +14,10 @@ export const getTeacherDashboard = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const offerings = await CourseOffering.find({ instructor: teacherId })
+    const offerings = await CourseOffering.find({
+      instructor: teacherId,
+      status: { $ne: "cancelled" },
+    })
       .populate("course", "courseCode courseNameTH")
       .populate("students", "_id")
       .lean();
@@ -136,7 +139,9 @@ export const getAdminDashboard = async (req, res) => {
         stats.admins += item.count;
     });
 
-    stats.totalClasses = await CourseOffering.countDocuments();
+    stats.totalClasses = await CourseOffering.countDocuments({
+      status: { $ne: "cancelled" },
+    });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

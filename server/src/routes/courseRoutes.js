@@ -9,6 +9,7 @@ import {
   getCourseOfferingById,
   createCourseOffering,
   updateCourseOffering,
+  deleteCourseOffering,
   toggleRegistration,
   getInstructors,
   enrollStudentsToOffering,
@@ -105,6 +106,13 @@ router.delete(
   "/offerings/:id/students/:studentId",
   requireRole(...REGISTRAR_ROLES),
   removeStudentFromOffering,
+);
+
+// Delete/Cancel offering (Soft delete — central_registrar + admin only)
+router.delete(
+  "/offerings/:id",
+  requireRole("central_registrar", "admin", "superadmin"),
+  deleteCourseOffering,
 );
 
 export default router;

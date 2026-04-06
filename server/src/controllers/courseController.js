@@ -24,6 +24,9 @@ export const getAllCourses = async (req, res) => {
 
     if (status) {
       query.status = status;
+    } else {
+      // Default: แสดงเฉพาะที่ active (ซ่อน soft-deleted / inactive)
+      query.status = "active";
     }
 
     if (search) {
@@ -252,7 +255,10 @@ export const getCourseOfferings = async (req, res) => {
     const { academicYear, semester, course, instructor, registrationOpen } =
       req.query;
 
-    const query = {};
+    const query = {
+      // Default: ไม่แสดง offerings ที่ถูก cancelled (soft-deleted)
+      status: { $ne: "cancelled" },
+    };
 
     if (academicYear) query.academicYear = academicYear;
     if (semester) query.semester = semester;
@@ -470,7 +476,9 @@ export const getInstructors = async (req, res) => {
 // ===== Enrollment Management =====
 
 /**
- * Enroll students to a course offering
+ * Pre-assign students to a course offering (push to eligibleStudents)
+ * Faculty Registrar ใช้จัดนักศึกษาเข้ากลุ่มเรียน — ยังไม่ enroll จริง
+ * นักศึกษาต้องยืนยันผ่าน Registration.jsx (Shopping Cart) เอง
  */
 export const enrollStudentsToOffering = async (req, res) => {
   try {
@@ -496,41 +504,58 @@ export const enrollStudentsToOffering = async (req, res) => {
     const students = await User.find({
       role: "student",
       $or: [
-        { _id: { $in: studentIds.filter((id) => id.match(/^[0-9a-fA-F]{24}$/)) } },
+        { _id: { $in: studentIds.filter((sid) => sid.match(/^[0-9a-fA-F]{24}$/)) } },
         { username: { $in: studentIds } },
       ],
     });
 
-    const results = { added: [], alreadyExists: [], notFound: [] };
+    const results = { added: [], alreadyEligible: [], alreadyEnrolled: [], notFound: [] };
 
     const foundUsernames = students.map((s) => s.username);
     const foundIds = students.map((s) => s._id.toString());
 
     results.notFound = studentIds.filter(
-      (id) => !foundUsernames.includes(id) && !foundIds.includes(id),
+      (sid) => !foundUsernames.includes(sid) && !foundIds.includes(sid),
     );
 
     for (const student of students) {
-      const alreadyEnrolled = offering.students.some(
-        (s) => s.toString() === student._id.toString(),
-      );
+      const sid = student._id.toString();
 
-      if (alreadyEnrolled) {
-        results.alreadyExists.push({
+      // ตรวจว่า enroll แล้วหรือยัง
+      const isEnrolled = offering.students.some(
+        (s) => s.toString() === sid,
+      );
+      if (isEnrolled) {
+        results.alreadyEnrolled.push({
           username: student.username,
           name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
         });
-      } else {
-        offering.students.push(student._id);
-        results.added.push({
-          username: student.username,
-          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
-        });
+        continue;
       }
+
+      // ตรวจว่า eligible อยู่แล้วหรือยัง
+      const isEligible = offering.eligibleStudents.some(
+        (s) => s.toString() === sid,
+      );
+      if (isEligible) {
+        results.alreadyEligible.push({
+          username: student.username,
+          name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        });
+        continue;
+      }
+
+      // เพิ่มเข้า eligibleStudents
+      offering.eligibleStudents.push(student._id);
+      results.added.push({
+        username: student.username,
+        name: `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+      });
     }
 
-    // Check capacity
-    if (offering.students.length > offering.maxStudents) {
+    // Check capacity (enrolled + eligible combined)
+    const totalOccupied = offering.students.length + offering.eligibleStudents.length;
+    if (totalOccupied > offering.maxStudents) {
       return res.status(400).json({
         success: false,
         message: `จำนวนนักศึกษาเกินจำนวนที่นั่ง (สูงสุด ${offering.maxStudents} คน)`,
@@ -541,30 +566,32 @@ export const enrollStudentsToOffering = async (req, res) => {
 
     res.json({
       success: true,
-      message: `เพิ่มนักศึกษาสำเร็จ ${results.added.length} คน`,
+      message: `จัดนักศึกษาสำเร็จ ${results.added.length} คน`,
       data: {
         added: results.added,
-        alreadyExists: results.alreadyExists,
+        alreadyEligible: results.alreadyEligible,
+        alreadyEnrolled: results.alreadyEnrolled,
         notFound: results.notFound,
         summary: {
           total: studentIds.length,
           added: results.added.length,
-          alreadyExists: results.alreadyExists.length,
+          alreadyEligible: results.alreadyEligible.length,
+          alreadyEnrolled: results.alreadyEnrolled.length,
           notFound: results.notFound.length,
         },
       },
     });
   } catch (error) {
-    console.error("Enroll students error:", error);
+    console.error("Pre-assign students error:", error);
     res.status(500).json({
       success: false,
-      message: "เกิดข้อผิดพลาดในการลงทะเบียนนักศึกษา",
+      message: "เกิดข้อผิดพลาดในการจัดนักศึกษา",
     });
   }
 };
 
 /**
- * Remove student from course offering
+ * Remove student from course offering (ลบจากทั้ง eligible + enrolled)
  */
 export const removeStudentFromOffering = async (req, res) => {
   try {
@@ -578,7 +605,11 @@ export const removeStudentFromOffering = async (req, res) => {
       });
     }
 
+    // ลบจากทั้ง 2 arrays
     offering.students = offering.students.filter(
+      (s) => s.toString() !== studentId,
+    );
+    offering.eligibleStudents = offering.eligibleStudents.filter(
       (s) => s.toString() !== studentId,
     );
     await offering.save();
@@ -658,7 +689,8 @@ export const getCourseOfferingById = async (req, res) => {
         ],
       })
       .populate("instructor", "firstName lastName email username")
-      .populate("students", "username email firstName lastName");
+      .populate("students", "username email firstName lastName")
+      .populate("eligibleStudents", "username email firstName lastName");
 
     if (!offering) {
       return res.status(404).json({
@@ -710,6 +742,49 @@ export const getMyTeachingOfferings = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "เกิดข้อผิดพลาดในการดึงข้อมูลรายวิชาที่สอน",
+    });
+  }
+};
+
+/**
+ * Delete/Cancel course offering (Soft delete)
+ * ถ้ามี students (enrolled) อยู่ → ไม่ให้ลบ
+ * ถ้ามีแค่ eligibleStudents → ลบ eligible ออกแล้ว cancel
+ */
+export const deleteCourseOffering = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const offering = await CourseOffering.findById(id);
+    if (!offering) {
+      return res.status(404).json({
+        success: false,
+        message: "ไม่พบกลุ่มเรียน",
+      });
+    }
+
+    // Guard: ไม่ให้ลบถ้ามีนักศึกษา enrolled อยู่
+    if (offering.students.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `ไม่สามารถยกเลิกกลุ่มเรียนได้ — มีนักศึกษาลงทะเบียนแล้ว ${offering.students.length} คน กรุณาลบนักศึกษาออกก่อน`,
+      });
+    }
+
+    // Clear eligible students ถ้ามี
+    offering.eligibleStudents = [];
+    offering.status = "cancelled";
+    await offering.save();
+
+    res.json({
+      success: true,
+      message: "ยกเลิกกลุ่มเรียนสำเร็จ",
+    });
+  } catch (error) {
+    console.error("Delete offering error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการยกเลิกกลุ่มเรียน",
     });
   }
 };

@@ -3,6 +3,7 @@ import {
   PlusIcon,
   MagnifyingGlassIcon,
   PencilSquareIcon,
+  TrashIcon,
   XMarkIcon,
   UserGroupIcon,
   AcademicCapIcon,
@@ -178,6 +179,18 @@ export default function CourseOfferingManage() {
       fetchOfferings();
     } catch (err) {
       console.error("Toggle error:", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("ต้องการยกเลิกกลุ่มเรียนนี้ใช่หรือไม่?")) return;
+    try {
+      const res = await registrarService.deleteCourseOffering(id);
+      if (res.success) {
+        fetchOfferings();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "เกิดข้อผิดพลาด");
     }
   };
 
@@ -358,6 +371,14 @@ export default function CourseOfferingManage() {
                   >
                     <PencilSquareIcon className="w-4 h-4" />
                     แก้ไข
+                  </button>
+                  <button
+                    onClick={() => handleDelete(o._id)}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="ยกเลิกกลุ่มเรียน"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                    ยกเลิก
                   </button>
                 </div>
               </div>

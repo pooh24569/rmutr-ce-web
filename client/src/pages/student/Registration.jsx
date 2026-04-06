@@ -85,7 +85,7 @@ const Registration = () => {
     );
     const totalCost = totalCredits * COST_PER_CREDIT;
 
-    // ─── Fetch Courses ──────────────────────────────────────────────────
+    // ─── Fetch Courses (eligible + already enrolled) ────────────────────
     const handleFetchCourses = useCallback(async () => {
         try {
             setFetching(true);
@@ -94,9 +94,13 @@ const Registration = () => {
                 const offerings = response.data || [];
                 setCourses(offerings);
 
-                // Pre-select courses that student is already enrolled in
+                // Pre-select:
+                // - courses already enrolled → selected + locked
+                // - courses eligible → pre-selected for convenience
                 const preSelected = new Set(
-                    offerings.filter((c) => c.isEnrolled).map((c) => c._id)
+                    offerings
+                        .filter((c) => c.isEnrolled || c.isEligible)
+                        .map((c) => c._id)
                 );
                 setSelectedIds(preSelected);
                 setStep("select");
@@ -111,6 +115,9 @@ const Registration = () => {
 
     // ─── Toggle Selection ───────────────────────────────────────────────
     const handleToggle = (course) => {
+        // Don't allow toggling already-enrolled courses
+        if (course.isEnrolled) return;
+
         const id = course._id;
         const credits = course.course?.credits || 0;
 
@@ -142,56 +149,41 @@ const Registration = () => {
         return totalCredits + credits > MAX_CREDITS;
     };
 
-    // ─── Confirm Registration ───────────────────────────────────────────
+    // ─── Confirm Registration (Batch — Shopping Cart checkout) ──────────
     const handleConfirmRegistration = async () => {
-        if (selectedCourses.length === 0) {
-            toast.error("กรุณาเลือกอย่างน้อย 1 วิชา");
+        // Only confirm courses that are eligible (not yet enrolled)
+        const toConfirm = selectedCourses.filter((c) => c.isEligible && !c.isEnrolled);
+
+        if (toConfirm.length === 0) {
+            toast.info("ไม่มีวิชาใหม่ที่ต้องยืนยัน (อาจลงทะเบียนหมดแล้ว)");
             return;
         }
 
         try {
             setEnrolling(true);
 
-            // Enroll each selected course that isn't already enrolled
-            const toEnroll = selectedCourses.filter((c) => !c.isEnrolled);
-            // Drop courses that were pre-selected but now deselected
-            const toDrop = courses.filter(
-                (c) => c.isEnrolled && !selectedIds.has(c._id)
-            );
+            // Batch confirm via new API — no popup, direct call
+            const { data: response } = await api.post("/student-registration/confirm", {
+                offeringIds: toConfirm.map((c) => c._id),
+            });
 
-            const enrollPromises = toEnroll.map((c) =>
-                api.post("/student-registration/enroll", { offeringId: c._id })
-                    .catch((err) => ({
-                        error: true,
-                        name: c.course?.courseNameTH || c.course?.courseCode,
-                        message: err.response?.data?.message,
-                    }))
-            );
-            const dropPromises = toDrop.map((c) =>
-                api.delete(`/student-registration/drop/${c._id}`)
-                    .catch((err) => ({
-                        error: true,
-                        name: c.course?.courseNameTH || c.course?.courseCode,
-                        message: err.response?.data?.message,
-                    }))
-            );
+            if (response.success) {
+                const { confirmed, failed } = response.data;
 
-            const results = await Promise.all([...enrollPromises, ...dropPromises]);
-            const errors = results.filter((r) => r?.error);
-
-            if (errors.length > 0) {
-                errors.forEach((e) => toast.error(`${e.name}: ${e.message}`));
-                if (errors.length < results.length) {
-                    toast.success("ลงทะเบียนบางวิชาสำเร็จ");
+                if (failed && failed.length > 0) {
+                    failed.forEach((f) =>
+                        toast.error(`${f.courseCode}: ${f.reason}`)
+                    );
                 }
-            } else {
-                toast.success("ลงทะเบียนสำเร็จทุกวิชา! 🎉");
-                setTimeout(() => navigate("/student/my-classes"), 1500);
+
+                // Redirect immediately — pass query param for success banner
+                navigate("/student/myclasses?registered=true");
             }
         } catch (err) {
             console.error("Error:", err);
-            toast.error("เกิดข้อผิดพลาดในการลงทะเบียน");
-        } finally {
+            toast.error(
+                err.response?.data?.message || "เกิดข้อผิดพลาดในการลงทะเบียน"
+            );
             setEnrolling(false);
         }
     };
@@ -249,7 +241,7 @@ const Registration = () => {
                             ) : (
                                 <Download className="w-6 h-6" />
                             )}
-                            {fetching ? "กำลังดึงข้อมูล..." : "ดึงรายวิชา"}
+                            {fetching ? "กำลังดึงข้อมูล..." : "ดึงรายวิชาที่จัดให้"}
                         </button>
                     </div>
                 </div>
@@ -274,7 +266,7 @@ const Registration = () => {
                             <div>
                                 <h1 className="text-xl font-bold text-gray-900">เลือกรายวิชา</h1>
                                 <p className="text-sm text-gray-500">
-                                    ทิกเลือกวิชาที่ต้องการลงทะเบียน
+                                    ทิกเลือกวิชาที่ต้องการลงทะเบียน (วิชาที่ทะเบียนจัดให้)
                                 </p>
                             </div>
                         </div>
@@ -354,25 +346,28 @@ const Registration = () => {
                     {filteredCourses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                             <BookOpen className="w-16 h-16 mb-4 text-gray-300" />
-                            <p className="text-lg font-medium">ไม่พบวิชา</p>
+                            <p className="text-lg font-medium">ไม่พบวิชาที่จัดให้</p>
+                            <p className="text-sm text-gray-400">ทะเบียนยังไม่ได้จัดวิชาให้คุณ หรือคุณลงทะเบียนครบแล้ว</p>
                         </div>
                     ) : (
                         <div className="space-y-3 pb-20">
                             {filteredCourses.map((c) => {
                                 const isSelected = selectedIds.has(c._id);
                                 const exceedsLimit = wouldExceedLimit(c);
-                                const isFull = c.isFull && !c.isEnrolled;
-                                const isDisabled = (!isSelected && exceedsLimit) || isFull;
+                                const isFull = c.isFull && !c.isEnrolled && !c.isEligible;
+                                const isDisabled = c.isEnrolled || (!isSelected && exceedsLimit) || isFull;
 
                                 return (
                                     <label
                                         key={c._id}
                                         className={`flex items-start gap-4 p-4 bg-white rounded-xl border-2 cursor-pointer transition-all ${
-                                            isSelected
-                                                ? "border-red-500 bg-red-50/30 shadow-sm"
-                                                : isDisabled
-                                                    ? "border-gray-200 opacity-50 cursor-not-allowed"
-                                                    : "border-gray-200 hover:border-red-300 hover:shadow-sm"
+                                            c.isEnrolled
+                                                ? "border-emerald-400 bg-emerald-50/30 opacity-75 cursor-default"
+                                                : isSelected
+                                                    ? "border-red-500 bg-red-50/30 shadow-sm"
+                                                    : isDisabled
+                                                        ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                                        : "border-gray-200 hover:border-red-300 hover:shadow-sm"
                                         }`}
                                     >
                                         {/* Checkbox */}
@@ -401,8 +396,13 @@ const Registration = () => {
                                                             Sec {c.section}
                                                         </span>
                                                         {c.isEnrolled && (
-                                                            <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                                                                ลงทะเบียนแล้ว
+                                                            <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">
+                                                                ✓ ลงทะเบียนแล้ว
+                                                            </span>
+                                                        )}
+                                                        {c.isEligible && !c.isEnrolled && (
+                                                            <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
+                                                                จัดไว้ให้
                                                             </span>
                                                         )}
                                                         {isFull && (
@@ -436,13 +436,10 @@ const Registration = () => {
                                                         ห้อง {c.schedule[0].room}
                                                     </span>
                                                 )}
-                                                <span className="text-gray-400">
-                                                    {c.students?.length || 0}/{c.maxStudents} คน
-                                                </span>
                                             </div>
 
                                             {/* Warning for credit limit */}
-                                            {!isSelected && exceedsLimit && (
+                                            {!isSelected && exceedsLimit && !c.isEnrolled && (
                                                 <div className="flex items-center gap-1.5 mt-2 text-xs text-orange-600">
                                                     <AlertTriangle className="w-3.5 h-3.5" />
                                                     เลือกไม่ได้ — เกิน {MAX_CREDITS} หน่วยกิต
@@ -506,6 +503,10 @@ const Registration = () => {
             timeSlots.push(`${String(h).padStart(2, "0")}:00`);
         }
 
+        // Count new vs existing
+        const newCourses = selectedCourses.filter((c) => c.isEligible && !c.isEnrolled);
+        const alreadyEnrolledCourses = selectedCourses.filter((c) => c.isEnrolled);
+
         return (
             <div className="flex flex-col h-full bg-gray-50">
                 {/* Header */}
@@ -556,6 +557,16 @@ const Registration = () => {
                                             <span className="text-sm font-medium text-gray-900 truncate">
                                                 {c.course?.courseNameTH || c.course?.courseNameEN}
                                             </span>
+                                            {c.isEnrolled && (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                                                    ลงแล้ว
+                                                </span>
+                                            )}
+                                            {c.isEligible && !c.isEnrolled && (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+                                                    ใหม่
+                                                </span>
+                                            )}
                                         </div>
                                         <p className="text-xs text-gray-400 mt-0.5">
                                             Sec {c.section}
@@ -632,6 +643,22 @@ const Registration = () => {
                                 <span className="text-gray-600">จำนวนหน่วยกิต</span>
                                 <span className="font-medium text-gray-900">{totalCredits} หน่วยกิต</span>
                             </div>
+                            {alreadyEnrolledCourses.length > 0 && (
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">ลงทะเบียนแล้ว</span>
+                                    <span className="font-medium text-emerald-600">
+                                        {alreadyEnrolledCourses.length} วิชา ({alreadyEnrolledCourses.reduce((s, c) => s + (c.course?.credits || 0), 0)} หน่วยกิต)
+                                    </span>
+                                </div>
+                            )}
+                            {newCourses.length > 0 && (
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">ลงทะเบียนใหม่</span>
+                                    <span className="font-medium text-amber-600">
+                                        {newCourses.length} วิชา ({newCourses.reduce((s, c) => s + (c.course?.credits || 0), 0)} หน่วยกิต)
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-600">ค่าหน่วยกิต (ต่อหน่วยกิต)</span>
                                 <span className="font-medium text-gray-900">{COST_PER_CREDIT.toLocaleString()} บาท</span>
@@ -654,7 +681,12 @@ const Registration = () => {
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
                     <div className="flex items-center justify-between max-w-4xl mx-auto">
                         <div>
-                            <p className="text-sm text-gray-500">ทั้งหมด {selectedCourses.length} วิชา • {totalCredits} หน่วยกิต</p>
+                            <p className="text-sm text-gray-500">
+                                ทั้งหมด {selectedCourses.length} วิชา • {totalCredits} หน่วยกิต
+                                {newCourses.length > 0 && (
+                                    <span className="text-amber-600 font-medium"> (ใหม่ {newCourses.length})</span>
+                                )}
+                            </p>
                             <p className="text-lg font-extrabold text-gray-900">฿{totalCost.toLocaleString()}</p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -667,7 +699,7 @@ const Registration = () => {
                             </button>
                             <button
                                 onClick={handleConfirmRegistration}
-                                disabled={enrolling}
+                                disabled={enrolling || newCourses.length === 0}
                                 className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                             >
                                 {enrolling ? (
@@ -675,7 +707,7 @@ const Registration = () => {
                                 ) : (
                                     <CheckCircle2 className="w-5 h-5" />
                                 )}
-                                {enrolling ? "กำลังลงทะเบียน..." : "ยืนยันลงทะเบียน"}
+                                {enrolling ? "กำลังลงทะเบียน..." : `ยืนยันลงทะเบียน (${newCourses.length} วิชาใหม่)`}
                             </button>
                         </div>
                     </div>

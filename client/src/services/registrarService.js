@@ -49,6 +49,11 @@ export const updateCourseOffering = async (id, offeringData) => {
   return data;
 };
 
+export const deleteCourseOffering = async (id) => {
+  const { data } = await api.delete(`/courses/offerings/${id}`);
+  return data;
+};
+
 export const toggleRegistration = async (id) => {
   const { data } = await api.patch(`/courses/offerings/${id}/toggle-registration`);
   return data;

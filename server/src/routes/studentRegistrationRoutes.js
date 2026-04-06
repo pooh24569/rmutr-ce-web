@@ -4,6 +4,7 @@ import {
   getMyRegisteredCourses,
   enrollCourse,
   dropCourse,
+  confirmRegistration,
   getAcademicRecords,
   addAcademicRecord,
 } from "../controllers/studentRegistrationController.js";
@@ -28,6 +29,9 @@ router.post("/enroll", requireRole("student"), enrollCourse);
 
 // Drop a course
 router.delete("/drop/:offeringId", requireRole("student"), dropCourse);
+
+// Confirm registration — Shopping Cart batch checkout
+router.post("/confirm", requireRole("student"), confirmRegistration);
 
 // ===== Academic Records (8-year tracking) =====
 
