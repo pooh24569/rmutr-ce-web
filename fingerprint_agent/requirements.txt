@@ -1,0 +1,17 @@
+# ===================================================================
+# 📦 Python Local Agent — Dependencies
+# ===================================================================
+#
+# ติดตั้ง: pip install -r requirements.txt
+#
+# ทุก package เป็น open-source / ฟรี 100%
+# ===================================================================
+
+# WebSocket server สำหรับสื่อสารกับ React
+websockets>=12.0
+
+# Image processing (แปลง raw fingerprint data เป็น PNG)
+Pillow>=10.0
+
+# สำหรับ colored console output (optional แต่ช่วย debug)
+colorama>=0.4.6

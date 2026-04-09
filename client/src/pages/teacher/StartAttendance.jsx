@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { sessionService } from "@/services/sessionService";
+import FingerprintPanel from "./components/FingerprintPanel";
 
 const StartAttendance = () => {
     const { classId: offeringId } = useParams();
@@ -338,7 +339,13 @@ const StartAttendance = () => {
                         </div>
                     </div>
 
-                    {}
+                    {/* 🔷 Fingerprint Scanner Panel */}
+                    <FingerprintPanel
+                        sessionId={activeSession._id}
+                        onCheckInSuccess={refreshAttendances}
+                    />
+
+                    {/* รายชื่อนักศึกษา */}
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-100">
                             <h2 className="text-lg font-semibold text-gray-800">

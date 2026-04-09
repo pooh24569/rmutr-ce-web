@@ -27,6 +27,7 @@ import parentRoutes from "./routes/parentRoutes.js";
 import academicRoutes from "./routes/academicRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import studentRegistrationRoutes from "./routes/studentRegistrationRoutes.js";
+import fingerprintRoutes from "./routes/fingerprintRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -155,6 +156,7 @@ app.use("/api/parent", parentRoutes);
 app.use("/api/academic", academicRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/student-registration", studentRegistrationRoutes);
+app.use("/api/fingerprint", checkInLimiter, fingerprintRoutes);
 
 app.use((req, res) => {
   logger.warn(`404 - Route not found: ${req.method} ${req.originalUrl}`);
