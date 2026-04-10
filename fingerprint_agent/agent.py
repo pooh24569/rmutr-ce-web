@@ -1,13 +1,17 @@
 """
 ===================================================================
-🌐 agent.py — Fingerprint Local WebSocket Agent
+🌐 agent.py — Fingerprint Local WebSocket Agent (Cross-Platform)
 ===================================================================
 
-WebSocket Server ที่รันบนเครื่องอาจารย์ (Windows)
-เชื่อมระหว่าง U.are.U 4500 Scanner กับ React App
+WebSocket Server เชื่อมระหว่าง U.are.U 4500 Scanner กับ React App
+รองรับทั้ง Windows (winbio.dll) และ Linux (libfprint)
+
+Auto-detect OS:
+  Windows → scanner_winbio.py (WinBio API)
+  Linux   → scanner_linux.py  (libfprint)
 
 สถาปัตยกรรม:
-[U.are.U 4500] → [scanner_winbio.py] → [agent.py ws://localhost:8765] → [React]
+[U.are.U 4500] → [OS driver] → [agent.py ws://localhost:8765] → [React]
 
 Commands ที่รับจาก React (JSON):
 ┌──────────────────────────────────────────────────────────┐
@@ -17,19 +21,9 @@ Commands ที่รับจาก React (JSON):
 │ { "action": "stop_continuous" }  → หยุดสแกนต่อเนื่อง    │
 └──────────────────────────────────────────────────────────┘
 
-Response ที่ส่งกลับ React (JSON):
-┌──────────────────────────────────────────────────────────┐
-│ { "type": "status", "connected": true, "device": "..." }│
-│ { "type": "captured", "image": "base64...", "size": 123 }│
-│ { "type": "error", "message": "..." }                    │
-│ { "type": "info", "message": "..." }                     │
-└──────────────────────────────────────────────────────────┘
-
 การใช้งาน:
-1. เปิด Command Prompt ด้วยสิทธิ์ Administrator
-2. cd fingerprint_agent
-3. pip install -r requirements.txt
-4. python agent.py
+  Windows: เปิด CMD (Admin) → python agent.py
+  Linux:   source venv/bin/activate → python agent.py
 
 ===================================================================
 """
@@ -45,7 +39,18 @@ from datetime import datetime
 import websockets
 
 from config import WS_HOST, WS_PORT, CONTINUOUS_INTERVAL, LOG_LEVEL
-from scanner_winbio import FingerprintScanner
+
+# ===================================================================
+# Auto-detect OS → เลือก scanner module อัตโนมัติ
+# ===================================================================
+if sys.platform == "win32":
+    from scanner_winbio import FingerprintScanner
+    PLATFORM_NAME = "Windows (WinBio)"
+elif sys.platform == "linux":
+    from scanner_linux import FingerprintScanner
+    PLATFORM_NAME = "Linux (libfprint)"
+else:
+    raise RuntimeError(f"❌ ไม่รองรับ OS: {sys.platform} (รองรับเฉพาะ Windows และ Linux)")
 
 # ===================================================================
 # Logging Setup
@@ -321,7 +326,7 @@ async def main():
     print("=" * 60)
     print(f"📡 WebSocket: ws://{WS_HOST}:{WS_PORT}")
     print(f"🐍 Python:    {sys.version.split()[0]}")
-    print(f"💻 Platform:  {sys.platform}")
+    print(f"💻 Platform:  {PLATFORM_NAME}")
     print("=" * 60)
     print()
 

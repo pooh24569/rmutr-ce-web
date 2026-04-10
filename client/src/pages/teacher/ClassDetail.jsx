@@ -7,6 +7,8 @@ import {
     Clock,
     MapPin,
     Play,
+    Fingerprint,
+    CheckCircle2,
 } from "lucide-react";
 import api from "@/lib/api";
 
@@ -16,6 +18,9 @@ const ClassDetail = () => {
 
     const [classData, setClassData] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Fingerprint enrollment status
+    const [enrolledStudents, setEnrolledStudents] = useState(new Set());
 
     useEffect(() => {
         fetchOfferingDetail();
@@ -27,11 +32,37 @@ const ClassDetail = () => {
             const { data: response } = await api.get(`/courses/offerings/${offeringId}`);
             if (response.success) {
                 setClassData(response.data);
+
+                // ตรวจสอบสถานะ enrollment ลายนิ้วมือ
+                if (response.data.students?.length > 0) {
+                    checkFingerprintStatus(response.data.students);
+                }
             }
         } catch (error) {
             console.error("Error:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const checkFingerprintStatus = async (students) => {
+        try {
+            const studentIds = students.map((s) => s._id);
+            const { data: response } = await api.post(
+                "/fingerprint/status/bulk",
+                { studentIds },
+            );
+            if (response.success) {
+                const enrolled = new Set(
+                    response.data
+                        .filter((s) => s.enrolled)
+                        .map((s) => s.studentId),
+                );
+                setEnrolledStudents(enrolled);
+            }
+        } catch (error) {
+            // ฝั่ง fingerprint service อาจยังไม่พร้อม — ไม่ต้องแสดง error
+            console.log("Fingerprint status check skipped:", error.message);
         }
     };
 
@@ -60,6 +91,10 @@ const ClassDetail = () => {
             </div>
         );
     }
+
+    const enrolledCount = classData.students?.filter((s) =>
+        enrolledStudents.has(s._id),
+    ).length || 0;
 
     return (
         <div className="p-6 space-y-6">
@@ -97,7 +132,7 @@ const ClassDetail = () => {
             </div>
 
             {}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {}
                 <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
@@ -144,6 +179,21 @@ const ClassDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* 🔷 Fingerprint Enrollment Status Card */}
+                <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                            <Fingerprint className="w-5 h-5 text-indigo-500" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500">ลงทะเบียนนิ้ว</p>
+                            <p className="text-xl font-bold text-gray-800">
+                                {enrolledCount}/{classData.students?.length || 0}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {}
@@ -151,7 +201,7 @@ const ClassDetail = () => {
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h2 className="text-lg font-semibold text-gray-800">รายชื่อนักศึกษา</h2>
                     <p className="text-sm text-gray-500 mt-1">
-                        จัดการนักศึกษาโดยทะเบียนคณะ (Faculty Registrar)
+                        กดปุ่ม 👆 เพื่อลงทะเบียนลายนิ้วมือ
                     </p>
                 </div>
 
@@ -163,27 +213,48 @@ const ClassDetail = () => {
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-100">
-                        {classData.students.map((student, index) => (
-                            <div
-                                key={student._id}
-                                className="flex items-center px-6 py-3 hover:bg-gray-50"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <span className="w-8 text-center text-sm text-gray-400">
-                                        {index + 1}
-                                    </span>
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                                        {student.firstName?.charAt(0) || student.username?.charAt(0) || "?"}
+                        {classData.students.map((student, index) => {
+                            const isEnrolled = enrolledStudents.has(student._id);
+
+                            return (
+                                <div
+                                    key={student._id}
+                                    className="flex items-center justify-between px-6 py-3 hover:bg-gray-50"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <span className="w-8 text-center text-sm text-gray-400">
+                                            {index + 1}
+                                        </span>
+                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                                            {student.firstName?.charAt(0) || student.username?.charAt(0) || "?"}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-gray-800">
+                                                {student.firstName} {student.lastName}
+                                            </p>
+                                            <p className="text-sm text-gray-500">{student.username}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium text-gray-800">
-                                            {student.firstName} {student.lastName}
-                                        </p>
-                                        <p className="text-sm text-gray-500">{student.username}</p>
-                                    </div>
+
+                                    {/* 🔷 Fingerprint Enroll Button */}
+                                    {isEnrolled ? (
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-lg">
+                                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                            <span className="text-xs font-medium text-emerald-600">
+                                                ลงทะเบียนแล้ว
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
+                                            <Fingerprint className="w-4 h-4 text-gray-400" />
+                                            <span className="text-xs font-medium text-gray-400">
+                                                ยังไม่ลงทะเบียน
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

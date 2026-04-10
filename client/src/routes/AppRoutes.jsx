@@ -57,6 +57,7 @@ import CourseManage from "@/pages/registrar/CourseManage";
 import CourseOfferingManage from "@/pages/registrar/CourseOfferingManage";
 import EnrollmentManage from "@/pages/registrar/EnrollmentManage";
 import ScheduleManage from "@/pages/registrar/ScheduleManage";
+import FingerprintEnrollManage from "@/pages/registrar/FingerprintEnrollManage";
 
 import DeptHeadLogin from "@/pages/depthead/DeptHeadLogin";
 import DeptHeadLayout from "@/layouts/DeptHeadLayout";
@@ -141,6 +142,7 @@ export default function AppRoutes() {
               <Route path="offerings" element={<CourseOfferingManage />} />
               <Route path="enrollments" element={<EnrollmentManage />} />
               <Route path="schedule" element={<ScheduleManage />} />
+              <Route path="fingerprint" element={<FingerprintEnrollManage />} />
             </Route>
           </Route>
         </Route>

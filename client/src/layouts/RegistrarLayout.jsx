@@ -10,6 +10,7 @@ import {
     ArrowRightOnRectangleIcon,
     ShieldCheckIcon,
     RectangleStackIcon,
+    FingerPrintIcon,
 } from "@heroicons/react/24/outline";
 
 
@@ -48,6 +49,11 @@ const facultyNav = [
         to: "/registrar/schedule",
         icon: CalendarDaysIcon,
         label: "จัดตารางเรียน",
+    },
+    {
+        to: "/registrar/fingerprint",
+        icon: FingerPrintIcon,
+        label: "ลงทะเบียนลายนิ้วมือ",
     },
 ];
 
