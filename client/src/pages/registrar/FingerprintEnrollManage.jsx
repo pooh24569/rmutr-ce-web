@@ -4,12 +4,9 @@
  * ===================================================================
  *
  * หน้านี้อยู่ใน Registrar (สำนักงานหัวหน้าภาค)
- * ใช้สำหรับ: ลงทะเบียนลายนิ้วมือนักศึกษาทั้งหมด (รวมศูนย์)
+ * กรองนักศึกษาตาม: คณะ → สาขา → ชั้นปี
  *
- * Flow:
- * 1. เลือกกลุ่มเรียน (offering) — dropdown
- * 2. ดูรายชื่อนักศึกษา + สถานะลงทะเบียน
- * 3. กดปุ่ม "ลงทะเบียนนิ้ว" ข้างชื่อ → เปิด FingerprintEnrollDialog
+ * ตัวอย่าง: ปี 1 / คณะวิศวกรรมศาสตร์ / วิศวกรรมคอมพิวเตอร์
  *
  * ===================================================================
  */
@@ -24,72 +21,104 @@ import {
   AlertCircle,
   Loader2,
   Trash2,
+  Building2,
+  GraduationCap,
+  Layers,
 } from "lucide-react";
 import api from "@/lib/api";
-import fingerprintService from "@/services/fingerprintService";
 import FingerprintEnrollDialog from "@/pages/teacher/components/FingerprintEnrollDialog";
 
 const FingerprintEnrollManage = () => {
-  // --- State ---
-  const [offerings, setOfferings] = useState([]);
-  const [selectedOffering, setSelectedOffering] = useState("");
+  // --- Filter State ---
+  const [faculties, setFaculties] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [selectedFaculty, setSelectedFaculty] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+
+  // --- Student List ---
   const [students, setStudents] = useState([]);
-  const [enrolledMap, setEnrolledMap] = useState({}); // { studentId: true }
+  const [enrolledMap, setEnrolledMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Enroll dialog
+  // --- Enroll dialog ---
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-
-  // Delete state
   const [deletingId, setDeletingId] = useState(null);
 
-  // --- โหลดรายวิชาทั้งหมด ---
+  // === โหลดคณะทั้งหมด ===
   useEffect(() => {
-    fetchOfferings();
+    fetchFaculties();
   }, []);
 
-  const fetchOfferings = async () => {
+  const fetchFaculties = async () => {
     try {
-      const { data: response } = await api.get("/courses/offerings/managed");
+      const { data: response } = await api.get("/academic/faculties");
       if (response.success) {
-        setOfferings(response.data || []);
+        setFaculties(response.data || []);
       }
     } catch (error) {
-      console.error("Error fetching offerings:", error);
-      // ลอง endpoint อื่น
-      try {
-        const { data: response } = await api.get("/courses/offerings");
-        if (response.success) {
-          setOfferings(response.data || []);
-        }
-      } catch {
-        console.error("Could not fetch offerings");
-      }
+      console.error("Error fetching faculties:", error);
     }
   };
 
-  // --- โหลดนักศึกษาเมื่อเลือกกลุ่มเรียน ---
+  // === โหลดสาขาเมื่อเลือกคณะ ===
   useEffect(() => {
-    if (selectedOffering) {
-      fetchStudents(selectedOffering);
+    if (selectedFaculty) {
+      fetchDepartments(selectedFaculty);
+    } else {
+      setDepartments([]);
+      setSelectedDepartment("");
+      setStudents([]);
+    }
+  }, [selectedFaculty]);
+
+  const fetchDepartments = async (facultyId) => {
+    try {
+      const { data: response } = await api.get(
+        `/academic/departments/${facultyId}`,
+      );
+      if (response.success) {
+        setDepartments(response.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
+  // === โหลดนักศึกษาเมื่อเลือกสาขา (+ ชั้นปี) ===
+  useEffect(() => {
+    if (selectedDepartment) {
+      fetchStudents();
     } else {
       setStudents([]);
       setEnrolledMap({});
     }
-  }, [selectedOffering]);
+  }, [selectedDepartment, selectedYear]);
 
-  const fetchStudents = async (offeringId) => {
+  const fetchStudents = async () => {
     setLoading(true);
     try {
+      const params = new URLSearchParams({
+        departmentId: selectedDepartment,
+      });
+      if (selectedYear) {
+        params.append("yearLevel", selectedYear);
+      }
+
       const { data: response } = await api.get(
-        `/courses/offerings/${offeringId}`,
+        `/academic/students/filter?${params}`,
       );
-      if (response.success && response.data?.students) {
-        setStudents(response.data.students);
+
+      if (response.success) {
+        setStudents(response.data.students || []);
         // ตรวจสอบสถานะ fingerprint
-        await checkEnrollmentStatus(response.data.students);
+        if (response.data.students?.length > 0) {
+          await checkEnrollmentStatus(response.data.students);
+        } else {
+          setEnrolledMap({});
+        }
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -101,23 +130,22 @@ const FingerprintEnrollManage = () => {
   const checkEnrollmentStatus = async (studentList) => {
     try {
       const studentIds = studentList.map((s) => s._id);
-      const { data: response } = await fingerprintService.getBulkStatus(
+      const { data: response } = await api.post("/fingerprint/status/bulk", {
         studentIds,
-      );
-      if (response?.data) {
+      });
+      if (response.success) {
         const map = {};
-        response.data.forEach((s) => {
+        response.data.students.forEach((s) => {
           if (s.enrolled) map[s.studentId] = true;
         });
         setEnrolledMap(map);
       }
     } catch {
-      // SourceAFIS / fingerprint service ยังไม่พร้อม
       console.log("Fingerprint status check skipped");
     }
   };
 
-  // --- Handlers ---
+  // === Handlers ===
   const handleEnrollClick = (student) => {
     setSelectedStudent(student);
     setDialogOpen(true);
@@ -129,23 +157,22 @@ const FingerprintEnrollManage = () => {
 
   const handleDelete = async (studentId) => {
     if (!window.confirm("ลบลายนิ้วมือของนักศึกษาคนนี้?")) return;
-
     setDeletingId(studentId);
     try {
-      await fingerprintService.delete(studentId);
+      await api.delete(`/fingerprint/${studentId}`);
       setEnrolledMap((prev) => {
         const next = { ...prev };
         delete next[studentId];
         return next;
       });
     } catch (error) {
-      alert(error.message || "ลบไม่สำเร็จ");
+      alert(error?.response?.data?.message || "ลบไม่สำเร็จ");
     } finally {
       setDeletingId(null);
     }
   };
 
-  // --- Filter ---
+  // === Filter ===
   const filteredStudents = students.filter((s) => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
@@ -156,7 +183,7 @@ const FingerprintEnrollManage = () => {
     );
   });
 
-  const enrolledCount = Object.keys(enrolledMap).length;
+  const enrolledCount = students.filter((s) => enrolledMap[s._id]).length;
   const totalCount = students.length;
 
   return (
@@ -172,38 +199,100 @@ const FingerprintEnrollManage = () => {
               ลงทะเบียนลายนิ้วมือ
             </h1>
             <p className="text-sm text-gray-500">
-              สำนักงานหัวหน้าภาค — ลงทะเบียนลายนิ้วมือนักศึกษาแต่ละกลุ่มเรียน
+              สำนักงานหัวหน้าภาค — เลือกคณะ → สาขา → ชั้นปี
             </p>
           </div>
         </div>
       </div>
 
-      {/* Offering Selector */}
+      {/* 🔷 3-Level Filter: คณะ → สาขา → ชั้นปี */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          เลือกกลุ่มเรียน
-        </label>
-        <div className="relative">
-          <select
-            value={selectedOffering}
-            onChange={(e) => setSelectedOffering(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-          >
-            <option value="">-- เลือกกลุ่มเรียน --</option>
-            {offerings.map((o) => (
-              <option key={o._id} value={o._id}>
-                {o.course?.courseCode} — {o.course?.courseNameTH || o.course?.courseNameEN} (Sec {o.section})
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <h2 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-blue-500" />
+          กรองนักศึกษา
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* คณะ */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+              <Building2 className="w-3.5 h-3.5 inline mr-1" />
+              คณะ
+            </label>
+            <div className="relative">
+              <select
+                value={selectedFaculty}
+                onChange={(e) => {
+                  setSelectedFaculty(e.target.value);
+                  setSelectedDepartment("");
+                  setSelectedYear("");
+                }}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                <option value="">-- เลือกคณะ --</option>
+                {faculties.map((f) => (
+                  <option key={f._id} value={f._id}>
+                    {f.nameTH || f.nameEN}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* สาขา */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+              <GraduationCap className="w-3.5 h-3.5 inline mr-1" />
+              สาขาวิชา
+            </label>
+            <div className="relative">
+              <select
+                value={selectedDepartment}
+                onChange={(e) => {
+                  setSelectedDepartment(e.target.value);
+                  setSelectedYear("");
+                }}
+                disabled={!selectedFaculty}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50"
+              >
+                <option value="">-- เลือกสาขา --</option>
+                {departments.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {d.nameTH || d.nameEN}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* ชั้นปี */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+              📚 ชั้นปี
+            </label>
+            <div className="relative">
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                disabled={!selectedDepartment}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50"
+              >
+                <option value="">ทุกชั้นปี</option>
+                <option value="1">ชั้นปี 1</option>
+                <option value="2">ชั้นปี 2</option>
+                <option value="3">ชั้นปี 3</option>
+                <option value="4">ชั้นปี 4</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Stats + Search */}
-      {selectedOffering && (
+      {selectedDepartment && students.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-4">
-          {/* Stats */}
           <div className="flex gap-4">
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-3 flex items-center gap-3">
               <Users className="w-5 h-5 text-blue-500" />
@@ -225,7 +314,6 @@ const FingerprintEnrollManage = () => {
             </div>
           </div>
 
-          {/* Search */}
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -246,8 +334,14 @@ const FingerprintEnrollManage = () => {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
         </div>
-      ) : selectedOffering && filteredStudents.length > 0 ? (
+      ) : selectedDepartment && filteredStudents.length > 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50">
+            <p className="text-xs font-medium text-gray-500">
+              {selectedYear ? `ชั้นปี ${selectedYear}` : "ทุกชั้นปี"} —{" "}
+              {filteredStudents.length} คน
+            </p>
+          </div>
           <div className="divide-y divide-gray-100">
             {filteredStudents.map((student, index) => {
               const isEnrolled = enrolledMap[student._id];
@@ -271,9 +365,18 @@ const FingerprintEnrollManage = () => {
                       <p className="font-medium text-gray-800">
                         {student.firstName} {student.lastName}
                       </p>
-                      <p className="text-sm text-gray-500">
-                        {student.username}
-                      </p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>{student.username}</span>
+                        {student.classInfo && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <span>
+                              ปี {student.classInfo.yearLevel} ห้อง{" "}
+                              {student.classInfo.section}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -316,13 +419,20 @@ const FingerprintEnrollManage = () => {
             })}
           </div>
         </div>
-      ) : selectedOffering && !loading ? (
+      ) : selectedDepartment && !loading ? (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
           <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500">
             {searchTerm
               ? "ไม่พบนักศึกษาที่ค้นหา"
-              : "ยังไม่มีนักศึกษาในกลุ่มเรียนนี้"}
+              : "ไม่พบนักศึกษาในสาขา/ชั้นปีที่เลือก"}
+          </p>
+        </div>
+      ) : !selectedDepartment ? (
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
+          <Layers className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">
+            เลือก คณะ → สาขา เพื่อดูรายชื่อนักศึกษา
           </p>
         </div>
       ) : null}

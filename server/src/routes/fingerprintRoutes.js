@@ -40,7 +40,7 @@ const router = express.Router();
 router.post(
   "/enroll",
   authenticate,
-  authorizeRoles("instructor", "admin", "superadmin"),
+  authorizeRoles("instructor", "faculty_registrar", "admin", "superadmin"),
   enrollFingerprint,
 );
 
@@ -59,7 +59,7 @@ router.post("/identify", identifyAndCheckIn);
 router.post(
   "/verify",
   authenticate,
-  authorizeRoles("instructor", "admin", "superadmin"),
+  authorizeRoles("instructor", "faculty_registrar", "admin", "superadmin"),
   verifyStudent,
 );
 
@@ -69,7 +69,7 @@ router.post(
 router.get(
   "/status/:studentId",
   authenticate,
-  authorizeRoles("instructor", "admin", "superadmin"),
+  authorizeRoles("instructor", "faculty_registrar", "admin", "superadmin"),
   getEnrollmentStatus,
 );
 
@@ -80,7 +80,7 @@ router.get(
 router.post(
   "/status/bulk",
   authenticate,
-  authorizeRoles("instructor", "admin", "superadmin"),
+  authorizeRoles("instructor", "faculty_registrar", "admin", "superadmin"),
   getBulkEnrollmentStatus,
 );
 
@@ -90,7 +90,7 @@ router.post(
 router.delete(
   "/:studentId",
   authenticate,
-  authorizeRoles("instructor", "admin", "superadmin"),
+  authorizeRoles("instructor", "faculty_registrar", "admin", "superadmin"),
   deleteFingerprint,
 );
 

@@ -378,3 +378,96 @@ export const getAvailableInstructors = async (req, res) => {
     });
   }
 };
+
+/**
+ * ===================================================================
+ * ค้นหานักศึกษาตาม ชั้นปี / คณะ / สาขา
+ * ===================================================================
+ *
+ * ใช้สำหรับหน้าลงทะเบียนลายนิ้วมือ
+ * Query: GET /api/academic/students/filter?departmentId=xxx&yearLevel=1&academicYear=2569
+ *
+ * Flow:
+ * 1. ค้นหา StudentClass ที่ตรงกับ department + yearLevel
+ * 2. Populate students → return รายชื่อ
+ */
+export const getStudentsByFilter = async (req, res) => {
+  try {
+    const { departmentId, yearLevel, academicYear } = req.query;
+
+    if (!departmentId) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณาระบุ departmentId",
+      });
+    }
+
+    // สร้าง query
+    const query = {
+      department: departmentId,
+      isActive: true,
+    };
+
+    if (yearLevel) {
+      query.yearLevel = Number(yearLevel);
+    }
+
+    if (academicYear) {
+      query.academicYear = academicYear;
+    }
+
+    // ค้นหา StudentClass + populate students
+    const classes = await StudentClass.find(query)
+      .populate({
+        path: "students",
+        select: "username firstName lastName email profileImage",
+      })
+      .populate("department", "code nameTH")
+      .sort({ yearLevel: 1, section: 1 });
+
+    // รวมนักศึกษาทั้งหมด (ไม่ซ้ำ)
+    const studentMap = new Map();
+    const studentClassInfo = {};
+
+    classes.forEach((cls) => {
+      cls.students.forEach((student) => {
+        const sid = student._id.toString();
+        if (!studentMap.has(sid)) {
+          studentMap.set(sid, student);
+          studentClassInfo[sid] = {
+            yearLevel: cls.yearLevel,
+            section: cls.section,
+            className: cls.displayName,
+            department: cls.department,
+          };
+        }
+      });
+    });
+
+    const students = Array.from(studentMap.values()).map((s) => ({
+      ...s.toObject(),
+      classInfo: studentClassInfo[s._id.toString()],
+    }));
+
+    // เรียงตามชื่อ
+    students.sort((a, b) =>
+      (a.firstName || "").localeCompare(b.firstName || "", "th"),
+    );
+
+    res.json({
+      success: true,
+      data: {
+        students,
+        totalStudents: students.length,
+        classCount: classes.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get students by filter error:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการค้นหานักศึกษา",
+    });
+  }
+};
+

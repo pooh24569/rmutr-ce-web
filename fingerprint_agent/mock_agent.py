@@ -44,14 +44,25 @@ continuous_mode = False
 connected_clients = set()
 
 
+# --- Cached mock fingerprint (ใช้ภาพเดิมทุกครั้งเพื่อให้ match ได้) ---
+_cached_fingerprint = None
+
+
 def create_mock_fingerprint():
     """
     สร้างภาพลายนิ้วมือจำลอง (PNG, grayscale)
-    ใช้สำหรับทดสอบ pipeline ทั้งหมดบน Linux
+    ใช้ภาพเดิมทุกครั้ง → SourceAFIS จะ match ได้
 
     ถ้ามี Pillow → สร้างภาพจำลองที่มีลายวงกลม (คล้ายนิ้วมือ)
     ถ้าไม่มี Pillow → สร้าง raw grayscale bytes
     """
+    global _cached_fingerprint
+    if _cached_fingerprint is not None:
+        return _cached_fingerprint
+
+    # ใช้ seed คงที่ → ให้ผลเหมือนกันทุกครั้ง
+    rng = random.Random(42)
+
     if HAS_PILLOW:
         # สร้างภาพ 300x400 grayscale
         width, height = 300, 400
@@ -61,10 +72,9 @@ def create_mock_fingerprint():
         # วาดวงกลมซ้อนกันจำลองลายนิ้วมือ
         cx, cy = width // 2, height // 2
         for r in range(10, 150, 8):
-            # สุ่มเล็กน้อย ให้แต่ละครั้งไม่เหมือนกัน (จำลองนิ้วคนละคน)
-            offset_x = random.randint(-3, 3)
-            offset_y = random.randint(-3, 3)
-            shade = random.randint(40, 120)
+            offset_x = rng.randint(-3, 3)
+            offset_y = rng.randint(-3, 3)
+            shade = rng.randint(40, 120)
             draw.ellipse(
                 [cx - r + offset_x, cy - r + offset_y,
                  cx + r + offset_x, cy + r + offset_y],
@@ -75,22 +85,22 @@ def create_mock_fingerprint():
         # แปลงเป็น PNG bytes
         buf = io.BytesIO()
         img.save(buf, format="PNG")
-        return buf.getvalue()
+        _cached_fingerprint = buf.getvalue()
     else:
         # ถ้าไม่มี Pillow → สร้าง raw bytes 300x400
         width, height = 300, 400
         pixels = bytearray()
         for y in range(height):
             for x in range(width):
-                # สร้าง pattern วงกลม
                 dx = x - width // 2
                 dy = y - height // 2
                 dist = (dx * dx + dy * dy) ** 0.5
-                # สร้างลายคลื่นวงกลม
                 val = int(128 + 80 * (((dist / 8) % 1) - 0.5))
                 val = max(0, min(255, val))
                 pixels.append(val)
-        return bytes(pixels)
+        _cached_fingerprint = bytes(pixels)
+
+    return _cached_fingerprint
 
 
 def create_response(msg_type, **kwargs):

@@ -44,6 +44,7 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
     lastMessage,
     connect,
     disconnect,
+    capture,
     setOnCapture,
   } = useFingerprintScanner();
 
@@ -62,7 +63,6 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
       setPdpaConsent(false);
       setCapturedImage(null);
       setEnrolling(false);
-      setEnrollResult(null);
       setError("");
     } else {
       disconnect();
@@ -77,6 +77,15 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
   useEffect(() => {
     setOnCapture(handleCapture);
   }, [setOnCapture, handleCapture]);
+
+  // --- Auto-capture เมื่อ scanner พร้อม ---
+  useEffect(() => {
+    if (step === 2 && status === "connected" && !capturedImage) {
+      // หน่วงเล็กน้อยให้ UI อัปเดตก่อน
+      const timer = setTimeout(() => capture(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [step, status, capturedImage, capture]);
 
   // --- ส่งลงทะเบียน ---
   const handleEnroll = async () => {
@@ -94,7 +103,6 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
       });
 
       if (response.success) {
-        setEnrollResult(response);
         setStep(3);
         if (onSuccess) onSuccess(student._id);
       }
@@ -260,6 +268,14 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
                     <p className="text-sm text-gray-400 mt-1">
                       {lastMessage}
                     </p>
+                    {status === "connected" && (
+                      <button
+                        onClick={() => capture()}
+                        className="mt-3 px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        🔄 สแกนอีกครั้ง
+                      </button>
+                    )}
                   </>
                 ) : (
                   <>

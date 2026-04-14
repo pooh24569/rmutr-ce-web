@@ -9,6 +9,7 @@ import {
   getAdvisorHistory,
   addStudentsToClass,
   getAvailableInstructors,
+  getStudentsByFilter,
 } from "../controllers/academicController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
 import {
@@ -29,6 +30,9 @@ router.get("/departments/:facultyId", getDepartmentsByFaculty);
 
 // ===== Class Routes =====
 router.get("/classes/:departmentId", getClassesByDepartment);
+
+// ===== Student Filter (สำหรับหน้าลงทะเบียนลายนิ้วมือ) =====
+router.get("/students/filter", getStudentsByFilter);
 
 // Create class (Dept Head, Admin, Central Registrar)
 router.post(
