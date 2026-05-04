@@ -128,9 +128,11 @@ const fingerprintTemplateSchema = new mongoose.Schema(
 
 // ค้นหา template ตาม student (ใช้ตอน identify)
 // unique compound: นักศึกษา 1 คน ลงทะเบียนนิ้วเดียวกันได้แค่ครั้งเดียว
+// ⭐ ใช้ partialFilterExpression → unique เฉพาะ record ที่ isActive=true
+// ทำให้ soft-deleted records (isActive=false) ไม่บล็อกการลงทะเบียนใหม่
 fingerprintTemplateSchema.index(
   { student: 1, fingerIndex: 1 },
-  { unique: true },
+  { unique: true, partialFilterExpression: { isActive: true } },
 );
 
 // ค้นหาตาม isActive (filter เฉพาะ template ที่ใช้งานอยู่)

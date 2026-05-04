@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     ArrowLeft,
@@ -135,11 +135,32 @@ const StartAttendance = () => {
         }
     };
 
-    const refreshAttendances = () => {
-        if (activeSession) {
-            fetchSessionDetail(activeSession._id);
+    // ⭐ Debounce ref — ป้องกัน refresh ซ้อนกันใน continuous mode
+    const refreshDebounceRef = useRef(null);
+
+    const refreshAttendances = useCallback(() => {
+        if (!activeSession) return;
+
+        // Debounce: ถ้ามี refresh pending อยู่ → เคลียร์ แล้วตั้งใหม่
+        // ลด API calls จาก N ครั้ง → 1 ครั้ง ภายใน 1 วินาที
+        if (refreshDebounceRef.current) {
+            clearTimeout(refreshDebounceRef.current);
         }
-    };
+
+        refreshDebounceRef.current = setTimeout(() => {
+            fetchSessionDetail(activeSession._id);
+            refreshDebounceRef.current = null;
+        }, 1000);
+    }, [activeSession]);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (refreshDebounceRef.current) {
+                clearTimeout(refreshDebounceRef.current);
+            }
+        };
+    }, []);
 
     const getStatusColor = (status) => {
         switch (status) {

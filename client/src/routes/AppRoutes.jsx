@@ -35,6 +35,7 @@ import Profile from "@/pages/student/Profile";
 import ProfileEdit from "@/pages/student/ProfileEdit";
 import Registration from "@/pages/student/Registration";
 import MyClasses from "@/pages/student/MyClasses";
+import Attendance from "@/pages/student/Attendance";
 
 import TeacherLayout from "@/layouts/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/Dashboard";
@@ -100,6 +101,7 @@ export default function AppRoutes() {
               <Route path="profile/edit" element={<ProfileEdit />} />
               <Route path="registration" element={<Registration />} />
               <Route path="myclasses" element={<MyClasses />} />
+              <Route path="attendance" element={<Attendance />} />
             </Route>
           </Route>
 

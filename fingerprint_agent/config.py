@@ -12,7 +12,7 @@ CAPTURE_TIMEOUT_MS = 10000  # 10 วินาที
 
 # --- Continuous Mode ---
 # ระยะเวลาระหว่างการ scan แต่ละครั้ง (วินาที)
-CONTINUOUS_INTERVAL = 0.5
+CONTINUOUS_INTERVAL = 2.5  # ⭐ ต้อง >= 2 วินาทีเพื่อป้องกัน U.are.U 4500 overheating
 
 # --- Image ---
 # DPI ของ U.are.U 4500 (ค่าจาก spec sheet)

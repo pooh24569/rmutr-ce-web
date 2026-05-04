@@ -54,6 +54,7 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
   const [fingerIndex, setFingerIndex] = useState("RIGHT_INDEX");
   const [capturedImage, setCapturedImage] = useState(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
 
   // --- Reset เมื่อเปิด dialog ---
@@ -63,6 +64,7 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
       setPdpaConsent(false);
       setCapturedImage(null);
       setEnrolling(false);
+      setScanning(false);
       setError("");
     } else {
       disconnect();
@@ -72,20 +74,19 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
   // --- รับ fingerprint จาก scanner ---
   const handleCapture = useCallback((captureData) => {
     setCapturedImage(captureData.image);
+    setScanning(false);
   }, []);
 
   useEffect(() => {
     setOnCapture(handleCapture);
   }, [setOnCapture, handleCapture]);
 
-  // --- Auto-capture เมื่อ scanner พร้อม ---
-  useEffect(() => {
-    if (step === 2 && status === "connected" && !capturedImage) {
-      // หน่วงเล็กน้อยให้ UI อัปเดตก่อน
-      const timer = setTimeout(() => capture(), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [step, status, capturedImage, capture]);
+  // --- เริ่มสแกน (user กดปุ่ม) ---
+  const handleStartScan = useCallback(() => {
+    setScanning(true);
+    setCapturedImage(null);
+    capture();
+  }, [capture]);
 
   // --- ส่งลงทะเบียน ---
   const handleEnroll = async () => {
@@ -253,28 +254,38 @@ const FingerprintEnrollDialog = ({ isOpen, onClose, student, onSuccess }) => {
                 {!capturedImage ? (
                   <>
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
-                      {status === "connected" ? (
+                      {scanning ? (
                         <Fingerprint className="w-10 h-10 text-blue-500 animate-pulse" />
+                      ) : status === "connected" ? (
+                        <Fingerprint className="w-10 h-10 text-blue-500" />
                       ) : (
                         <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                       )}
                     </div>
                     <p className="text-gray-600 font-medium">
-                      {status === "connected"
-                        ? "กรุณาวางนิ้วบน Scanner"
+                      {scanning
+                        ? "👆 วางนิ้วบน Scanner แล้วรอสักครู่..."
+                        : status === "connected"
+                        ? "Scanner พร้อมแล้ว"
                         : "กำลังเชื่อมต่อ Scanner..."
                       }
                     </p>
                     <p className="text-sm text-gray-400 mt-1">
                       {lastMessage}
                     </p>
-                    {status === "connected" && (
+                    {status === "connected" && !scanning && (
                       <button
-                        onClick={() => capture()}
-                        className="mt-3 px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                        onClick={handleStartScan}
+                        className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2 mx-auto"
                       >
-                        🔄 สแกนอีกครั้ง
+                        <Fingerprint className="w-5 h-5" />
+                        เริ่มสแกนลายนิ้วมือ
                       </button>
+                    )}
+                    {scanning && (
+                      <p className="text-xs text-blue-400 mt-3 animate-pulse">
+                        รอรับข้อมูลจาก Scanner...
+                      </p>
                     )}
                   </>
                 ) : (

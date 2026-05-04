@@ -16,7 +16,7 @@
  * ===================================================================
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Fingerprint,
   Wifi,
@@ -47,20 +47,38 @@ const FingerprintPanel = ({ sessionId, onCheckInSuccess }) => {
   const [processing, setProcessing] = useState(false);
   const [resultAnimation, setResultAnimation] = useState(""); // 'success' | 'error' | ''
 
+  // ⭐ ใช้ refs แทน state ใน useCallback deps เพื่อป้องกัน re-render loop
+  const processingRef = useRef(false);
+  const onCheckInSuccessRef = useRef(onCheckInSuccess);
+  const sessionIdRef = useRef(sessionId);
+  const animationTimerRef = useRef(null);
+
+  // ซิงค์ refs กับ props/state ล่าสุดเสมอ
+  useEffect(() => { onCheckInSuccessRef.current = onCheckInSuccess; }, [onCheckInSuccess]);
+  useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
+
   /**
    * เมื่อได้ fingerprint จาก scanner → ส่งไป API เพื่อ identify + check-in
+   * ⭐ ใช้ refs สำหรับ guard condition → handleCapture ไม่ต้องสร้างใหม่ทุก render
    */
   const handleCapture = useCallback(
     async (captureData) => {
-      if (!sessionId || processing) return;
+      // ใช้ ref แทน state เพื่อไม่ให้ recreate callback
+      if (!sessionIdRef.current || processingRef.current) return;
 
+      processingRef.current = true;
       setProcessing(true);
       setResult(null);
       setResultAnimation("");
 
+      // เคลียร์ timer เก่า
+      if (animationTimerRef.current) {
+        clearTimeout(animationTimerRef.current);
+      }
+
       try {
         const response = await fingerprintService.identifyAndCheckIn({
-          sessionId,
+          sessionId: sessionIdRef.current,
           imageBase64: captureData.image,
         });
 
@@ -74,31 +92,56 @@ const FingerprintPanel = ({ sessionId, onCheckInSuccess }) => {
           });
           setResultAnimation("success");
 
-          // เรียก callback เพื่ออัปเดตรายชื่อ
-          if (onCheckInSuccess) {
-            onCheckInSuccess();
+          // เรียก callback เพื่ออัปเดตรายชื่อ (ผ่าน ref)
+          if (onCheckInSuccessRef.current) {
+            onCheckInSuccessRef.current();
           }
         }
       } catch (error) {
-        setResult({
-          success: false,
-          message: error.message || "เกิดข้อผิดพลาด",
-        });
-        setResultAnimation("error");
+        const errMsg = error.message || "เกิดข้อผิดพลาด";
+        const errData = error.data;
+
+        // ⭐ ถ้าเป็น "เช็คชื่อแล้ว" → แสดงเป็น info แทน error
+        if (errMsg.includes("เช็คชื่อแล้ว") && errData) {
+          setResult({
+            success: true,
+            student: errData.student,
+            checkInStatus: errData.status,
+            message: `${errData.student?.firstName} ${errData.student?.lastName} — เช็คชื่อไปแล้ว`,
+            alreadyCheckedIn: true,
+          });
+          setResultAnimation("success");
+        } else {
+          setResult({
+            success: false,
+            message: errMsg,
+          });
+          setResultAnimation("error");
+        }
       } finally {
+        processingRef.current = false;
         setProcessing(false);
 
         // ลบ animation หลัง 3 วินาที
-        setTimeout(() => setResultAnimation(""), 3000);
+        animationTimerRef.current = setTimeout(() => setResultAnimation(""), 3000);
       }
     },
-    [sessionId, processing, onCheckInSuccess],
+    [], // ⭐ ไม่มี deps → สร้างครั้งเดียว ใช้ refs อ้างอิงค่าล่าสุด
   );
 
-  // ลงทะเบียน callback สำหรับ auto-submit
+  // ลงทะเบียน callback สำหรับ auto-submit (ทำครั้งเดียว)
   useEffect(() => {
     setOnCapture(handleCapture);
   }, [setOnCapture, handleCapture]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (animationTimerRef.current) {
+        clearTimeout(animationTimerRef.current);
+      }
+    };
+  }, []);
 
   // --- Status LED Colors ---
   const getStatusConfig = () => {
@@ -287,17 +330,23 @@ const FingerprintPanel = ({ sessionId, onCheckInSuccess }) => {
                         {result.student?.username}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className={`
-                            inline-block px-2.5 py-0.5 rounded-full text-xs font-medium
-                            ${result.checkInStatus === "PRESENT"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-amber-100 text-amber-700"
-                            }
-                          `}
-                        >
-                          {result.checkInStatus === "PRESENT" ? "มาเรียน ✅" : "สาย ⚠️"}
-                        </span>
+                        {result.alreadyCheckedIn ? (
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            เช็คชื่อไปแล้ว ℹ️
+                          </span>
+                        ) : (
+                          <span
+                            className={`
+                              inline-block px-2.5 py-0.5 rounded-full text-xs font-medium
+                              ${result.checkInStatus === "PRESENT"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-amber-100 text-amber-700"
+                              }
+                            `}
+                          >
+                            {result.checkInStatus === "PRESENT" ? "มาเรียน ✅" : "สาย ⚠️"}
+                          </span>
+                        )}
                         {result.score && (
                           <span className="text-xs text-gray-400">
                             ความแม่นยำ: {Math.round(result.score)}

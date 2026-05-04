@@ -54,7 +54,7 @@ const ClassDetail = () => {
             );
             if (response.success) {
                 const enrolled = new Set(
-                    response.data
+                    response.data.students
                         .filter((s) => s.enrolled)
                         .map((s) => s.studentId),
                 );

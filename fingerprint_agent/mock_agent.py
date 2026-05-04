@@ -39,6 +39,15 @@ WS_HOST = "localhost"
 WS_PORT = 8765
 CONTINUOUS_INTERVAL = 2.0  # ช้ากว่าตัวจริง เพื่อให้ดู UI ชัดๆ
 
+
+def _wait_for_enter(prompt=""):
+    """
+    Blocking call — รอ user กด Enter ใน terminal
+    ใช้จำลอง "การวางนิ้วบน scanner"
+    """
+    input(prompt)
+    return True
+
 # --- Global State ---
 continuous_mode = False
 connected_clients = set()
@@ -125,11 +134,17 @@ async def handle_status(websocket):
 
 
 async def handle_capture(websocket):
-    """จำลองการสแกน — หน่วงเวลา 1.5 วินาที แล้วส่งภาพจำลอง"""
+    """
+    จำลองการสแกน — รอ user กด Enter ใน terminal (จำลองการวางนิ้ว)
+    ไม่ auto-fire! ต้องมี interaction จึงจะส่ง captured event
+    """
     await websocket.send(create_response("info", message="🧪 [MOCK] กรุณาวางนิ้วบน Scanner..."))
 
-    # จำลองเวลาสแกน
-    await asyncio.sleep(1.5)
+    # ⭐ รอ user กด Enter ใน terminal (แทน asyncio.sleep)
+    # ทำให้ mock agent มีพฤติกรรมเหมือน scanner จริง (blocking จนกว่าจะมี interaction)
+    loop = asyncio.get_event_loop()
+    print("\n⏳ [MOCK] กด Enter เพื่อจำลองการวางนิ้ว...")
+    await loop.run_in_executor(None, _wait_for_enter, "")
 
     raw_data = create_mock_fingerprint()
     image_base64 = base64.b64encode(raw_data).decode("utf-8")
@@ -154,6 +169,7 @@ async def handle_continuous_start(websocket):
     continuous_mode = True
     await websocket.send(create_response("info", message="🔄 [MOCK] เริ่มโหมดสแกนต่อเนื่อง"))
     print("🔄 เริ่ม Continuous Mode (MOCK)")
+    print("   กด Enter ทุกครั้งเพื่อจำลองการวางนิ้ว (พิมพ์ 'stop' เพื่อหยุด)")
 
     try:
         while continuous_mode:
@@ -162,8 +178,17 @@ async def handle_continuous_start(websocket):
                 message="👆 [MOCK] กรุณาวางนิ้ว... (กด Stop เพื่อหยุด)"
             ))
 
-            # จำลองเวลาสแกน
-            await asyncio.sleep(CONTINUOUS_INTERVAL)
+            # ⭐ รอ user กด Enter ใน terminal (แทน asyncio.sleep)
+            loop = asyncio.get_event_loop()
+            print("\n⏳ [MOCK][Continuous] กด Enter เพื่อจำลองการวางนิ้ว...")
+            user_input = await loop.run_in_executor(
+                None, input, ""
+            )
+
+            # ถ้า user พิมพ์ 'stop' → หยุด continuous mode
+            if user_input.strip().lower() == "stop":
+                continuous_mode = False
+                break
 
             if not continuous_mode:
                 break
@@ -180,8 +205,6 @@ async def handle_continuous_start(websocket):
             )
             await websocket.send(response)
             print(f"📤 [MOCK][Continuous] ส่ง data: {len(raw_data)} bytes")
-
-            await asyncio.sleep(0.5)
 
     except websockets.exceptions.ConnectionClosed:
         print("📴 Client ตัดการเชื่อมต่อ")

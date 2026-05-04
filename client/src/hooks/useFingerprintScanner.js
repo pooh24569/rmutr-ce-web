@@ -37,6 +37,7 @@ export function useFingerprintScanner(wsUrl = DEFAULT_WS_URL) {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const onCaptureCallbackRef = useRef(null);
+  const lastCaptureTimeRef = useRef(0); // ⭐ ป้องกัน duplicate captures
 
   /**
    * ลงทะเบียน callback เมื่อ สแกนสำเร็จ
@@ -73,7 +74,15 @@ export function useFingerprintScanner(wsUrl = DEFAULT_WS_URL) {
           const data = JSON.parse(event.data);
 
           switch (data.type) {
-            case "captured":
+            case "captured": {
+              // ⭐ ป้องกัน duplicate capture — ต้องห่างกันอย่างน้อย 1 วินาที
+              const now = Date.now();
+              if (now - lastCaptureTimeRef.current < 1000) {
+                console.log("[FP Hook] Duplicate capture ignored (< 1s interval)");
+                break;
+              }
+              lastCaptureTimeRef.current = now;
+
               // ได้ลายนิ้วมือ!
               setLastCapture({
                 image: data.image,
@@ -94,6 +103,7 @@ export function useFingerprintScanner(wsUrl = DEFAULT_WS_URL) {
                 });
               }
               break;
+            }
 
             case "status":
               setScannerInfo({

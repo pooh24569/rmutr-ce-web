@@ -199,9 +199,18 @@ async def handle_continuous_start(websocket):
                     message="👆 กรุณาวางนิ้ว... (กด Stop เพื่อหยุด)"
                 ))
 
+                # ⭐ เปิด scanner ใหม่ทุกรอบ — ป้องกัน stale device state
+                if not scanner.is_connected:
+                    scanner.open()
+
                 # Capture ใน thread แยก
                 loop = asyncio.get_event_loop()
                 raw_data = await loop.run_in_executor(None, scanner.capture)
+
+                # ⭐ ตรวจสอบ flag อีกครั้งหลัง capture (กรณี stop ระหว่าง capture)
+                if not continuous_mode:
+                    logger.info("⏹️  Continuous mode ถูกหยุดระหว่าง capture — ไม่ส่งผล")
+                    break
 
                 # ส่งผลลัพธ์
                 image_base64 = data_to_base64(raw_data)
@@ -219,13 +228,29 @@ async def handle_continuous_start(websocket):
                 await asyncio.sleep(CONTINUOUS_INTERVAL)
 
             except RuntimeError as e:
-                # Bad capture — ข้ามไป capture ใหม่
+                error_msg = str(e)
+
+                # ⭐ ถ้าถูก stop (scanner ถูกปิด) → ออกจาก loop เงียบๆ
+                if not continuous_mode:
+                    logger.info("⏹️  Continuous mode หยุดแล้ว (scanner closed)")
+                    break
+
                 logger.warning(f"⚠️  Continuous capture warning: {e}")
                 await websocket.send(create_response(
                     "warning",
-                    message=str(e),
+                    message=error_msg,
                 ))
-                await asyncio.sleep(CONTINUOUS_INTERVAL)
+
+                # ⭐ ถ้า overheating → รอนานขึ้นก่อน retry
+                if "overheating" in error_msg.lower():
+                    logger.info("🌡️  Scanner ร้อนเกินไป — รอ 5 วินาที...")
+                    await websocket.send(create_response(
+                        "info",
+                        message="🌡️ Scanner ร้อนเกินไป — รอ 5 วินาทีก่อน scan ต่อ..."
+                    ))
+                    await asyncio.sleep(5)
+                else:
+                    await asyncio.sleep(CONTINUOUS_INTERVAL)
 
     except websockets.exceptions.ConnectionClosed:
         logger.info("📴 Client ตัดการเชื่อมต่อ — หยุด continuous mode")
@@ -238,10 +263,21 @@ async def handle_continuous_start(websocket):
 
 
 async def handle_continuous_stop(websocket):
-    """หยุดโหมดสแกนต่อเนื่อง"""
-    global continuous_mode
+    """หยุดโหมดสแกนต่อเนื่อง — ปิด scanner เพื่อ interrupt capture ที่ค้างอยู่"""
+    global continuous_mode, scanner
 
     continuous_mode = False
+
+    # ⭐ ปิด scanner เพื่อ interrupt blocking capture_sync()
+    # ทำให้ capture thread throw exception → loop จบทันที → ไฟ LED ดับ
+    if scanner and scanner.is_connected:
+        try:
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, scanner.close)
+            logger.info("🔒 ปิด scanner เพื่อหยุด continuous capture")
+        except Exception as e:
+            logger.warning(f"⚠️  ปิด scanner ไม่สำเร็จ: {e}")
+
     await websocket.send(create_response("info", message="⏹️  หยุดสแกนต่อเนื่องแล้ว"))
     logger.info("⏹️  หยุด Continuous Mode (จาก client)")
 
