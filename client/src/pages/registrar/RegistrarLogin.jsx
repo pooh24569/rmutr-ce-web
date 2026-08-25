@@ -137,10 +137,10 @@ export default function RegistrarLogin() {
     };
 
     return (
-        <div className="min-h-screen w-full flex">
+        <div className="min-h-screen w-full flex flex-col lg:flex-row">
             {/* Left Side — Branding */}
             <div
-                className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+                className="hidden lg:flex w-1/2 min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden"
                 style={{
                     background:
                         "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
@@ -209,7 +209,7 @@ export default function RegistrarLogin() {
             </div>
 
             {/* Right Side — Login Form */}
-            <div className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
+            <div className="w-full lg:w-1/2 min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
                 <div className="w-full max-w-sm">
 
 

@@ -97,7 +97,7 @@ export default function AdminProfile() {
         : { label: "Admin", color: "bg-purple-100 text-purple-700" };
 
     return (
-        <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
             {successMsg && (
                 <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
                     <CheckIcon className="w-5 h-5" />

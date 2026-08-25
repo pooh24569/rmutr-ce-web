@@ -5,9 +5,9 @@ export default function StudentHeader({ title, subtitle, breadcrumbs }) {
 
   if (breadcrumbs && breadcrumbs.length > 0) {
     return (
-      <header className="h-16 flex items-center px-8 border-b border-[#dddddd] bg-white">
-        <div>
-          <h1 className="text-xs font-semibold tracking-wide uppercase flex items-center gap-1">
+      <header className="h-14 sm:h-16 flex items-center px-4 sm:px-6 lg:px-8 border-b border-[#dddddd] bg-white">
+        <div className="min-w-0">
+          <h1 className="text-xs font-semibold tracking-wide uppercase flex items-center gap-1 flex-wrap">
             {breadcrumbs.map((crumb, index) => (
               <span key={index} className="flex items-center gap-1">
                 {crumb.link ? (
@@ -37,7 +37,7 @@ export default function StudentHeader({ title, subtitle, breadcrumbs }) {
   }
 
   return (
-    <header className="h-16 flex items-center px-8 border-b border-[#dddddd] bg-white">
+    <header className="h-14 sm:h-16 flex items-center px-4 sm:px-6 lg:px-8 border-b border-[#dddddd] bg-white">
       <div>
         <h1 className="text-xs font-semibold tracking-wide text-[#e62b2b] uppercase">
           {title}

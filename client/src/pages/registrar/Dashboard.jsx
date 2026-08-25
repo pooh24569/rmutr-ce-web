@@ -169,7 +169,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-slate-800">
@@ -185,7 +185,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
                 {statCards.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
@@ -224,7 +224,7 @@ const Dashboard = () => {
                 <h2 className="text-lg font-semibold text-slate-800 mb-4">
                     เมนูด่วน
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {quickActions.map((action, index) => {
                         const Icon = action.icon;
                         const c = colorMap[action.color] || colorMap.blue;

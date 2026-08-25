@@ -110,7 +110,7 @@ const ClassHomework = () => {
         <div className="flex flex-col h-full">
             <StudentHeader title="HOMEWORK" />
 
-            <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
+            <section className="flex-1 px-4 sm:px-6 py-4 sm:py-6 bg-gray-100 overflow-y-auto">
                 {}
                 <div className="flex items-center gap-4 mb-6">
                     <button

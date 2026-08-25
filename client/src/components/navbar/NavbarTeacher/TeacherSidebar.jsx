@@ -55,7 +55,7 @@ const advisorLink = {
     icon: Users
 };
 
-const TeacherSidebar = () => {
+const TeacherSidebar = ({ onNavClick }) => {
     const location = useLocation();
     const { logout, user } = useAuth();
     const { profile, fetchProfile } = useProfile();
@@ -70,13 +70,17 @@ const TeacherSidebar = () => {
         window.location.assign("/login");
     };
 
+    const handleLinkClick = () => {
+        if (onNavClick) onNavClick();
+    };
+
     const displayName = profile?.firstName || user?.firstName || "";
     const displayLastName = profile?.lastName || user?.lastName || "";
     const displayImage = profile?.profileImage;
     const initial = displayName?.charAt(0) || user?.username?.charAt(0) || "T";
 
     return (
-        <aside className="w-64 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] text-white flex flex-col min-h-screen">
+        <aside className="w-64 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] text-white flex flex-col min-h-screen h-full">
             { }
             <div className="h-20 flex items-center px-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -93,6 +97,7 @@ const TeacherSidebar = () => {
             { }
             <Link
                 to="/teacher/profile"
+                onClick={handleLinkClick}
                 className="block px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
             >
                 <div className="flex items-center gap-3">
@@ -129,6 +134,7 @@ const TeacherSidebar = () => {
                         <Link
                             key={item.href}
                             to={item.href}
+                            onClick={handleLinkClick}
                             className={[
                                 "flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-all duration-200",
                                 active

@@ -63,10 +63,10 @@ export default function AdminLogin() {
     };
 
     return (
-        <div className="min-h-screen w-full flex">
+        <div className="min-h-screen w-full flex flex-col lg:flex-row">
             {/* Left Side - Branding & Welcome */}
             <div
-                className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+                className="hidden lg:flex w-1/2 min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden"
                 style={{ background: 'linear-gradient(135deg, #25343F 0%, #1a252d 50%, #0f171c 100%)' }}
             >
                 {/* Decorative circles */}
@@ -122,7 +122,7 @@ export default function AdminLogin() {
 
             {/* Right Side - Login Form */}
             <div
-                className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6"
+                className="w-full lg:w-1/2 min-h-screen flex flex-col items-center justify-center p-6"
                 style={{ background: '#F5E7C6' }}
             >
                 <div className="w-full max-w-sm">

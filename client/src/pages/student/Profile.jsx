@@ -36,7 +36,7 @@ const Profile = () => {
         <div className="flex flex-col h-full">
             <StudentHeader title="MY PROFILE" />
 
-            <section className="flex-1 px-8 py-6 bg-[#e5e5e5] overflow-y-auto">
+            <section className="flex-1 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-[#e5e5e5] overflow-y-auto">
                 {}
                 <StudentIDCard
                     profile={profile}

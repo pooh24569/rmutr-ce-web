@@ -205,7 +205,7 @@ const Registration = () => {
     if (step === "idle") {
         return (
             <div className="flex flex-col h-full bg-gradient-to-br from-slate-50 to-slate-100">
-                <div className="flex-1 flex items-center justify-center p-6">
+                <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
                     <div className="text-center max-w-md">
                         <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-xl shadow-red-500/20">
                             <GraduationCap className="w-12 h-12 text-white" />
@@ -254,7 +254,7 @@ const Registration = () => {
         return (
             <div className="flex flex-col h-full bg-gray-50">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+                <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <button
@@ -287,9 +287,9 @@ const Registration = () => {
                 </header>
 
                 {/* Credit Summary Bar */}
-                <div className="bg-white border-b border-gray-200 px-6 py-3">
+                <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3 sm:gap-6">
                             <div className="flex items-center gap-2">
                                 <ShoppingCart className="w-5 h-5 text-red-500" />
                                 <span className="font-semibold text-gray-800">
@@ -328,7 +328,7 @@ const Registration = () => {
                 </div>
 
                 {/* Search */}
-                <div className="px-6 pt-4 pb-2">
+                <div className="px-4 sm:px-6 pt-4 pb-2">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
@@ -342,7 +342,7 @@ const Registration = () => {
                 </div>
 
                 {/* Course List */}
-                <div className="flex-1 px-6 py-3 overflow-auto">
+                <div className="flex-1 px-4 sm:px-6 py-3 overflow-auto">
                     {filteredCourses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                             <BookOpen className="w-16 h-16 mb-4 text-gray-300" />
@@ -454,7 +454,7 @@ const Registration = () => {
                 </div>
 
                 {/* Mobile Bottom Bar */}
-                <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 z-20">
+                <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-20">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-500">
                             {selectedIds.size} วิชา • {totalCredits}/{MAX_CREDITS} หน่วยกิต
@@ -510,7 +510,7 @@ const Registration = () => {
         return (
             <div className="flex flex-col h-full bg-gray-50">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+                <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <button
@@ -540,7 +540,7 @@ const Registration = () => {
                     </div>
                 </header>
 
-                <div className="flex-1 p-6 overflow-auto space-y-6 pb-32">
+                <div className="flex-1 p-4 sm:p-6 overflow-auto space-y-6 pb-32">
                     {/* 1) Selected Courses Summary */}
                     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">

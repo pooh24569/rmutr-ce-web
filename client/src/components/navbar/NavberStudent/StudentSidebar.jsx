@@ -15,7 +15,7 @@ const studentLinks = [
   { href: "/student/profile", label: "PROFILE" },
 ];
 
-const StudentSidebar = () => {
+const StudentSidebar = ({ onNavClick }) => {
   const location = useLocation();
   const { logout } = useAuth();
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -25,8 +25,12 @@ const StudentSidebar = () => {
     window.location.assign("/login");
   };
 
+  const handleLinkClick = () => {
+    if (onNavClick) onNavClick();
+  };
+
   return (
-    <aside className="w-60 bg-[#f5f5f5] border-r border-[#dddddd] flex flex-col">
+    <aside className="w-60 bg-[#f5f5f5] border-r border-[#dddddd] flex flex-col h-full">
       {}
       <div className="h-20 flex items-center px-6">
         <img
@@ -45,6 +49,7 @@ const StudentSidebar = () => {
             <Link
               key={item.href}
               to={item.href}
+              onClick={handleLinkClick}
               className={[
                 "flex items-center gap-3 px-4 py-2.5 text-sm rounded-md transition-colors",
                 active

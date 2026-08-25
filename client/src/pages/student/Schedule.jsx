@@ -138,7 +138,7 @@ const Schedule = () => {
   return (
     <div className="flex flex-col h-full bg-white">
       { }
-      <header className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
+      <header className="bg-gradient-to-r from-red-600 to-red-500 px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white tracking-wide">
             STUDY SCHEDULE
@@ -154,7 +154,7 @@ const Schedule = () => {
       </header>
 
       { }
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-4 sm:p-6 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -276,6 +276,7 @@ const Schedule = () => {
             { }
             {classes.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
@@ -339,6 +340,7 @@ const Schedule = () => {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
           </div>

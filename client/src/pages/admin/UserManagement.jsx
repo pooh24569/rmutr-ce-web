@@ -220,7 +220,7 @@ export default function UserManagement() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {stats.map((s) => (
                     <div key={s.label} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                         <p className="text-xs text-gray-500 mb-1">{s.label}</p>

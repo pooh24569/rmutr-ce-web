@@ -145,7 +145,7 @@ const HomeworkDetail = () => {
             />
 
             { }
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
                 { }
                 <button
                     onClick={() => navigate("/student/homework")}

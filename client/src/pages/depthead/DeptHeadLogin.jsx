@@ -123,10 +123,10 @@ export default function DeptHeadLogin() {
     };
 
     return (
-        <div className="min-h-screen w-full flex">
+        <div className="min-h-screen w-full flex flex-col lg:flex-row">
             {/* Left Side — Branding */}
             <div
-                className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+                className="hidden lg:flex w-1/2 min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden"
                 style={{
                     background:
                         "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #064e3b 100%)",
@@ -176,7 +176,7 @@ export default function DeptHeadLogin() {
             </div>
 
             {/* Right Side — Login Form */}
-            <div className="w-1/2 min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
+            <div className="w-full lg:w-1/2 min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
                 <div className="w-full max-w-sm">
 
                     <div className="mb-8">

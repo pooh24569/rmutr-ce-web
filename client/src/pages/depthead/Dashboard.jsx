@@ -42,7 +42,7 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
                 <p className="text-slate-500">
@@ -54,7 +54,7 @@ const Dashboard = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
@@ -78,7 +78,7 @@ const Dashboard = () => {
 
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                 <h2 className="text-lg font-semibold text-slate-800 mb-4">เมนูด่วน</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors cursor-pointer">
                         <UserGroupIcon className="w-8 h-8 text-emerald-600 mb-2" />
                         <p className="font-medium text-slate-800">ข้อมูลนักศึกษา</p>

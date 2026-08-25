@@ -175,7 +175,7 @@ const Attendance = () => {
           subtitle={selectedClass.course?.courseNameTH || selectedClass.course?.courseNameEN}
         />
 
-        <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
+        <section className="flex-1 px-4 sm:px-6 py-4 sm:py-6 bg-gray-100 overflow-y-auto">
           {/* Back Button */}
           <button
             onClick={closeDetail}
@@ -309,7 +309,7 @@ const Attendance = () => {
     <div className="flex flex-col h-full">
       <StudentHeader title="ATTENDANCE" />
 
-      <section className="flex-1 px-6 py-6 bg-gray-100 overflow-y-auto">
+      <section className="flex-1 px-4 sm:px-6 py-4 sm:py-6 bg-gray-100 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-800">สถิติการเข้าเรียน</h2>

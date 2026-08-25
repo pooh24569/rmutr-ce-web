@@ -143,7 +143,7 @@ export default function EnrollmentManage() {
 
   // ===== Render =====
   return (
-    <div className="p-6 h-full">
+    <div className="p-4 sm:p-6 h-full">
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         {/* Left Panel — Offering List */}
         <div className="w-full lg:w-96 flex-shrink-0 space-y-4">
@@ -349,6 +349,7 @@ export default function EnrollmentManage() {
                     )}
                   </div>
                 ) : (
+                  <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-slate-50 z-10">
                       <tr className="border-b border-slate-100">
@@ -412,6 +413,7 @@ export default function EnrollmentManage() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 )}
               </div>
 

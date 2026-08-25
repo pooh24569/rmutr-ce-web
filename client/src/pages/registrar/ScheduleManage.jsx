@@ -121,7 +121,7 @@ export default function ScheduleManage() {
 
   // ===== Render =====
   return (
-    <div className="p-6 h-full">
+    <div className="p-4 sm:p-6 h-full">
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         {/* Left Panel — Offering List */}
         <div className="w-full lg:w-96 flex-shrink-0 space-y-4">

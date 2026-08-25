@@ -86,7 +86,7 @@ const TeacherProfile = () => {
     }
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="p-4 sm:p-6 max-w-4xl mx-auto">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 {}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-white">
