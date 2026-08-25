@@ -1,0 +1,39 @@
+# ===================================================================
+# 🐳 Docker Compose — Fingerprint Matcher Service
+# ===================================================================
+#
+# ใช้งาน:
+#   docker-compose up -d           → เริ่ม service
+#   docker-compose logs -f         → ดู logs
+#   docker-compose down            → หยุด service
+#
+# Service จะรันที่ http://localhost:8090
+# Express API เรียกที่ http://localhost:8090/api/...
+#
+# ===================================================================
+
+version: "3.8"
+
+services:
+  fingerprint-matcher:
+    build:
+      context: ./fingerprint_matcher
+      dockerfile: Dockerfile
+    container_name: fingerprint-matcher
+    ports:
+      - "8090:8090"
+    environment:
+      - MATCHER_THRESHOLD=40
+      - MATCHER_SCANNER_DPI=512
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8090/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    # จำกัด resources (SourceAFIS ใช้ CPU ตอน matching)
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M

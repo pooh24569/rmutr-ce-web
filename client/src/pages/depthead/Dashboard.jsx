@@ -1,0 +1,103 @@
+import React from "react";
+import { useAuth } from "@/context/AuthContext";
+import {
+    UserGroupIcon,
+    AcademicCapIcon,
+    DocumentTextIcon,
+    ChartBarIcon,
+} from "@heroicons/react/24/outline";
+
+const Dashboard = () => {
+    const { user } = useAuth();
+
+    const stats = [
+        {
+            label: "นักศึกษาในสาขา",
+            value: "—",
+            icon: UserGroupIcon,
+            bgColor: "bg-emerald-50",
+            iconColor: "text-emerald-600",
+        },
+        {
+            label: "อาจารย์ในสาขา",
+            value: "—",
+            icon: AcademicCapIcon,
+            bgColor: "bg-blue-50",
+            iconColor: "text-blue-600",
+        },
+        {
+            label: "รายวิชาในสาขา",
+            value: "—",
+            icon: DocumentTextIcon,
+            bgColor: "bg-amber-50",
+            iconColor: "text-amber-600",
+        },
+        {
+            label: "อัตราการเข้าเรียนเฉลี่ย",
+            value: "—",
+            icon: ChartBarIcon,
+            bgColor: "bg-purple-50",
+            iconColor: "text-purple-600",
+        },
+    ];
+
+    return (
+        <div className="p-4 sm:p-6 space-y-6">
+            <div>
+                <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+                <p className="text-slate-500">
+                    ยินดีต้อนรับ{" "}
+                    <span className="font-medium text-slate-700">
+                        {user?.firstName || user?.username}
+                    </span>{" "}
+                    — หัวหน้าสาขา
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                {stats.map((stat, index) => {
+                    const Icon = stat.icon;
+                    return (
+                        <div
+                            key={index}
+                            className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-shadow"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-slate-500 mb-1">{stat.label}</p>
+                                    <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+                                </div>
+                                <div className={`w-12 h-12 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
+                                    <Icon className={`w-6 h-6 ${stat.iconColor}`} />
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <h2 className="text-lg font-semibold text-slate-800 mb-4">เมนูด่วน</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-colors cursor-pointer">
+                        <UserGroupIcon className="w-8 h-8 text-emerald-600 mb-2" />
+                        <p className="font-medium text-slate-800">ข้อมูลนักศึกษา</p>
+                        <p className="text-sm text-slate-500 mt-1">ดูข้อมูลนักศึกษาทั้งหมดในสาขา</p>
+                    </div>
+                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer">
+                        <AcademicCapIcon className="w-8 h-8 text-blue-600 mb-2" />
+                        <p className="font-medium text-slate-800">อาจารย์ในสาขา</p>
+                        <p className="text-sm text-slate-500 mt-1">ดูรายชื่ออาจารย์และสถานะ</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 transition-colors cursor-pointer">
+                        <ChartBarIcon className="w-8 h-8 text-purple-600 mb-2" />
+                        <p className="font-medium text-slate-800">รายงานสถิติ</p>
+                        <p className="text-sm text-slate-500 mt-1">ผลการเรียน การเข้าเรียน</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Dashboard;

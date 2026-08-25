@@ -1,0 +1,132 @@
+[
+  {
+    "_id": "693bc3fde9240e55bdb0a64f",
+    "classCode": "CS101",
+    "className": "การเขียนโปรแกรมคอมพิวเตอร์ 1",
+    "section": "01",
+    "description": "",
+    "schedule": [
+      {
+        "day": "monday",
+        "startTime": "09:00",
+        "endTime": "12:00",
+        "room": "IT-301",
+        "_id": "693bc3fde9240e55bdb0a650"
+      }
+    ],
+    "teacher": "69334f762ff4add116ca0034",
+    "students": [
+      "693dc21cad9f02d90b72489c"
+    ],
+    "academicYear": "2567",
+    "semester": "1",
+    "isActive": true,
+    "createdAt": "2025-12-12T07:27:57.101Z",
+    "updatedAt": "2025-12-13T20:20:52.584Z",
+    "isFromRegistration": true
+  },
+  {
+    "_id": "693bc7f8d96b4576b1779fe8",
+    "classCode": "CS102",
+    "className": "การเขียนโปรแกรมคอมพิวเตอร์ 2",
+    "section": "01",
+    "description": "",
+    "schedule": [
+      {
+        "day": "tuesday",
+        "startTime": "13:00",
+        "endTime": "16:00",
+        "room": "IT-302",
+        "_id": "693bc7f8d96b4576b1779fe9"
+      }
+    ],
+    "teacher": "69334f762ff4add116ca0034",
+    "students": [
+      "693dc21cad9f02d90b72489c"
+    ],
+    "academicYear": "2567",
+    "semester": "1",
+    "isActive": true,
+    "isFromRegistration": true,
+    "createdAt": "2025-12-12T07:44:56.948Z",
+    "updatedAt": "2025-12-13T20:20:54.103Z"
+  },
+  {
+    "_id": "693dc2beb7a3dd2ffcefb7cc",
+    "classCode": "MATH201",
+    "className": "คณิตศาสตร์วิศวกรรม",
+    "section": "02",
+    "description": "",
+    "schedule": [
+      {
+        "day": "wednesday",
+        "startTime": "09:00",
+        "endTime": "12:00",
+        "room": "SC-201",
+        "_id": "693dc2beb7a3dd2ffcefb7cd"
+      }
+    ],
+    "teacher": "69334f762ff4add116ca0034",
+    "students": [
+      "693dc21cad9f02d90b72489c"
+    ],
+    "academicYear": "2567",
+    "semester": "1",
+    "isActive": true,
+    "isFromRegistration": false,
+    "createdAt": "2025-12-13T19:47:10.347Z",
+    "updatedAt": "2025-12-13T20:20:55.814Z"
+  },
+  {
+    "_id": "693dc2f4a0b3932fd25341c0",
+    "classCode": "ENG101",
+    "className": "ภาษาอังกฤษเพื่อการสื่อสาร",
+    "section": "03",
+    "description": "",
+    "schedule": [
+      {
+        "day": "thursday",
+        "startTime": "13:00",
+        "endTime": "16:00",
+        "room": "LA-101",
+        "_id": "693dc2f4a0b3932fd25341c1"
+      }
+    ],
+    "teacher": "69334f762ff4add116ca0034",
+    "students": [
+      "693dc21cad9f02d90b72489c"
+    ],
+    "academicYear": "2567",
+    "semester": "1",
+    "isActive": true,
+    "isFromRegistration": false,
+    "createdAt": "2025-12-13T19:48:04.391Z",
+    "updatedAt": "2026-01-15T06:12:14.477Z"
+  },
+  {
+    "_id": "693dc2f4a0b3932fd25341c7",
+    "classCode": "PHY101",
+    "className": "ฟิสิกส์ทั่วไป",
+    "section": "01",
+    "description": "",
+    "schedule": [
+      {
+        "day": "friday",
+        "startTime": "09:00",
+        "endTime": "12:00",
+        "room": "SC-301",
+        "_id": "693dc2f4a0b3932fd25341c8"
+      }
+    ],
+    "teacher": "69334f762ff4add116ca0034",
+    "students": [
+      "693dc21cad9f02d90b72489c"
+    ],
+    "academicYear": "2567",
+    "semester": "1",
+    "isActive": true,
+    "isFromRegistration": false,
+    "createdAt": "2025-12-13T19:48:04.406Z",
+    "updatedAt": "2026-01-14T16:04:22.994Z"
+  }
+]

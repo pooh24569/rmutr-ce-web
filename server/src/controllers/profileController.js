@@ -1,0 +1,97 @@
+import * as profileService from "../services/profileService.js";
+import { createParentAccountsForStudent } from "../services/parentAccountService.js";
+import { successResponse, errorResponse } from "../utils/responseFormatter.js";
+import { logger } from "../utils/logger.js";
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const profile = await profileService.getUserProfile(userId);
+
+    return res.json(successResponse(profile, "Profile retrieved successfully"));
+  } catch (error) {
+    logger.error("Get profile error", { error: error.message });
+    const statusCode = error.statusCode || 500;
+    return res
+      .status(statusCode)
+      .json(errorResponse(error.message || "Failed to get profile"));
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = req.body;
+
+    const updatedUser = await profileService.updateUserProfile(userId, data);
+
+    return res.json(
+      successResponse(updatedUser, "Profile updated successfully")
+    );
+  } catch (error) {
+    logger.error("Update profile error", { error: error.message });
+    const statusCode = error.statusCode || 500;
+    return res
+      .status(statusCode)
+      .json(errorResponse(error.message || "Failed to update profile"));
+  }
+};
+
+export const updateStudentProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = req.body;
+
+    const studentProfile = await profileService.updateStudentProfile(
+      userId,
+      data
+    );
+
+    // Auto-create parent accounts after profile save
+    const parentAccounts = await createParentAccountsForStudent(userId);
+
+    return res.json(
+      successResponse(
+        { studentProfile, parentAccounts },
+        "Student profile updated successfully"
+      )
+    );
+  } catch (error) {
+    logger.error("Update student profile error", { error: error.message });
+    const statusCode = error.statusCode || 500;
+    return res
+      .status(statusCode)
+      .json(errorResponse(error.message || "Failed to update student profile"));
+  }
+};
+
+export const uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { imageData } = req.body;
+
+    if (!imageData) {
+      return res.status(400).json(errorResponse("Image data is required"));
+    }
+
+    const result = await profileService.uploadProfileImage(userId, imageData);
+
+    return res.json(
+      successResponse(result, "Profile image uploaded successfully")
+    );
+  } catch (error) {
+    logger.error("Upload profile image error", { error: error.message });
+    const statusCode = error.statusCode || 500;
+    return res
+      .status(statusCode)
+      .json(errorResponse(error.message || "Failed to upload profile image"));
+  }
+};
+
+export default {
+  getProfile,
+  updateProfile,
+  updateStudentProfile,
+  uploadProfileImage,
+};

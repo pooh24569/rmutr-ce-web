@@ -1,0 +1,156 @@
+[
+  {
+    "_id": "6935a423002d2c899d36ce95",
+    "classId": "6935a322002d2c899d36ce3c",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2025-12-06T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:15",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "1132",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 2,
+      "present": 0,
+      "late": 0,
+      "absent": 2
+    },
+    "createdAt": "2025-12-07T15:58:27.335Z",
+    "updatedAt": "2025-12-07T15:58:47.277Z"
+  },
+  {
+    "_id": "6947bc68fd4eb44811c3ee0b",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2025-12-20T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:15",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2025-12-21T09:22:48.917Z",
+    "updatedAt": "2026-01-14T06:14:54.033Z"
+  },
+  {
+    "_id": "6967365c202e827b4722fe1b",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2026-01-13T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:10",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2026-01-14T06:23:24.626Z",
+    "updatedAt": "2026-01-14T06:23:47.944Z"
+  },
+  {
+    "_id": "69673697202e827b4722fe86",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2026-01-13T17:00:00.000Z",
+    "startTime": "13:25",
+    "lateTime": "13:40",
+    "endTime": "13:55",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2026-01-14T06:24:23.272Z",
+    "updatedAt": "2026-01-14T06:47:54.787Z"
+  },
+  {
+    "_id": "69673fda34d393ca72797fee",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2026-01-13T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:15",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2026-01-14T07:03:54.388Z",
+    "updatedAt": "2026-01-14T15:16:06.539Z"
+  },
+  {
+    "_id": "6967b350e86bb019f60e2af7",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2026-01-13T17:00:00.000Z",
+    "startTime": "10:17",
+    "lateTime": "10:32",
+    "endTime": "10:47",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2026-01-14T15:16:32.062Z",
+    "updatedAt": "2026-01-14T15:18:23.992Z"
+  },
+  {
+    "_id": "69699320a833ab4458a9252c",
+    "classId": "693dc2f4a0b3932fd25341c7",
+    "teacher": "69334f762ff4add116ca0034",
+    "date": "2026-01-15T17:00:00.000Z",
+    "startTime": "09:00",
+    "lateTime": "09:15",
+    "endTime": "09:30",
+    "classEndTime": "12:00",
+    "room": "SC-301",
+    "deviceId": "",
+    "status": "CLOSED",
+    "note": "",
+    "summary": {
+      "totalStudents": 1,
+      "present": 0,
+      "late": 0,
+      "absent": 1
+    },
+    "createdAt": "2026-01-16T01:23:44.066Z",
+    "updatedAt": "2026-01-16T01:23:48.483Z"
+  }
+]
